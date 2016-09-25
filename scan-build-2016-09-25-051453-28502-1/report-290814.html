@@ -1,0 +1,1319 @@
+<!doctype html>
+<html>
+<head>
+<title>../test/cctest/compiler/test-js-typed-lowering.cc</title>
+<style type="text/css">
+ body { color:#000000; background-color:#ffffff }
+ body { font-family:Helvetica, sans-serif; font-size:10pt }
+ h1 { font-size:14pt }
+ .code { border-collapse:collapse; width:100%; }
+ .code { font-family: "Monospace", monospace; font-size:10pt }
+ .code { line-height: 1.2em }
+ .comment { color: green; font-style: oblique }
+ .keyword { color: blue }
+ .string_literal { color: red }
+ .directive { color: darkmagenta }
+ .expansion { display: none; }
+ .macro:hover .expansion { display: block; border: 2px solid #FF0000; padding: 2px; background-color:#FFF0F0; font-weight: normal;   -webkit-border-radius:5px;  -webkit-box-shadow:1px 1px 7px #000;   border-radius:5px;  box-shadow:1px 1px 7px #000; position: absolute; top: -1em; left:10em; z-index: 1 } 
+ .macro { color: darkmagenta; background-color:LemonChiffon; position: relative }
+ .num { width:2.5em; padding-right:2ex; background-color:#eeeeee }
+ .num { text-align:right; font-size:8pt }
+ .num { color:#444444 }
+ .line { padding-left: 1ex; border-left: 3px solid #ccc }
+ .line { white-space: pre }
+ .msg { -webkit-box-shadow:1px 1px 7px #000 }
+ .msg { box-shadow:1px 1px 7px #000 }
+ .msg { -webkit-border-radius:5px }
+ .msg { border-radius:5px }
+ .msg { font-family:Helvetica, sans-serif; font-size:8pt }
+ .msg { float:left }
+ .msg { padding:0.25em 1ex 0.25em 1ex }
+ .msg { margin-top:10px; margin-bottom:10px }
+ .msg { font-weight:bold }
+ .msg { max-width:60em; word-wrap: break-word; white-space: pre-wrap }
+ .msgT { padding:0x; spacing:0x }
+ .msgEvent { background-color:#fff8b4; color:#000000 }
+ .msgControl { background-color:#bbbbbb; color:#000000 }
+ .mrange { background-color:#dfddf3 }
+ .mrange { border-bottom:1px solid #6F9DBE }
+ .PathIndex { font-weight: bold; padding:0px 5px; margin-right:5px; }
+ .PathIndex { -webkit-border-radius:8px }
+ .PathIndex { border-radius:8px }
+ .PathIndexEvent { background-color:#bfba87 }
+ .PathIndexControl { background-color:#8c8c8c }
+ .PathNav a { text-decoration:none; font-size: larger }
+ .CodeInsertionHint { font-weight: bold; background-color: #10dd10 }
+ .CodeRemovalHint { background-color:#de1010 }
+ .CodeRemovalHint { border-bottom:1px solid #6F9DBE }
+ table.simpletable {
+   padding: 5px;
+   font-size:12pt;
+   margin:20px;
+   border-collapse: collapse; border-spacing: 0px;
+ }
+ td.rowname {
+   text-align:right; font-weight:bold; color:#444444;
+   padding-right:2ex; }
+</style>
+</head>
+<body>
+<!-- BUGDESC Value stored to 'effect_use' is never read -->
+
+<!-- BUGTYPE Dead assignment -->
+
+<!-- BUGCATEGORY Dead store -->
+
+<!-- BUGFILE /home/haha/code/v8_5_0/v8/out/../test/cctest/compiler/test-js-typed-lowering.cc -->
+
+<!-- FILENAME test-js-typed-lowering.cc -->
+
+<!-- FUNCTIONNAME TestRemoveToNumberEffects -->
+
+<!-- ISSUEHASHCONTENTOFLINEINCONTEXT ff4ae244c81afbb0b6c57cdbb01111dc -->
+
+<!-- BUGLINE 701 -->
+
+<!-- BUGCOLUMN 9 -->
+
+<!-- BUGPATHLENGTH 1 -->
+
+<!-- BUGMETAEND -->
+<!-- REPORTHEADER -->
+<h3>Bug Summary</h3>
+<table class="simpletable">
+<tr><td class="rowname">File:</td><td>out/../test/cctest/compiler/test-js-typed-lowering.cc</td></tr>
+<tr><td class="rowname">Location:</td><td><a href="#EndPath">line 701, column 9</a></td></tr>
+<tr><td class="rowname">Description:</td><td>Value stored to 'effect_use' is never read</td></tr>
+</table>
+<!-- REPORTSUMMARYEXTRA -->
+<h3>Annotated Source Code</h3>
+<table class="code">
+<tr><td class="num" id="LN1">1</td><td class="line"><span class='comment'>// Copyright 2014 the V8 project authors. All rights reserved.</span></td></tr>
+<tr><td class="num" id="LN2">2</td><td class="line"><span class='comment'>// Use of this source code is governed by a BSD-style license that can be</span></td></tr>
+<tr><td class="num" id="LN3">3</td><td class="line"><span class='comment'>// found in the LICENSE file.</span></td></tr>
+<tr><td class="num" id="LN4">4</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN5">5</td><td class="line"><span class='directive'>#include "src/compilation-dependencies.h"</span></td></tr>
+<tr><td class="num" id="LN6">6</td><td class="line"><span class='directive'>#include "src/compiler/js-graph.h"</span></td></tr>
+<tr><td class="num" id="LN7">7</td><td class="line"><span class='directive'>#include "src/compiler/js-typed-lowering.h"</span></td></tr>
+<tr><td class="num" id="LN8">8</td><td class="line"><span class='directive'>#include "src/compiler/machine-operator.h"</span></td></tr>
+<tr><td class="num" id="LN9">9</td><td class="line"><span class='directive'>#include "src/compiler/node-properties.h"</span></td></tr>
+<tr><td class="num" id="LN10">10</td><td class="line"><span class='directive'>#include "src/compiler/opcodes.h"</span></td></tr>
+<tr><td class="num" id="LN11">11</td><td class="line"><span class='directive'>#include "src/compiler/operator-properties.h"</span></td></tr>
+<tr><td class="num" id="LN12">12</td><td class="line"><span class='directive'>#include "src/compiler/simplified-operator.h"</span></td></tr>
+<tr><td class="num" id="LN13">13</td><td class="line"><span class='directive'>#include "src/compiler/typer.h"</span></td></tr>
+<tr><td class="num" id="LN14">14</td><td class="line"><span class='directive'>#include "test/cctest/cctest.h"</span></td></tr>
+<tr><td class="num" id="LN15">15</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN16">16</td><td class="line"><span class='keyword'>namespace</span> v8 {</td></tr>
+<tr><td class="num" id="LN17">17</td><td class="line"><span class='keyword'>namespace</span> internal {</td></tr>
+<tr><td class="num" id="LN18">18</td><td class="line"><span class='keyword'>namespace</span> compiler {</td></tr>
+<tr><td class="num" id="LN19">19</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN20">20</td><td class="line"><span class='keyword'>class</span> JSTypedLoweringTester : <span class='keyword'>public</span> HandleAndZoneScope {</td></tr>
+<tr><td class="num" id="LN21">21</td><td class="line"> <span class='keyword'>public</span>:</td></tr>
+<tr><td class="num" id="LN22">22</td><td class="line">  <span class='keyword'>explicit</span> JSTypedLoweringTester(<span class='keyword'>int</span> num_parameters = 0)</td></tr>
+<tr><td class="num" id="LN23">23</td><td class="line">      : isolate(main_isolate()),</td></tr>
+<tr><td class="num" id="LN24">24</td><td class="line">        binop(<span class='macro'>NULL<span class='expansion'>__null</span></span>),</td></tr>
+<tr><td class="num" id="LN25">25</td><td class="line">        unop(<span class='macro'>NULL<span class='expansion'>__null</span></span>),</td></tr>
+<tr><td class="num" id="LN26">26</td><td class="line">        javascript(main_zone()),</td></tr>
+<tr><td class="num" id="LN27">27</td><td class="line">        machine(main_zone()),</td></tr>
+<tr><td class="num" id="LN28">28</td><td class="line">        simplified(main_zone()),</td></tr>
+<tr><td class="num" id="LN29">29</td><td class="line">        common(main_zone()),</td></tr>
+<tr><td class="num" id="LN30">30</td><td class="line">        deps(main_isolate(), main_zone()),</td></tr>
+<tr><td class="num" id="LN31">31</td><td class="line">        graph(main_zone()),</td></tr>
+<tr><td class="num" id="LN32">32</td><td class="line">        typer(main_isolate(), &amp;graph),</td></tr>
+<tr><td class="num" id="LN33">33</td><td class="line">        context_node(<span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num" id="LN34">34</td><td class="line">    graph.SetStart(graph.NewNode(common.Start(num_parameters)));</td></tr>
+<tr><td class="num" id="LN35">35</td><td class="line">    graph.SetEnd(graph.NewNode(common.End(1), graph.start()));</td></tr>
+<tr><td class="num" id="LN36">36</td><td class="line">    typer.Run();</td></tr>
+<tr><td class="num" id="LN37">37</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN38">38</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN39">39</td><td class="line">  Isolate* isolate;</td></tr>
+<tr><td class="num" id="LN40">40</td><td class="line">  <span class='keyword'>const</span> Operator* binop;</td></tr>
+<tr><td class="num" id="LN41">41</td><td class="line">  <span class='keyword'>const</span> Operator* unop;</td></tr>
+<tr><td class="num" id="LN42">42</td><td class="line">  JSOperatorBuilder javascript;</td></tr>
+<tr><td class="num" id="LN43">43</td><td class="line">  MachineOperatorBuilder machine;</td></tr>
+<tr><td class="num" id="LN44">44</td><td class="line">  SimplifiedOperatorBuilder simplified;</td></tr>
+<tr><td class="num" id="LN45">45</td><td class="line">  CommonOperatorBuilder common;</td></tr>
+<tr><td class="num" id="LN46">46</td><td class="line">  CompilationDependencies deps;</td></tr>
+<tr><td class="num" id="LN47">47</td><td class="line">  Graph graph;</td></tr>
+<tr><td class="num" id="LN48">48</td><td class="line">  Typer typer;</td></tr>
+<tr><td class="num" id="LN49">49</td><td class="line">  Node* context_node;</td></tr>
+<tr><td class="num" id="LN50">50</td><td class="line">  BinaryOperationHints <span class='keyword'>const</span> hints = BinaryOperationHints::Any();</td></tr>
+<tr><td class="num" id="LN51">51</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN52">52</td><td class="line">  Node* Parameter(Type* t, int32_t index = 0) {</td></tr>
+<tr><td class="num" id="LN53">53</td><td class="line">    Node* n = graph.NewNode(common.Parameter(index), graph.start());</td></tr>
+<tr><td class="num" id="LN54">54</td><td class="line">    NodeProperties::SetType(n, t);</td></tr>
+<tr><td class="num" id="LN55">55</td><td class="line">    <span class='keyword'>return</span> n;</td></tr>
+<tr><td class="num" id="LN56">56</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN57">57</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN58">58</td><td class="line">  Node* UndefinedConstant() {</td></tr>
+<tr><td class="num" id="LN59">59</td><td class="line">    Handle&lt;HeapObject&gt; value = isolate-&gt;factory()-&gt;undefined_value();</td></tr>
+<tr><td class="num" id="LN60">60</td><td class="line">    <span class='keyword'>return</span> graph.NewNode(common.HeapConstant(value));</td></tr>
+<tr><td class="num" id="LN61">61</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN62">62</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN63">63</td><td class="line">  Node* HeapConstant(Handle&lt;HeapObject&gt; constant) {</td></tr>
+<tr><td class="num" id="LN64">64</td><td class="line">    <span class='keyword'>return</span> graph.NewNode(common.HeapConstant(constant));</td></tr>
+<tr><td class="num" id="LN65">65</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN66">66</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN67">67</td><td class="line">  Node* EmptyFrameState(Node* context) {</td></tr>
+<tr><td class="num" id="LN68">68</td><td class="line">    Node* parameters = graph.NewNode(common.StateValues(0));</td></tr>
+<tr><td class="num" id="LN69">69</td><td class="line">    Node* locals = graph.NewNode(common.StateValues(0));</td></tr>
+<tr><td class="num" id="LN70">70</td><td class="line">    Node* stack = graph.NewNode(common.StateValues(0));</td></tr>
+<tr><td class="num" id="LN71">71</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN72">72</td><td class="line">    Node* state_node = graph.NewNode(</td></tr>
+<tr><td class="num" id="LN73">73</td><td class="line">        common.FrameState(BailoutId::None(), OutputFrameStateCombine::Ignore(),</td></tr>
+<tr><td class="num" id="LN74">74</td><td class="line">                          <span class='keyword'>nullptr</span>),</td></tr>
+<tr><td class="num" id="LN75">75</td><td class="line">        parameters, locals, stack, context, UndefinedConstant(), graph.start());</td></tr>
+<tr><td class="num" id="LN76">76</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN77">77</td><td class="line">    <span class='keyword'>return</span> state_node;</td></tr>
+<tr><td class="num" id="LN78">78</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN79">79</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN80">80</td><td class="line">  Node* reduce(Node* node) {</td></tr>
+<tr><td class="num" id="LN81">81</td><td class="line">    JSGraph jsgraph(main_isolate(), &amp;graph, &amp;common, &amp;javascript, &amp;simplified,</td></tr>
+<tr><td class="num" id="LN82">82</td><td class="line">                    &amp;machine);</td></tr>
+<tr><td class="num" id="LN83">83</td><td class="line">    <span class='comment'>// TODO(titzer): mock the GraphReducer here for better unit testing.</span></td></tr>
+<tr><td class="num" id="LN84">84</td><td class="line">    GraphReducer graph_reducer(main_zone(), &amp;graph);</td></tr>
+<tr><td class="num" id="LN85">85</td><td class="line">    JSTypedLowering reducer(&amp;graph_reducer, &amp;deps,</td></tr>
+<tr><td class="num" id="LN86">86</td><td class="line">                            JSTypedLowering::kDeoptimizationEnabled, &amp;jsgraph,</td></tr>
+<tr><td class="num" id="LN87">87</td><td class="line">                            main_zone());</td></tr>
+<tr><td class="num" id="LN88">88</td><td class="line">    Reduction reduction = reducer.Reduce(node);</td></tr>
+<tr><td class="num" id="LN89">89</td><td class="line">    <span class='keyword'>if</span> (reduction.Changed()) <span class='keyword'>return</span> reduction.replacement();</td></tr>
+<tr><td class="num" id="LN90">90</td><td class="line">    <span class='keyword'>return</span> node;</td></tr>
+<tr><td class="num" id="LN91">91</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN92">92</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN93">93</td><td class="line">  Node* start() { <span class='keyword'>return</span> graph.start(); }</td></tr>
+<tr><td class="num" id="LN94">94</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN95">95</td><td class="line">  Node* context() {</td></tr>
+<tr><td class="num" id="LN96">96</td><td class="line">    <span class='keyword'>if</span> (context_node == <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num" id="LN97">97</td><td class="line">      context_node = graph.NewNode(common.Parameter(-1), graph.start());</td></tr>
+<tr><td class="num" id="LN98">98</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN99">99</td><td class="line">    <span class='keyword'>return</span> context_node;</td></tr>
+<tr><td class="num" id="LN100">100</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN101">101</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN102">102</td><td class="line">  Node* control() { <span class='keyword'>return</span> start(); }</td></tr>
+<tr><td class="num" id="LN103">103</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN104">104</td><td class="line">  <span class='keyword'>void</span> CheckBinop(IrOpcode::Value expected, Node* node) {</td></tr>
+<tr><td class="num" id="LN105">105</td><td class="line">    <span class='macro'>CHECK_EQ(expected, node-&gt;opcode())<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (expected<br>), (node-&gt;opcode()), "expected" " " "==" " " "node-&gt;opcode()"<br>)) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 105, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN106">106</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN107">107</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN108">108</td><td class="line">  <span class='keyword'>void</span> CheckBinop(<span class='keyword'>const</span> Operator* expected, Node* node) {</td></tr>
+<tr><td class="num" id="LN109">109</td><td class="line">    <span class='macro'>CHECK_EQ(expected-&gt;opcode(), node-&gt;op()-&gt;opcode())<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (expected<br>-&gt;opcode()), (node-&gt;op()-&gt;opcode()), "expected-&gt;opcode()"<br> " " "==" " " "node-&gt;op()-&gt;opcode()")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 109, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN110">110</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN111">111</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN112">112</td><td class="line">  Node* ReduceUnop(<span class='keyword'>const</span> Operator* op, Type* input_type) {</td></tr>
+<tr><td class="num" id="LN113">113</td><td class="line">    <span class='keyword'>return</span> reduce(Unop(op, Parameter(input_type)));</td></tr>
+<tr><td class="num" id="LN114">114</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN115">115</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN116">116</td><td class="line">  Node* ReduceBinop(<span class='keyword'>const</span> Operator* op, Type* left_type, Type* right_type) {</td></tr>
+<tr><td class="num" id="LN117">117</td><td class="line">    <span class='keyword'>return</span> reduce(Binop(op, Parameter(left_type, 0), Parameter(right_type, 1)));</td></tr>
+<tr><td class="num" id="LN118">118</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN119">119</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN120">120</td><td class="line">  Node* Binop(<span class='keyword'>const</span> Operator* op, Node* left, Node* right) {</td></tr>
+<tr><td class="num" id="LN121">121</td><td class="line">    <span class='comment'>// JS binops also require context, effect, and control</span></td></tr>
+<tr><td class="num" id="LN122">122</td><td class="line">    std::vector&lt;Node*&gt; inputs;</td></tr>
+<tr><td class="num" id="LN123">123</td><td class="line">    inputs.push_back(left);</td></tr>
+<tr><td class="num" id="LN124">124</td><td class="line">    inputs.push_back(right);</td></tr>
+<tr><td class="num" id="LN125">125</td><td class="line">    <span class='keyword'>if</span> (OperatorProperties::HasContextInput(op)) {</td></tr>
+<tr><td class="num" id="LN126">126</td><td class="line">      inputs.push_back(context());</td></tr>
+<tr><td class="num" id="LN127">127</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN128">128</td><td class="line">    <span class='keyword'>for</span> (<span class='keyword'>int</span> i = 0; i &lt; OperatorProperties::GetFrameStateInputCount(op); i++) {</td></tr>
+<tr><td class="num" id="LN129">129</td><td class="line">      inputs.push_back(EmptyFrameState(context()));</td></tr>
+<tr><td class="num" id="LN130">130</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN131">131</td><td class="line">    <span class='keyword'>if</span> (op-&gt;EffectInputCount() &gt; 0) {</td></tr>
+<tr><td class="num" id="LN132">132</td><td class="line">      inputs.push_back(start());</td></tr>
+<tr><td class="num" id="LN133">133</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN134">134</td><td class="line">    <span class='keyword'>if</span> (op-&gt;ControlInputCount() &gt; 0) {</td></tr>
+<tr><td class="num" id="LN135">135</td><td class="line">      inputs.push_back(control());</td></tr>
+<tr><td class="num" id="LN136">136</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN137">137</td><td class="line">    <span class='keyword'>return</span> graph.NewNode(op, <span class='keyword'>static_cast</span>&lt;<span class='keyword'>int</span>&gt;(inputs.size()),</td></tr>
+<tr><td class="num" id="LN138">138</td><td class="line">                         &amp;(inputs.front()));</td></tr>
+<tr><td class="num" id="LN139">139</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN140">140</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN141">141</td><td class="line">  Node* Unop(<span class='keyword'>const</span> Operator* op, Node* input) {</td></tr>
+<tr><td class="num" id="LN142">142</td><td class="line">    <span class='comment'>// JS unops also require context, effect, and control</span></td></tr>
+<tr><td class="num" id="LN143">143</td><td class="line">    <span class='keyword'>if</span> (OperatorProperties::GetFrameStateInputCount(op) &gt; 0) {</td></tr>
+<tr><td class="num" id="LN144">144</td><td class="line">      <span class='macro'>CHECK_EQ(1, OperatorProperties::GetFrameStateInputCount(op))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (1), (OperatorProperties<br>::GetFrameStateInputCount(op)), "1" " " "==" " " "OperatorProperties::GetFrameStateInputCount(op)"<br>)) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 144, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN145">145</td><td class="line">      <span class='keyword'>return</span> graph.NewNode(op, input, context(), EmptyFrameState(context()),</td></tr>
+<tr><td class="num" id="LN146">146</td><td class="line">                           start(), control());</td></tr>
+<tr><td class="num" id="LN147">147</td><td class="line">    } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN148">148</td><td class="line">      <span class='keyword'>return</span> graph.NewNode(op, input, context(), start(), control());</td></tr>
+<tr><td class="num" id="LN149">149</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN150">150</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN151">151</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN152">152</td><td class="line">  Node* UseForEffect(Node* node) {</td></tr>
+<tr><td class="num" id="LN153">153</td><td class="line">    Node* merge = graph.NewNode(common.Merge(1), start());</td></tr>
+<tr><td class="num" id="LN154">154</td><td class="line">    <span class='keyword'>return</span> graph.NewNode(common.EffectPhi(1), node, merge);</td></tr>
+<tr><td class="num" id="LN155">155</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN156">156</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN157">157</td><td class="line">  <span class='keyword'>void</span> CheckEffectInput(Node* effect, Node* use) {</td></tr>
+<tr><td class="num" id="LN158">158</td><td class="line">    <span class='macro'>CHECK_EQ(effect, NodeProperties::GetEffectInput(use))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (effect<br>), (NodeProperties::GetEffectInput(use)), "effect" " " "==" " "<br> "NodeProperties::GetEffectInput(use)")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 158, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN159">159</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN160">160</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN161">161</td><td class="line">  <span class='keyword'>void</span> CheckInt32Constant(int32_t expected, Node* result) {</td></tr>
+<tr><td class="num" id="LN162">162</td><td class="line">    <span class='macro'>CHECK_EQ(IrOpcode::kInt32Constant, result-&gt;opcode())<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (IrOpcode<br>::kInt32Constant), (result-&gt;opcode()), "IrOpcode::kInt32Constant"<br> " " "==" " " "result-&gt;opcode()")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 162, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN163">163</td><td class="line">    <span class='macro'>CHECK_EQ(expected, OpParameter&lt;int32_t&gt;(result))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (expected<br>), (OpParameter&lt;int32_t&gt;(result)), "expected" " " "==" " "<br> "OpParameter&lt;int32_t&gt;(result)")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 163, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN164">164</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN165">165</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN166">166</td><td class="line">  <span class='keyword'>void</span> CheckNumberConstant(<span class='keyword'>double</span> expected, Node* result) {</td></tr>
+<tr><td class="num" id="LN167">167</td><td class="line">    <span class='macro'>CHECK_EQ(IrOpcode::kNumberConstant, result-&gt;opcode())<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (IrOpcode<br>::kNumberConstant), (result-&gt;opcode()), "IrOpcode::kNumberConstant"<br> " " "==" " " "result-&gt;opcode()")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 167, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN168">168</td><td class="line">    <span class='macro'>CHECK_EQ(expected, OpParameter&lt;<span class='keyword'>double</span>&gt;(result))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (expected<br>), (OpParameter&lt;double&gt;(result)), "expected" " " "==" " "<br> "OpParameter&lt;double&gt;(result)")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 168, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN169">169</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN170">170</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN171">171</td><td class="line">  <span class='keyword'>void</span> CheckNaN(Node* result) {</td></tr>
+<tr><td class="num" id="LN172">172</td><td class="line">    <span class='macro'>CHECK_EQ(IrOpcode::kNumberConstant, result-&gt;opcode())<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (IrOpcode<br>::kNumberConstant), (result-&gt;opcode()), "IrOpcode::kNumberConstant"<br> " " "==" " " "result-&gt;opcode()")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 172, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN173">173</td><td class="line">    <span class='keyword'>double</span> value = OpParameter&lt;<span class='keyword'>double</span>&gt;(result);</td></tr>
+<tr><td class="num" id="LN174">174</td><td class="line">    <span class='macro'>CHECK(std::isnan(value))<span class='expansion'>do { if ((__builtin_expect(!!(!(std::isnan(value))), 0))) { V8_Fatal<br>("../test/cctest/compiler/test-js-typed-lowering.cc", 174, "Check failed: %s."<br>, "std::isnan(value)"); } } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN175">175</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN176">176</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN177">177</td><td class="line">  <span class='keyword'>void</span> CheckTrue(Node* result) {</td></tr>
+<tr><td class="num" id="LN178">178</td><td class="line">    CheckHandle(isolate-&gt;factory()-&gt;true_value(), result);</td></tr>
+<tr><td class="num" id="LN179">179</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN180">180</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN181">181</td><td class="line">  <span class='keyword'>void</span> CheckFalse(Node* result) {</td></tr>
+<tr><td class="num" id="LN182">182</td><td class="line">    CheckHandle(isolate-&gt;factory()-&gt;false_value(), result);</td></tr>
+<tr><td class="num" id="LN183">183</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN184">184</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN185">185</td><td class="line">  <span class='keyword'>void</span> CheckHandle(Handle&lt;HeapObject&gt; expected, Node* result) {</td></tr>
+<tr><td class="num" id="LN186">186</td><td class="line">    <span class='macro'>CHECK_EQ(IrOpcode::kHeapConstant, result-&gt;opcode())<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (IrOpcode<br>::kHeapConstant), (result-&gt;opcode()), "IrOpcode::kHeapConstant"<br> " " "==" " " "result-&gt;opcode()")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 186, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN187">187</td><td class="line">    Handle&lt;HeapObject&gt; value = OpParameter&lt;Handle&lt;HeapObject&gt;&gt;(result);</td></tr>
+<tr><td class="num" id="LN188">188</td><td class="line">    <span class='macro'>CHECK_EQ(*expected, *value)<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (*expected<br>), (*value), "*expected" " " "==" " " "*value")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 188, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN189">189</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN190">190</td><td class="line">};</td></tr>
+<tr><td class="num" id="LN191">191</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN192">192</td><td class="line"><span class='keyword'>static</span> Type* kStringTypes[] = {Type::InternalizedString(), Type::OtherString(),</td></tr>
+<tr><td class="num" id="LN193">193</td><td class="line">                               Type::String()};</td></tr>
+<tr><td class="num" id="LN194">194</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN195">195</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN196">196</td><td class="line"><span class='keyword'>static</span> Type* kInt32Types[] = {Type::UnsignedSmall(), Type::Negative32(),</td></tr>
+<tr><td class="num" id="LN197">197</td><td class="line">                              Type::Unsigned31(),    Type::SignedSmall(),</td></tr>
+<tr><td class="num" id="LN198">198</td><td class="line">                              Type::Signed32(),      Type::Unsigned32(),</td></tr>
+<tr><td class="num" id="LN199">199</td><td class="line">                              Type::Integral32()};</td></tr>
+<tr><td class="num" id="LN200">200</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN201">201</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN202">202</td><td class="line"><span class='keyword'>static</span> Type* kNumberTypes[] = {</td></tr>
+<tr><td class="num" id="LN203">203</td><td class="line">    Type::UnsignedSmall(), Type::Negative32(),  Type::Unsigned31(),</td></tr>
+<tr><td class="num" id="LN204">204</td><td class="line">    Type::SignedSmall(),   Type::Signed32(),    Type::Unsigned32(),</td></tr>
+<tr><td class="num" id="LN205">205</td><td class="line">    Type::Integral32(),    Type::MinusZero(),   Type::NaN(),</td></tr>
+<tr><td class="num" id="LN206">206</td><td class="line">    Type::OrderedNumber(), Type::PlainNumber(), Type::Number()};</td></tr>
+<tr><td class="num" id="LN207">207</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN208">208</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN209">209</td><td class="line"><span class='keyword'>static</span> Type* I32Type(<span class='keyword'>bool</span> is_signed) {</td></tr>
+<tr><td class="num" id="LN210">210</td><td class="line">  <span class='keyword'>return</span> is_signed ? Type::Signed32() : Type::Unsigned32();</td></tr>
+<tr><td class="num" id="LN211">211</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN212">212</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN213">213</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN214">214</td><td class="line"><span class='keyword'>static</span> IrOpcode::Value NumberToI32(<span class='keyword'>bool</span> is_signed) {</td></tr>
+<tr><td class="num" id="LN215">215</td><td class="line">  <span class='keyword'>return</span> is_signed ? IrOpcode::kNumberToInt32 : IrOpcode::kNumberToUint32;</td></tr>
+<tr><td class="num" id="LN216">216</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN217">217</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN218">218</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN219">219</td><td class="line"><span class='comment'>// TODO(turbofan): Lowering of StringAdd is disabled for now.</span></td></tr>
+<tr><td class="num" id="LN220">220</td><td class="line"><span class='directive'>#if 0</span></td></tr>
+<tr><td class="num" id="LN221">221</td><td class="line"><span class='macro'>TEST(StringBinops)<span class='expansion'>static void TestStringBinops(); CcTest register_test_StringBinops<br>(TestStringBinops, "../test/cctest/compiler/test-js-typed-lowering.cc"<br>, "StringBinops", __null, true, true); static void TestStringBinops<br>()</span></span> {</td></tr>
+<tr><td class="num" id="LN222">222</td><td class="line">  JSTypedLoweringTester R;</td></tr>
+<tr><td class="num" id="LN223">223</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN224">224</td><td class="line">  <span class='keyword'>for</span> (size_t i = 0; i &lt; <span class='macro'>arraysize(kStringTypes)<span class='expansion'>(sizeof(ArraySizeHelper(kStringTypes)))</span></span>; ++i) {</td></tr>
+<tr><td class="num" id="LN225">225</td><td class="line">    Node* p0 = R.Parameter(kStringTypes[i], 0);</td></tr>
+<tr><td class="num" id="LN226">226</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN227">227</td><td class="line">    <span class='keyword'>for</span> (size_t j = 0; j &lt; <span class='macro'>arraysize(kStringTypes)<span class='expansion'>(sizeof(ArraySizeHelper(kStringTypes)))</span></span>; ++j) {</td></tr>
+<tr><td class="num" id="LN228">228</td><td class="line">      Node* p1 = R.Parameter(kStringTypes[j], 1);</td></tr>
+<tr><td class="num" id="LN229">229</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN230">230</td><td class="line">      Node* add = R.Binop(R.javascript.Add(), p0, p1);</td></tr>
+<tr><td class="num" id="LN231">231</td><td class="line">      Node* r = R.reduce(add);</td></tr>
+<tr><td class="num" id="LN232">232</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN233">233</td><td class="line">      R.CheckBinop(IrOpcode::kStringAdd, r);</td></tr>
+<tr><td class="num" id="LN234">234</td><td class="line">      <span class='macro'>CHECK_EQ(p0, r-&gt;InputAt(0))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (p0), (<br>r-&gt;InputAt(0)), "p0" " " "==" " " "r-&gt;InputAt(0)")) { V8_Fatal<br>("../test/cctest/compiler/test-js-typed-lowering.cc", 234, "Check failed: %s."<br>, _msg-&gt;c_str()); delete _msg; } } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN235">235</td><td class="line">      <span class='macro'>CHECK_EQ(p1, r-&gt;InputAt(1))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (p1), (<br>r-&gt;InputAt(1)), "p1" " " "==" " " "r-&gt;InputAt(1)")) { V8_Fatal<br>("../test/cctest/compiler/test-js-typed-lowering.cc", 235, "Check failed: %s."<br>, _msg-&gt;c_str()); delete _msg; } } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN236">236</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN237">237</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN238">238</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN239">239</td><td class="line"><span class='directive'>#endif</span></td></tr>
+<tr><td class="num" id="LN240">240</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN241">241</td><td class="line"><span class='macro'>TEST(AddNumber1)<span class='expansion'>static void TestAddNumber1(); CcTest register_test_AddNumber1<br>(TestAddNumber1, "../test/cctest/compiler/test-js-typed-lowering.cc"<br>, "AddNumber1", __null, true, true); static void TestAddNumber1<br>()</span></span> {</td></tr>
+<tr><td class="num" id="LN242">242</td><td class="line">  JSTypedLoweringTester R;</td></tr>
+<tr><td class="num" id="LN243">243</td><td class="line">  <span class='keyword'>for</span> (size_t i = 0; i &lt; <span class='macro'>arraysize(kNumberTypes)<span class='expansion'>(sizeof(ArraySizeHelper(kNumberTypes)))</span></span>; ++i) {</td></tr>
+<tr><td class="num" id="LN244">244</td><td class="line">    Node* p0 = R.Parameter(kNumberTypes[i], 0);</td></tr>
+<tr><td class="num" id="LN245">245</td><td class="line">    Node* p1 = R.Parameter(kNumberTypes[i], 1);</td></tr>
+<tr><td class="num" id="LN246">246</td><td class="line">    Node* add = R.Binop(R.javascript.Add(BinaryOperationHints::Any()), p0, p1);</td></tr>
+<tr><td class="num" id="LN247">247</td><td class="line">    Node* r = R.reduce(add);</td></tr>
+<tr><td class="num" id="LN248">248</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN249">249</td><td class="line">    R.CheckBinop(IrOpcode::kNumberAdd, r);</td></tr>
+<tr><td class="num" id="LN250">250</td><td class="line">    <span class='macro'>CHECK_EQ(p0, r-&gt;InputAt(0))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (p0), (<br>r-&gt;InputAt(0)), "p0" " " "==" " " "r-&gt;InputAt(0)")) { V8_Fatal<br>("../test/cctest/compiler/test-js-typed-lowering.cc", 250, "Check failed: %s."<br>, _msg-&gt;c_str()); delete _msg; } } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN251">251</td><td class="line">    <span class='macro'>CHECK_EQ(p1, r-&gt;InputAt(1))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (p1), (<br>r-&gt;InputAt(1)), "p1" " " "==" " " "r-&gt;InputAt(1)")) { V8_Fatal<br>("../test/cctest/compiler/test-js-typed-lowering.cc", 251, "Check failed: %s."<br>, _msg-&gt;c_str()); delete _msg; } } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN252">252</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN253">253</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN254">254</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN255">255</td><td class="line"><span class='macro'>TEST(NumberBinops)<span class='expansion'>static void TestNumberBinops(); CcTest register_test_NumberBinops<br>(TestNumberBinops, "../test/cctest/compiler/test-js-typed-lowering.cc"<br>, "NumberBinops", __null, true, true); static void TestNumberBinops<br>()</span></span> {</td></tr>
+<tr><td class="num" id="LN256">256</td><td class="line">  JSTypedLoweringTester R;</td></tr>
+<tr><td class="num" id="LN257">257</td><td class="line">  <span class='keyword'>const</span> Operator* ops[] = {</td></tr>
+<tr><td class="num" id="LN258">258</td><td class="line">      R.javascript.Add(R.hints),      R.simplified.NumberAdd(),</td></tr>
+<tr><td class="num" id="LN259">259</td><td class="line">      R.javascript.Subtract(R.hints), R.simplified.NumberSubtract(),</td></tr>
+<tr><td class="num" id="LN260">260</td><td class="line">      R.javascript.Multiply(R.hints), R.simplified.NumberMultiply(),</td></tr>
+<tr><td class="num" id="LN261">261</td><td class="line">      R.javascript.Divide(R.hints),   R.simplified.NumberDivide(),</td></tr>
+<tr><td class="num" id="LN262">262</td><td class="line">      R.javascript.Modulus(R.hints),  R.simplified.NumberModulus(),</td></tr>
+<tr><td class="num" id="LN263">263</td><td class="line">  };</td></tr>
+<tr><td class="num" id="LN264">264</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN265">265</td><td class="line">  <span class='keyword'>for</span> (size_t i = 0; i &lt; <span class='macro'>arraysize(kNumberTypes)<span class='expansion'>(sizeof(ArraySizeHelper(kNumberTypes)))</span></span>; ++i) {</td></tr>
+<tr><td class="num" id="LN266">266</td><td class="line">    Node* p0 = R.Parameter(kNumberTypes[i], 0);</td></tr>
+<tr><td class="num" id="LN267">267</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN268">268</td><td class="line">    <span class='keyword'>for</span> (size_t j = 0; j &lt; <span class='macro'>arraysize(kNumberTypes)<span class='expansion'>(sizeof(ArraySizeHelper(kNumberTypes)))</span></span>; ++j) {</td></tr>
+<tr><td class="num" id="LN269">269</td><td class="line">      Node* p1 = R.Parameter(kNumberTypes[j], 1);</td></tr>
+<tr><td class="num" id="LN270">270</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN271">271</td><td class="line">      <span class='keyword'>for</span> (size_t k = 0; k &lt; <span class='macro'>arraysize(ops)<span class='expansion'>(sizeof(ArraySizeHelper(ops)))</span></span>; k += 2) {</td></tr>
+<tr><td class="num" id="LN272">272</td><td class="line">        Node* add = R.Binop(ops[k], p0, p1);</td></tr>
+<tr><td class="num" id="LN273">273</td><td class="line">        Node* r = R.reduce(add);</td></tr>
+<tr><td class="num" id="LN274">274</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN275">275</td><td class="line">        R.CheckBinop(ops[k + 1], r);</td></tr>
+<tr><td class="num" id="LN276">276</td><td class="line">        <span class='macro'>CHECK_EQ(p0, r-&gt;InputAt(0))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (p0), (<br>r-&gt;InputAt(0)), "p0" " " "==" " " "r-&gt;InputAt(0)")) { V8_Fatal<br>("../test/cctest/compiler/test-js-typed-lowering.cc", 276, "Check failed: %s."<br>, _msg-&gt;c_str()); delete _msg; } } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN277">277</td><td class="line">        <span class='macro'>CHECK_EQ(p1, r-&gt;InputAt(1))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (p1), (<br>r-&gt;InputAt(1)), "p1" " " "==" " " "r-&gt;InputAt(1)")) { V8_Fatal<br>("../test/cctest/compiler/test-js-typed-lowering.cc", 277, "Check failed: %s."<br>, _msg-&gt;c_str()); delete _msg; } } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN278">278</td><td class="line">      }</td></tr>
+<tr><td class="num" id="LN279">279</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN280">280</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN281">281</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN282">282</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN283">283</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN284">284</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>void</span> CheckToI32(Node* old_input, Node* new_input, <span class='keyword'>bool</span> is_signed) {</td></tr>
+<tr><td class="num" id="LN285">285</td><td class="line">  Type* old_type = NodeProperties::GetType(old_input);</td></tr>
+<tr><td class="num" id="LN286">286</td><td class="line">  Type* new_type = NodeProperties::GetType(new_input);</td></tr>
+<tr><td class="num" id="LN287">287</td><td class="line">  Type* expected_type = I32Type(is_signed);</td></tr>
+<tr><td class="num" id="LN288">288</td><td class="line">  <span class='macro'>CHECK(new_type-&gt;Is(expected_type))<span class='expansion'>do { if ((__builtin_expect(!!(!(new_type-&gt;Is(expected_type<br>))), 0))) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 288, "Check failed: %s.", "new_type-&gt;Is(expected_type)")<br>; } } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN289">289</td><td class="line">  <span class='keyword'>if</span> (old_type-&gt;Is(expected_type)) {</td></tr>
+<tr><td class="num" id="LN290">290</td><td class="line">    <span class='macro'>CHECK_EQ(old_input, new_input)<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (old_input<br>), (new_input), "old_input" " " "==" " " "new_input")) { V8_Fatal<br>("../test/cctest/compiler/test-js-typed-lowering.cc", 290, "Check failed: %s."<br>, _msg-&gt;c_str()); delete _msg; } } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN291">291</td><td class="line">  } <span class='keyword'>else</span> <span class='keyword'>if</span> (new_input-&gt;opcode() == IrOpcode::kNumberConstant) {</td></tr>
+<tr><td class="num" id="LN292">292</td><td class="line">    <span class='keyword'>double</span> v = OpParameter&lt;<span class='keyword'>double</span>&gt;(new_input);</td></tr>
+<tr><td class="num" id="LN293">293</td><td class="line">    <span class='keyword'>double</span> e = <span class='keyword'>static_cast</span>&lt;<span class='keyword'>double</span>&gt;(is_signed ? FastD2I(v) : FastD2UI(v));</td></tr>
+<tr><td class="num" id="LN294">294</td><td class="line">    <span class='macro'>CHECK_EQ(e, v)<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (e), (v<br>), "e" " " "==" " " "v")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 294, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN295">295</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN296">296</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN297">297</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN298">298</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN299">299</td><td class="line"><span class='comment'>// A helper class for testing lowering of bitwise shift operators.</span></td></tr>
+<tr><td class="num" id="LN300">300</td><td class="line"><span class='keyword'>class</span> JSBitwiseShiftTypedLoweringTester : <span class='keyword'>public</span> JSTypedLoweringTester {</td></tr>
+<tr><td class="num" id="LN301">301</td><td class="line"> <span class='keyword'>public</span>:</td></tr>
+<tr><td class="num" id="LN302">302</td><td class="line">  JSBitwiseShiftTypedLoweringTester() : JSTypedLoweringTester() {</td></tr>
+<tr><td class="num" id="LN303">303</td><td class="line">    <span class='keyword'>int</span> i = 0;</td></tr>
+<tr><td class="num" id="LN304">304</td><td class="line">    set(i++, javascript.ShiftLeft(hints), <span class='keyword'>true</span>);</td></tr>
+<tr><td class="num" id="LN305">305</td><td class="line">    set(i++, simplified.NumberShiftLeft(), <span class='keyword'>false</span>);</td></tr>
+<tr><td class="num" id="LN306">306</td><td class="line">    set(i++, javascript.ShiftRight(hints), <span class='keyword'>true</span>);</td></tr>
+<tr><td class="num" id="LN307">307</td><td class="line">    set(i++, simplified.NumberShiftRight(), <span class='keyword'>false</span>);</td></tr>
+<tr><td class="num" id="LN308">308</td><td class="line">    set(i++, javascript.ShiftRightLogical(hints), <span class='keyword'>false</span>);</td></tr>
+<tr><td class="num" id="LN309">309</td><td class="line">    set(i++, simplified.NumberShiftRightLogical(), <span class='keyword'>false</span>);</td></tr>
+<tr><td class="num" id="LN310">310</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN311">311</td><td class="line">  <span class='keyword'>static</span> <span class='keyword'>const</span> <span class='keyword'>int</span> kNumberOps = 6;</td></tr>
+<tr><td class="num" id="LN312">312</td><td class="line">  <span class='keyword'>const</span> Operator* ops[kNumberOps];</td></tr>
+<tr><td class="num" id="LN313">313</td><td class="line">  <span class='keyword'>bool</span> signedness[kNumberOps];</td></tr>
+<tr><td class="num" id="LN314">314</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN315">315</td><td class="line"> <span class='keyword'>private</span>:</td></tr>
+<tr><td class="num" id="LN316">316</td><td class="line">  <span class='keyword'>void</span> set(<span class='keyword'>int</span> idx, <span class='keyword'>const</span> Operator* op, <span class='keyword'>bool</span> s) {</td></tr>
+<tr><td class="num" id="LN317">317</td><td class="line">    ops[idx] = op;</td></tr>
+<tr><td class="num" id="LN318">318</td><td class="line">    signedness[idx] = s;</td></tr>
+<tr><td class="num" id="LN319">319</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN320">320</td><td class="line">};</td></tr>
+<tr><td class="num" id="LN321">321</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN322">322</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN323">323</td><td class="line"><span class='macro'>TEST(Int32BitwiseShifts)<span class='expansion'>static void TestInt32BitwiseShifts(); CcTest register_test_Int32BitwiseShifts<br>(TestInt32BitwiseShifts, "../test/cctest/compiler/test-js-typed-lowering.cc"<br>, "Int32BitwiseShifts", __null, true, true); static void TestInt32BitwiseShifts<br>()</span></span> {</td></tr>
+<tr><td class="num" id="LN324">324</td><td class="line">  JSBitwiseShiftTypedLoweringTester R;</td></tr>
+<tr><td class="num" id="LN325">325</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN326">326</td><td class="line">  Type* types[] = {</td></tr>
+<tr><td class="num" id="LN327">327</td><td class="line">      Type::SignedSmall(), Type::UnsignedSmall(), Type::Negative32(),</td></tr>
+<tr><td class="num" id="LN328">328</td><td class="line">      Type::Unsigned31(),  Type::Unsigned32(),    Type::Signed32(),</td></tr>
+<tr><td class="num" id="LN329">329</td><td class="line">      Type::MinusZero(),   Type::NaN(),           Type::Undefined(),</td></tr>
+<tr><td class="num" id="LN330">330</td><td class="line">      Type::Null(),        Type::Boolean(),       Type::Number(),</td></tr>
+<tr><td class="num" id="LN331">331</td><td class="line">      Type::PlainNumber(), Type::String()};</td></tr>
+<tr><td class="num" id="LN332">332</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN333">333</td><td class="line">  <span class='keyword'>for</span> (size_t i = 0; i &lt; <span class='macro'>arraysize(types)<span class='expansion'>(sizeof(ArraySizeHelper(types)))</span></span>; ++i) {</td></tr>
+<tr><td class="num" id="LN334">334</td><td class="line">    Node* p0 = R.Parameter(types[i], 0);</td></tr>
+<tr><td class="num" id="LN335">335</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN336">336</td><td class="line">    <span class='keyword'>for</span> (size_t j = 0; j &lt; <span class='macro'>arraysize(types)<span class='expansion'>(sizeof(ArraySizeHelper(types)))</span></span>; ++j) {</td></tr>
+<tr><td class="num" id="LN337">337</td><td class="line">      Node* p1 = R.Parameter(types[j], 1);</td></tr>
+<tr><td class="num" id="LN338">338</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN339">339</td><td class="line">      <span class='keyword'>for</span> (<span class='keyword'>int</span> k = 0; k &lt; R.kNumberOps; k += 2) {</td></tr>
+<tr><td class="num" id="LN340">340</td><td class="line">        Node* add = R.Binop(R.ops[k], p0, p1);</td></tr>
+<tr><td class="num" id="LN341">341</td><td class="line">        Node* r = R.reduce(add);</td></tr>
+<tr><td class="num" id="LN342">342</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN343">343</td><td class="line">        R.CheckBinop(R.ops[k + 1], r);</td></tr>
+<tr><td class="num" id="LN344">344</td><td class="line">        Node* r0 = r-&gt;InputAt(0);</td></tr>
+<tr><td class="num" id="LN345">345</td><td class="line">        Node* r1 = r-&gt;InputAt(1);</td></tr>
+<tr><td class="num" id="LN346">346</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN347">347</td><td class="line">        CheckToI32(p0, r0, R.signedness[k]);</td></tr>
+<tr><td class="num" id="LN348">348</td><td class="line">        CheckToI32(p1, r1, <span class='keyword'>false</span>);</td></tr>
+<tr><td class="num" id="LN349">349</td><td class="line">      }</td></tr>
+<tr><td class="num" id="LN350">350</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN351">351</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN352">352</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN353">353</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN354">354</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN355">355</td><td class="line"><span class='comment'>// A helper class for testing lowering of bitwise operators.</span></td></tr>
+<tr><td class="num" id="LN356">356</td><td class="line"><span class='keyword'>class</span> JSBitwiseTypedLoweringTester : <span class='keyword'>public</span> JSTypedLoweringTester {</td></tr>
+<tr><td class="num" id="LN357">357</td><td class="line"> <span class='keyword'>public</span>:</td></tr>
+<tr><td class="num" id="LN358">358</td><td class="line">  JSBitwiseTypedLoweringTester() : JSTypedLoweringTester() {</td></tr>
+<tr><td class="num" id="LN359">359</td><td class="line">    <span class='keyword'>int</span> i = 0;</td></tr>
+<tr><td class="num" id="LN360">360</td><td class="line">    set(i++, javascript.BitwiseOr(hints), <span class='keyword'>true</span>);</td></tr>
+<tr><td class="num" id="LN361">361</td><td class="line">    set(i++, simplified.NumberBitwiseOr(), <span class='keyword'>true</span>);</td></tr>
+<tr><td class="num" id="LN362">362</td><td class="line">    set(i++, javascript.BitwiseXor(hints), <span class='keyword'>true</span>);</td></tr>
+<tr><td class="num" id="LN363">363</td><td class="line">    set(i++, simplified.NumberBitwiseXor(), <span class='keyword'>true</span>);</td></tr>
+<tr><td class="num" id="LN364">364</td><td class="line">    set(i++, javascript.BitwiseAnd(hints), <span class='keyword'>true</span>);</td></tr>
+<tr><td class="num" id="LN365">365</td><td class="line">    set(i++, simplified.NumberBitwiseAnd(), <span class='keyword'>true</span>);</td></tr>
+<tr><td class="num" id="LN366">366</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN367">367</td><td class="line">  <span class='keyword'>static</span> <span class='keyword'>const</span> <span class='keyword'>int</span> kNumberOps = 6;</td></tr>
+<tr><td class="num" id="LN368">368</td><td class="line">  <span class='keyword'>const</span> Operator* ops[kNumberOps];</td></tr>
+<tr><td class="num" id="LN369">369</td><td class="line">  <span class='keyword'>bool</span> signedness[kNumberOps];</td></tr>
+<tr><td class="num" id="LN370">370</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN371">371</td><td class="line"> <span class='keyword'>private</span>:</td></tr>
+<tr><td class="num" id="LN372">372</td><td class="line">  <span class='keyword'>void</span> set(<span class='keyword'>int</span> idx, <span class='keyword'>const</span> Operator* op, <span class='keyword'>bool</span> s) {</td></tr>
+<tr><td class="num" id="LN373">373</td><td class="line">    ops[idx] = op;</td></tr>
+<tr><td class="num" id="LN374">374</td><td class="line">    signedness[idx] = s;</td></tr>
+<tr><td class="num" id="LN375">375</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN376">376</td><td class="line">};</td></tr>
+<tr><td class="num" id="LN377">377</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN378">378</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN379">379</td><td class="line"><span class='macro'>TEST(Int32BitwiseBinops)<span class='expansion'>static void TestInt32BitwiseBinops(); CcTest register_test_Int32BitwiseBinops<br>(TestInt32BitwiseBinops, "../test/cctest/compiler/test-js-typed-lowering.cc"<br>, "Int32BitwiseBinops", __null, true, true); static void TestInt32BitwiseBinops<br>()</span></span> {</td></tr>
+<tr><td class="num" id="LN380">380</td><td class="line">  JSBitwiseTypedLoweringTester R;</td></tr>
+<tr><td class="num" id="LN381">381</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN382">382</td><td class="line">  Type* types[] = {</td></tr>
+<tr><td class="num" id="LN383">383</td><td class="line">      Type::SignedSmall(),   Type::UnsignedSmall(), Type::Unsigned32(),</td></tr>
+<tr><td class="num" id="LN384">384</td><td class="line">      Type::Signed32(),      Type::MinusZero(),     Type::NaN(),</td></tr>
+<tr><td class="num" id="LN385">385</td><td class="line">      Type::OrderedNumber(), Type::PlainNumber(),   Type::Undefined(),</td></tr>
+<tr><td class="num" id="LN386">386</td><td class="line">      Type::Null(),          Type::Boolean(),       Type::Number(),</td></tr>
+<tr><td class="num" id="LN387">387</td><td class="line">      Type::String()};</td></tr>
+<tr><td class="num" id="LN388">388</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN389">389</td><td class="line">  <span class='keyword'>for</span> (size_t i = 0; i &lt; <span class='macro'>arraysize(types)<span class='expansion'>(sizeof(ArraySizeHelper(types)))</span></span>; ++i) {</td></tr>
+<tr><td class="num" id="LN390">390</td><td class="line">    Node* p0 = R.Parameter(types[i], 0);</td></tr>
+<tr><td class="num" id="LN391">391</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN392">392</td><td class="line">    <span class='keyword'>for</span> (size_t j = 0; j &lt; <span class='macro'>arraysize(types)<span class='expansion'>(sizeof(ArraySizeHelper(types)))</span></span>; ++j) {</td></tr>
+<tr><td class="num" id="LN393">393</td><td class="line">      Node* p1 = R.Parameter(types[j], 1);</td></tr>
+<tr><td class="num" id="LN394">394</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN395">395</td><td class="line">      <span class='keyword'>for</span> (<span class='keyword'>int</span> k = 0; k &lt; R.kNumberOps; k += 2) {</td></tr>
+<tr><td class="num" id="LN396">396</td><td class="line">        Node* add = R.Binop(R.ops[k], p0, p1);</td></tr>
+<tr><td class="num" id="LN397">397</td><td class="line">        Node* r = R.reduce(add);</td></tr>
+<tr><td class="num" id="LN398">398</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN399">399</td><td class="line">        R.CheckBinop(R.ops[k + 1], r);</td></tr>
+<tr><td class="num" id="LN400">400</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN401">401</td><td class="line">        CheckToI32(p0, r-&gt;InputAt(0), R.signedness[k]);</td></tr>
+<tr><td class="num" id="LN402">402</td><td class="line">        CheckToI32(p1, r-&gt;InputAt(1), R.signedness[k + 1]);</td></tr>
+<tr><td class="num" id="LN403">403</td><td class="line">      }</td></tr>
+<tr><td class="num" id="LN404">404</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN405">405</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN406">406</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN407">407</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN408">408</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN409">409</td><td class="line"><span class='macro'>TEST(JSToNumber1)<span class='expansion'>static void TestJSToNumber1(); CcTest register_test_JSToNumber1<br>(TestJSToNumber1, "../test/cctest/compiler/test-js-typed-lowering.cc"<br>, "JSToNumber1", __null, true, true); static void TestJSToNumber1<br>()</span></span> {</td></tr>
+<tr><td class="num" id="LN410">410</td><td class="line">  JSTypedLoweringTester R;</td></tr>
+<tr><td class="num" id="LN411">411</td><td class="line">  <span class='keyword'>const</span> Operator* ton = R.javascript.ToNumber();</td></tr>
+<tr><td class="num" id="LN412">412</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN413">413</td><td class="line">  <span class='keyword'>for</span> (size_t i = 0; i &lt; <span class='macro'>arraysize(kNumberTypes)<span class='expansion'>(sizeof(ArraySizeHelper(kNumberTypes)))</span></span>; i++) {  <span class='comment'>// ToNumber(number)</span></td></tr>
+<tr><td class="num" id="LN414">414</td><td class="line">    Node* r = R.ReduceUnop(ton, kNumberTypes[i]);</td></tr>
+<tr><td class="num" id="LN415">415</td><td class="line">    <span class='macro'>CHECK_EQ(IrOpcode::kParameter, r-&gt;opcode())<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (IrOpcode<br>::kParameter), (r-&gt;opcode()), "IrOpcode::kParameter" " " "=="<br> " " "r-&gt;opcode()")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 415, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN416">416</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN417">417</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN418">418</td><td class="line">  {  <span class='comment'>// ToNumber(undefined)</span></td></tr>
+<tr><td class="num" id="LN419">419</td><td class="line">    Node* r = R.ReduceUnop(ton, Type::Undefined());</td></tr>
+<tr><td class="num" id="LN420">420</td><td class="line">    R.CheckNaN(r);</td></tr>
+<tr><td class="num" id="LN421">421</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN422">422</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN423">423</td><td class="line">  {  <span class='comment'>// ToNumber(null)</span></td></tr>
+<tr><td class="num" id="LN424">424</td><td class="line">    Node* r = R.ReduceUnop(ton, Type::Null());</td></tr>
+<tr><td class="num" id="LN425">425</td><td class="line">    R.CheckNumberConstant(0.0, r);</td></tr>
+<tr><td class="num" id="LN426">426</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN427">427</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN428">428</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN429">429</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN430">430</td><td class="line"><span class='macro'>TEST(JSToNumber_replacement)<span class='expansion'>static void TestJSToNumber_replacement(); CcTest register_test_JSToNumber_replacement<br>(TestJSToNumber_replacement, "../test/cctest/compiler/test-js-typed-lowering.cc"<br>, "JSToNumber_replacement", __null, true, true); static void TestJSToNumber_replacement<br>()</span></span> {</td></tr>
+<tr><td class="num" id="LN431">431</td><td class="line">  JSTypedLoweringTester R;</td></tr>
+<tr><td class="num" id="LN432">432</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN433">433</td><td class="line">  Type* types[] = {Type::Null(), Type::Undefined(), Type::Number()};</td></tr>
+<tr><td class="num" id="LN434">434</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN435">435</td><td class="line">  <span class='keyword'>for</span> (size_t i = 0; i &lt; <span class='macro'>arraysize(types)<span class='expansion'>(sizeof(ArraySizeHelper(types)))</span></span>; i++) {</td></tr>
+<tr><td class="num" id="LN436">436</td><td class="line">    Node* n = R.Parameter(types[i]);</td></tr>
+<tr><td class="num" id="LN437">437</td><td class="line">    Node* c =</td></tr>
+<tr><td class="num" id="LN438">438</td><td class="line">        R.graph.NewNode(R.javascript.ToNumber(), n, R.context(),</td></tr>
+<tr><td class="num" id="LN439">439</td><td class="line">                        R.EmptyFrameState(R.context()), R.start(), R.start());</td></tr>
+<tr><td class="num" id="LN440">440</td><td class="line">    Node* effect_use = R.UseForEffect(c);</td></tr>
+<tr><td class="num" id="LN441">441</td><td class="line">    Node* add = R.graph.NewNode(R.simplified.ReferenceEqual(Type::Any()), n, c);</td></tr>
+<tr><td class="num" id="LN442">442</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN443">443</td><td class="line">    R.CheckEffectInput(c, effect_use);</td></tr>
+<tr><td class="num" id="LN444">444</td><td class="line">    Node* r = R.reduce(c);</td></tr>
+<tr><td class="num" id="LN445">445</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN446">446</td><td class="line">    <span class='keyword'>if</span> (types[i]-&gt;Is(Type::Number())) {</td></tr>
+<tr><td class="num" id="LN447">447</td><td class="line">      <span class='macro'>CHECK_EQ(n, r)<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (n), (r<br>), "n" " " "==" " " "r")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 447, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN448">448</td><td class="line">    } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN449">449</td><td class="line">      <span class='macro'>CHECK_EQ(IrOpcode::kNumberConstant, r-&gt;opcode())<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (IrOpcode<br>::kNumberConstant), (r-&gt;opcode()), "IrOpcode::kNumberConstant"<br> " " "==" " " "r-&gt;opcode()")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 449, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN450">450</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN451">451</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN452">452</td><td class="line">    <span class='macro'>CHECK_EQ(n, add-&gt;InputAt(0))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (n), (add<br>-&gt;InputAt(0)), "n" " " "==" " " "add-&gt;InputAt(0)")) { V8_Fatal<br>("../test/cctest/compiler/test-js-typed-lowering.cc", 452, "Check failed: %s."<br>, _msg-&gt;c_str()); delete _msg; } } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN453">453</td><td class="line">    <span class='macro'>CHECK_EQ(r, add-&gt;InputAt(1))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (r), (add<br>-&gt;InputAt(1)), "r" " " "==" " " "add-&gt;InputAt(1)")) { V8_Fatal<br>("../test/cctest/compiler/test-js-typed-lowering.cc", 453, "Check failed: %s."<br>, _msg-&gt;c_str()); delete _msg; } } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN454">454</td><td class="line">    R.CheckEffectInput(R.start(), effect_use);</td></tr>
+<tr><td class="num" id="LN455">455</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN456">456</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN457">457</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN458">458</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN459">459</td><td class="line"><span class='macro'>TEST(JSToNumberOfConstant)<span class='expansion'>static void TestJSToNumberOfConstant(); CcTest register_test_JSToNumberOfConstant<br>(TestJSToNumberOfConstant, "../test/cctest/compiler/test-js-typed-lowering.cc"<br>, "JSToNumberOfConstant", __null, true, true); static void TestJSToNumberOfConstant<br>()</span></span> {</td></tr>
+<tr><td class="num" id="LN460">460</td><td class="line">  JSTypedLoweringTester R;</td></tr>
+<tr><td class="num" id="LN461">461</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN462">462</td><td class="line">  <span class='keyword'>const</span> Operator* ops[] = {</td></tr>
+<tr><td class="num" id="LN463">463</td><td class="line">      R.common.NumberConstant(0), R.common.NumberConstant(-1),</td></tr>
+<tr><td class="num" id="LN464">464</td><td class="line">      R.common.NumberConstant(0.1), R.common.Int32Constant(1177),</td></tr>
+<tr><td class="num" id="LN465">465</td><td class="line">      R.common.Float64Constant(0.99)};</td></tr>
+<tr><td class="num" id="LN466">466</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN467">467</td><td class="line">  <span class='keyword'>for</span> (size_t i = 0; i &lt; <span class='macro'>arraysize(ops)<span class='expansion'>(sizeof(ArraySizeHelper(ops)))</span></span>; i++) {</td></tr>
+<tr><td class="num" id="LN468">468</td><td class="line">    Node* n = R.graph.NewNode(ops[i]);</td></tr>
+<tr><td class="num" id="LN469">469</td><td class="line">    Node* convert = R.Unop(R.javascript.ToNumber(), n);</td></tr>
+<tr><td class="num" id="LN470">470</td><td class="line">    Node* r = R.reduce(convert);</td></tr>
+<tr><td class="num" id="LN471">471</td><td class="line">    <span class='comment'>// Note that either outcome below is correct. It only depends on whether</span></td></tr>
+<tr><td class="num" id="LN472">472</td><td class="line">    <span class='comment'>// the types of constants are eagerly computed or only computed by the</span></td></tr>
+<tr><td class="num" id="LN473">473</td><td class="line">    <span class='comment'>// typing pass.</span></td></tr>
+<tr><td class="num" id="LN474">474</td><td class="line">    <span class='keyword'>if</span> (NodeProperties::GetType(n)-&gt;Is(Type::Number())) {</td></tr>
+<tr><td class="num" id="LN475">475</td><td class="line">      <span class='comment'>// If number constants are eagerly typed, then reduction should</span></td></tr>
+<tr><td class="num" id="LN476">476</td><td class="line">      <span class='comment'>// remove the ToNumber.</span></td></tr>
+<tr><td class="num" id="LN477">477</td><td class="line">      <span class='macro'>CHECK_EQ(n, r)<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (n), (r<br>), "n" " " "==" " " "r")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 477, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN478">478</td><td class="line">    } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN479">479</td><td class="line">      <span class='comment'>// Otherwise, type-based lowering should only look at the type, and</span></td></tr>
+<tr><td class="num" id="LN480">480</td><td class="line">      <span class='comment'>// *not* try to constant fold.</span></td></tr>
+<tr><td class="num" id="LN481">481</td><td class="line">      <span class='macro'>CHECK_EQ(convert, r)<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (convert<br>), (r), "convert" " " "==" " " "r")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 481, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN482">482</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN483">483</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN484">484</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN485">485</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN486">486</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN487">487</td><td class="line"><span class='macro'>TEST(JSToNumberOfNumberOrOtherPrimitive)<span class='expansion'>static void TestJSToNumberOfNumberOrOtherPrimitive(); CcTest register_test_JSToNumberOfNumberOrOtherPrimitive<br>(TestJSToNumberOfNumberOrOtherPrimitive, "../test/cctest/compiler/test-js-typed-lowering.cc"<br>, "JSToNumberOfNumberOrOtherPrimitive", __null, true, true); static<br> void TestJSToNumberOfNumberOrOtherPrimitive()</span></span> {</td></tr>
+<tr><td class="num" id="LN488">488</td><td class="line">  JSTypedLoweringTester R;</td></tr>
+<tr><td class="num" id="LN489">489</td><td class="line">  Type* others[] = {Type::Undefined(), Type::Null(), Type::Boolean(),</td></tr>
+<tr><td class="num" id="LN490">490</td><td class="line">                    Type::String()};</td></tr>
+<tr><td class="num" id="LN491">491</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN492">492</td><td class="line">  <span class='keyword'>for</span> (size_t i = 0; i &lt; <span class='macro'>arraysize(others)<span class='expansion'>(sizeof(ArraySizeHelper(others)))</span></span>; i++) {</td></tr>
+<tr><td class="num" id="LN493">493</td><td class="line">    Type* t = Type::Union(Type::Number(), others[i], R.main_zone());</td></tr>
+<tr><td class="num" id="LN494">494</td><td class="line">    Node* r = R.ReduceUnop(R.javascript.ToNumber(), t);</td></tr>
+<tr><td class="num" id="LN495">495</td><td class="line">    <span class='macro'>CHECK_EQ(IrOpcode::kJSToNumber, r-&gt;opcode())<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (IrOpcode<br>::kJSToNumber), (r-&gt;opcode()), "IrOpcode::kJSToNumber" " "<br> "==" " " "r-&gt;opcode()")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 495, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN496">496</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN497">497</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN498">498</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN499">499</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN500">500</td><td class="line"><span class='macro'>TEST(JSToString1)<span class='expansion'>static void TestJSToString1(); CcTest register_test_JSToString1<br>(TestJSToString1, "../test/cctest/compiler/test-js-typed-lowering.cc"<br>, "JSToString1", __null, true, true); static void TestJSToString1<br>()</span></span> {</td></tr>
+<tr><td class="num" id="LN501">501</td><td class="line">  JSTypedLoweringTester R;</td></tr>
+<tr><td class="num" id="LN502">502</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN503">503</td><td class="line">  <span class='keyword'>for</span> (size_t i = 0; i &lt; <span class='macro'>arraysize(kStringTypes)<span class='expansion'>(sizeof(ArraySizeHelper(kStringTypes)))</span></span>; i++) {</td></tr>
+<tr><td class="num" id="LN504">504</td><td class="line">    Node* r = R.ReduceUnop(R.javascript.ToString(), kStringTypes[i]);</td></tr>
+<tr><td class="num" id="LN505">505</td><td class="line">    <span class='macro'>CHECK_EQ(IrOpcode::kParameter, r-&gt;opcode())<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (IrOpcode<br>::kParameter), (r-&gt;opcode()), "IrOpcode::kParameter" " " "=="<br> " " "r-&gt;opcode()")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 505, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN506">506</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN507">507</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN508">508</td><td class="line">  <span class='keyword'>const</span> Operator* op = R.javascript.ToString();</td></tr>
+<tr><td class="num" id="LN509">509</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN510">510</td><td class="line">  {  <span class='comment'>// ToString(undefined) =&gt; "undefined"</span></td></tr>
+<tr><td class="num" id="LN511">511</td><td class="line">    Node* r = R.ReduceUnop(op, Type::Undefined());</td></tr>
+<tr><td class="num" id="LN512">512</td><td class="line">    R.CheckHandle(R.isolate-&gt;factory()-&gt;undefined_string(), r);</td></tr>
+<tr><td class="num" id="LN513">513</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN514">514</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN515">515</td><td class="line">  {  <span class='comment'>// ToString(null) =&gt; "null"</span></td></tr>
+<tr><td class="num" id="LN516">516</td><td class="line">    Node* r = R.ReduceUnop(op, Type::Null());</td></tr>
+<tr><td class="num" id="LN517">517</td><td class="line">    R.CheckHandle(R.isolate-&gt;factory()-&gt;null_string(), r);</td></tr>
+<tr><td class="num" id="LN518">518</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN519">519</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN520">520</td><td class="line">  {  <span class='comment'>// ToString(boolean)</span></td></tr>
+<tr><td class="num" id="LN521">521</td><td class="line">    Node* r = R.ReduceUnop(op, Type::Boolean());</td></tr>
+<tr><td class="num" id="LN522">522</td><td class="line">    <span class='macro'>CHECK_EQ(IrOpcode::kSelect, r-&gt;opcode())<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (IrOpcode<br>::kSelect), (r-&gt;opcode()), "IrOpcode::kSelect" " " "==" " "<br> "r-&gt;opcode()")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 522, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN523">523</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN524">524</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN525">525</td><td class="line">  {  <span class='comment'>// ToString(number)</span></td></tr>
+<tr><td class="num" id="LN526">526</td><td class="line">    Node* r = R.ReduceUnop(op, Type::Number());</td></tr>
+<tr><td class="num" id="LN527">527</td><td class="line">    <span class='macro'>CHECK_EQ(IrOpcode::kJSToString, r-&gt;opcode())<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (IrOpcode<br>::kJSToString), (r-&gt;opcode()), "IrOpcode::kJSToString" " "<br> "==" " " "r-&gt;opcode()")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 527, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN528">528</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN529">529</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN530">530</td><td class="line">  {  <span class='comment'>// ToString(string)</span></td></tr>
+<tr><td class="num" id="LN531">531</td><td class="line">    Node* r = R.ReduceUnop(op, Type::String());</td></tr>
+<tr><td class="num" id="LN532">532</td><td class="line">    <span class='macro'>CHECK_EQ(IrOpcode::kParameter, r-&gt;opcode())<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (IrOpcode<br>::kParameter), (r-&gt;opcode()), "IrOpcode::kParameter" " " "=="<br> " " "r-&gt;opcode()")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 532, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;  <span class='comment'>// No-op</span></td></tr>
+<tr><td class="num" id="LN533">533</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN534">534</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN535">535</td><td class="line">  {  <span class='comment'>// ToString(object)</span></td></tr>
+<tr><td class="num" id="LN536">536</td><td class="line">    Node* r = R.ReduceUnop(op, Type::Object());</td></tr>
+<tr><td class="num" id="LN537">537</td><td class="line">    <span class='macro'>CHECK_EQ(IrOpcode::kJSToString, r-&gt;opcode())<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (IrOpcode<br>::kJSToString), (r-&gt;opcode()), "IrOpcode::kJSToString" " "<br> "==" " " "r-&gt;opcode()")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 537, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;  <span class='comment'>// No reduction.</span></td></tr>
+<tr><td class="num" id="LN538">538</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN539">539</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN540">540</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN541">541</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN542">542</td><td class="line"><span class='macro'>TEST(JSToString_replacement)<span class='expansion'>static void TestJSToString_replacement(); CcTest register_test_JSToString_replacement<br>(TestJSToString_replacement, "../test/cctest/compiler/test-js-typed-lowering.cc"<br>, "JSToString_replacement", __null, true, true); static void TestJSToString_replacement<br>()</span></span> {</td></tr>
+<tr><td class="num" id="LN543">543</td><td class="line">  JSTypedLoweringTester R;</td></tr>
+<tr><td class="num" id="LN544">544</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN545">545</td><td class="line">  Type* types[] = {Type::Null(), Type::Undefined(), Type::String()};</td></tr>
+<tr><td class="num" id="LN546">546</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN547">547</td><td class="line">  <span class='keyword'>for</span> (size_t i = 0; i &lt; <span class='macro'>arraysize(types)<span class='expansion'>(sizeof(ArraySizeHelper(types)))</span></span>; i++) {</td></tr>
+<tr><td class="num" id="LN548">548</td><td class="line">    Node* n = R.Parameter(types[i]);</td></tr>
+<tr><td class="num" id="LN549">549</td><td class="line">    Node* c =</td></tr>
+<tr><td class="num" id="LN550">550</td><td class="line">        R.graph.NewNode(R.javascript.ToString(), n, R.context(),</td></tr>
+<tr><td class="num" id="LN551">551</td><td class="line">                        R.EmptyFrameState(R.context()), R.start(), R.start());</td></tr>
+<tr><td class="num" id="LN552">552</td><td class="line">    Node* effect_use = R.UseForEffect(c);</td></tr>
+<tr><td class="num" id="LN553">553</td><td class="line">    Node* add = R.graph.NewNode(R.simplified.ReferenceEqual(Type::Any()), n, c);</td></tr>
+<tr><td class="num" id="LN554">554</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN555">555</td><td class="line">    R.CheckEffectInput(c, effect_use);</td></tr>
+<tr><td class="num" id="LN556">556</td><td class="line">    Node* r = R.reduce(c);</td></tr>
+<tr><td class="num" id="LN557">557</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN558">558</td><td class="line">    <span class='keyword'>if</span> (types[i]-&gt;Is(Type::String())) {</td></tr>
+<tr><td class="num" id="LN559">559</td><td class="line">      <span class='macro'>CHECK_EQ(n, r)<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (n), (r<br>), "n" " " "==" " " "r")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 559, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN560">560</td><td class="line">    } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN561">561</td><td class="line">      <span class='macro'>CHECK_EQ(IrOpcode::kHeapConstant, r-&gt;opcode())<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (IrOpcode<br>::kHeapConstant), (r-&gt;opcode()), "IrOpcode::kHeapConstant"<br> " " "==" " " "r-&gt;opcode()")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 561, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN562">562</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN563">563</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN564">564</td><td class="line">    <span class='macro'>CHECK_EQ(n, add-&gt;InputAt(0))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (n), (add<br>-&gt;InputAt(0)), "n" " " "==" " " "add-&gt;InputAt(0)")) { V8_Fatal<br>("../test/cctest/compiler/test-js-typed-lowering.cc", 564, "Check failed: %s."<br>, _msg-&gt;c_str()); delete _msg; } } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN565">565</td><td class="line">    <span class='macro'>CHECK_EQ(r, add-&gt;InputAt(1))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (r), (add<br>-&gt;InputAt(1)), "r" " " "==" " " "add-&gt;InputAt(1)")) { V8_Fatal<br>("../test/cctest/compiler/test-js-typed-lowering.cc", 565, "Check failed: %s."<br>, _msg-&gt;c_str()); delete _msg; } } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN566">566</td><td class="line">    R.CheckEffectInput(R.start(), effect_use);</td></tr>
+<tr><td class="num" id="LN567">567</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN568">568</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN569">569</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN570">570</td><td class="line"><span class='macro'>TEST(StringComparison)<span class='expansion'>static void TestStringComparison(); CcTest register_test_StringComparison<br>(TestStringComparison, "../test/cctest/compiler/test-js-typed-lowering.cc"<br>, "StringComparison", __null, true, true); static void TestStringComparison<br>()</span></span> {</td></tr>
+<tr><td class="num" id="LN571">571</td><td class="line">  JSTypedLoweringTester R;</td></tr>
+<tr><td class="num" id="LN572">572</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN573">573</td><td class="line">  <span class='keyword'>const</span> Operator* ops[] = {</td></tr>
+<tr><td class="num" id="LN574">574</td><td class="line">      R.javascript.LessThan(),           R.simplified.StringLessThan(),</td></tr>
+<tr><td class="num" id="LN575">575</td><td class="line">      R.javascript.LessThanOrEqual(),    R.simplified.StringLessThanOrEqual(),</td></tr>
+<tr><td class="num" id="LN576">576</td><td class="line">      R.javascript.GreaterThan(),        R.simplified.StringLessThan(),</td></tr>
+<tr><td class="num" id="LN577">577</td><td class="line">      R.javascript.GreaterThanOrEqual(), R.simplified.StringLessThanOrEqual()};</td></tr>
+<tr><td class="num" id="LN578">578</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN579">579</td><td class="line">  <span class='keyword'>for</span> (size_t i = 0; i &lt; <span class='macro'>arraysize(kStringTypes)<span class='expansion'>(sizeof(ArraySizeHelper(kStringTypes)))</span></span>; i++) {</td></tr>
+<tr><td class="num" id="LN580">580</td><td class="line">    Node* p0 = R.Parameter(kStringTypes[i], 0);</td></tr>
+<tr><td class="num" id="LN581">581</td><td class="line">    <span class='keyword'>for</span> (size_t j = 0; j &lt; <span class='macro'>arraysize(kStringTypes)<span class='expansion'>(sizeof(ArraySizeHelper(kStringTypes)))</span></span>; j++) {</td></tr>
+<tr><td class="num" id="LN582">582</td><td class="line">      Node* p1 = R.Parameter(kStringTypes[j], 1);</td></tr>
+<tr><td class="num" id="LN583">583</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN584">584</td><td class="line">      <span class='keyword'>for</span> (size_t k = 0; k &lt; <span class='macro'>arraysize(ops)<span class='expansion'>(sizeof(ArraySizeHelper(ops)))</span></span>; k += 2) {</td></tr>
+<tr><td class="num" id="LN585">585</td><td class="line">        Node* cmp = R.Binop(ops[k], p0, p1);</td></tr>
+<tr><td class="num" id="LN586">586</td><td class="line">        Node* r = R.reduce(cmp);</td></tr>
+<tr><td class="num" id="LN587">587</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN588">588</td><td class="line">        R.CheckBinop(ops[k + 1], r);</td></tr>
+<tr><td class="num" id="LN589">589</td><td class="line">        <span class='keyword'>if</span> (k &gt;= 4) {</td></tr>
+<tr><td class="num" id="LN590">590</td><td class="line">          <span class='comment'>// GreaterThan and GreaterThanOrEqual commute the inputs</span></td></tr>
+<tr><td class="num" id="LN591">591</td><td class="line">          <span class='comment'>// and use the LessThan and LessThanOrEqual operators.</span></td></tr>
+<tr><td class="num" id="LN592">592</td><td class="line">          <span class='macro'>CHECK_EQ(p1, r-&gt;InputAt(0))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (p1), (<br>r-&gt;InputAt(0)), "p1" " " "==" " " "r-&gt;InputAt(0)")) { V8_Fatal<br>("../test/cctest/compiler/test-js-typed-lowering.cc", 592, "Check failed: %s."<br>, _msg-&gt;c_str()); delete _msg; } } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN593">593</td><td class="line">          <span class='macro'>CHECK_EQ(p0, r-&gt;InputAt(1))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (p0), (<br>r-&gt;InputAt(1)), "p0" " " "==" " " "r-&gt;InputAt(1)")) { V8_Fatal<br>("../test/cctest/compiler/test-js-typed-lowering.cc", 593, "Check failed: %s."<br>, _msg-&gt;c_str()); delete _msg; } } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN594">594</td><td class="line">        } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN595">595</td><td class="line">          <span class='macro'>CHECK_EQ(p0, r-&gt;InputAt(0))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (p0), (<br>r-&gt;InputAt(0)), "p0" " " "==" " " "r-&gt;InputAt(0)")) { V8_Fatal<br>("../test/cctest/compiler/test-js-typed-lowering.cc", 595, "Check failed: %s."<br>, _msg-&gt;c_str()); delete _msg; } } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN596">596</td><td class="line">          <span class='macro'>CHECK_EQ(p1, r-&gt;InputAt(1))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (p1), (<br>r-&gt;InputAt(1)), "p1" " " "==" " " "r-&gt;InputAt(1)")) { V8_Fatal<br>("../test/cctest/compiler/test-js-typed-lowering.cc", 596, "Check failed: %s."<br>, _msg-&gt;c_str()); delete _msg; } } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN597">597</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN598">598</td><td class="line">      }</td></tr>
+<tr><td class="num" id="LN599">599</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN600">600</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN601">601</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN602">602</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN603">603</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN604">604</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>void</span> CheckIsConvertedToNumber(Node* val, Node* converted) {</td></tr>
+<tr><td class="num" id="LN605">605</td><td class="line">  <span class='keyword'>if</span> (NodeProperties::GetType(val)-&gt;Is(Type::Number())) {</td></tr>
+<tr><td class="num" id="LN606">606</td><td class="line">    <span class='macro'>CHECK_EQ(val, converted)<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (val), (<br>converted), "val" " " "==" " " "converted")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 606, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN607">607</td><td class="line">  } <span class='keyword'>else</span> <span class='keyword'>if</span> (NodeProperties::GetType(val)-&gt;Is(Type::Boolean())) {</td></tr>
+<tr><td class="num" id="LN608">608</td><td class="line">    <span class='macro'>CHECK_EQ(IrOpcode::kBooleanToNumber, converted-&gt;opcode())<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (IrOpcode<br>::kBooleanToNumber), (converted-&gt;opcode()), "IrOpcode::kBooleanToNumber"<br> " " "==" " " "converted-&gt;opcode()")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 608, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN609">609</td><td class="line">    <span class='macro'>CHECK_EQ(val, converted-&gt;InputAt(0))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (val), (<br>converted-&gt;InputAt(0)), "val" " " "==" " " "converted-&gt;InputAt(0)"<br>)) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 609, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN610">610</td><td class="line">  } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN611">611</td><td class="line">    <span class='keyword'>if</span> (converted-&gt;opcode() == IrOpcode::kNumberConstant) <span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN612">612</td><td class="line">    <span class='macro'>CHECK_EQ(IrOpcode::kJSToNumber, converted-&gt;opcode())<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (IrOpcode<br>::kJSToNumber), (converted-&gt;opcode()), "IrOpcode::kJSToNumber"<br> " " "==" " " "converted-&gt;opcode()")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 612, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN613">613</td><td class="line">    <span class='macro'>CHECK_EQ(val, converted-&gt;InputAt(0))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (val), (<br>converted-&gt;InputAt(0)), "val" " " "==" " " "converted-&gt;InputAt(0)"<br>)) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 613, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN614">614</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN615">615</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN616">616</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN617">617</td><td class="line"><span class='macro'>TEST(NumberComparison)<span class='expansion'>static void TestNumberComparison(); CcTest register_test_NumberComparison<br>(TestNumberComparison, "../test/cctest/compiler/test-js-typed-lowering.cc"<br>, "NumberComparison", __null, true, true); static void TestNumberComparison<br>()</span></span> {</td></tr>
+<tr><td class="num" id="LN618">618</td><td class="line">  JSTypedLoweringTester R;</td></tr>
+<tr><td class="num" id="LN619">619</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN620">620</td><td class="line">  <span class='keyword'>const</span> Operator* ops[] = {</td></tr>
+<tr><td class="num" id="LN621">621</td><td class="line">      R.javascript.LessThan(),           R.simplified.NumberLessThan(),</td></tr>
+<tr><td class="num" id="LN622">622</td><td class="line">      R.javascript.LessThanOrEqual(),    R.simplified.NumberLessThanOrEqual(),</td></tr>
+<tr><td class="num" id="LN623">623</td><td class="line">      R.javascript.GreaterThan(),        R.simplified.NumberLessThan(),</td></tr>
+<tr><td class="num" id="LN624">624</td><td class="line">      R.javascript.GreaterThanOrEqual(), R.simplified.NumberLessThanOrEqual()};</td></tr>
+<tr><td class="num" id="LN625">625</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN626">626</td><td class="line">  Node* <span class='keyword'>const</span> p0 = R.Parameter(Type::Number(), 0);</td></tr>
+<tr><td class="num" id="LN627">627</td><td class="line">  Node* <span class='keyword'>const</span> p1 = R.Parameter(Type::Number(), 1);</td></tr>
+<tr><td class="num" id="LN628">628</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN629">629</td><td class="line">  <span class='keyword'>for</span> (size_t k = 0; k &lt; <span class='macro'>arraysize(ops)<span class='expansion'>(sizeof(ArraySizeHelper(ops)))</span></span>; k += 2) {</td></tr>
+<tr><td class="num" id="LN630">630</td><td class="line">    Node* cmp = R.Binop(ops[k], p0, p1);</td></tr>
+<tr><td class="num" id="LN631">631</td><td class="line">    Node* r = R.reduce(cmp);</td></tr>
+<tr><td class="num" id="LN632">632</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN633">633</td><td class="line">    R.CheckBinop(ops[k + 1], r);</td></tr>
+<tr><td class="num" id="LN634">634</td><td class="line">    <span class='keyword'>if</span> (k &gt;= 4) {</td></tr>
+<tr><td class="num" id="LN635">635</td><td class="line">      <span class='comment'>// GreaterThan and GreaterThanOrEqual commute the inputs</span></td></tr>
+<tr><td class="num" id="LN636">636</td><td class="line">      <span class='comment'>// and use the LessThan and LessThanOrEqual operators.</span></td></tr>
+<tr><td class="num" id="LN637">637</td><td class="line">      CheckIsConvertedToNumber(p1, r-&gt;InputAt(0));</td></tr>
+<tr><td class="num" id="LN638">638</td><td class="line">      CheckIsConvertedToNumber(p0, r-&gt;InputAt(1));</td></tr>
+<tr><td class="num" id="LN639">639</td><td class="line">    } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN640">640</td><td class="line">      CheckIsConvertedToNumber(p0, r-&gt;InputAt(0));</td></tr>
+<tr><td class="num" id="LN641">641</td><td class="line">      CheckIsConvertedToNumber(p1, r-&gt;InputAt(1));</td></tr>
+<tr><td class="num" id="LN642">642</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN643">643</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN644">644</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN645">645</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN646">646</td><td class="line"><span class='macro'>TEST(MixedComparison1)<span class='expansion'>static void TestMixedComparison1(); CcTest register_test_MixedComparison1<br>(TestMixedComparison1, "../test/cctest/compiler/test-js-typed-lowering.cc"<br>, "MixedComparison1", __null, true, true); static void TestMixedComparison1<br>()</span></span> {</td></tr>
+<tr><td class="num" id="LN647">647</td><td class="line">  JSTypedLoweringTester R;</td></tr>
+<tr><td class="num" id="LN648">648</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN649">649</td><td class="line">  Type* types[] = {Type::Number(), Type::String(),</td></tr>
+<tr><td class="num" id="LN650">650</td><td class="line">                   Type::Union(Type::Number(), Type::String(), R.main_zone())};</td></tr>
+<tr><td class="num" id="LN651">651</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN652">652</td><td class="line">  <span class='keyword'>for</span> (size_t i = 0; i &lt; <span class='macro'>arraysize(types)<span class='expansion'>(sizeof(ArraySizeHelper(types)))</span></span>; i++) {</td></tr>
+<tr><td class="num" id="LN653">653</td><td class="line">    Node* p0 = R.Parameter(types[i], 0);</td></tr>
+<tr><td class="num" id="LN654">654</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN655">655</td><td class="line">    <span class='keyword'>for</span> (size_t j = 0; j &lt; <span class='macro'>arraysize(types)<span class='expansion'>(sizeof(ArraySizeHelper(types)))</span></span>; j++) {</td></tr>
+<tr><td class="num" id="LN656">656</td><td class="line">      Node* p1 = R.Parameter(types[j], 1);</td></tr>
+<tr><td class="num" id="LN657">657</td><td class="line">      {</td></tr>
+<tr><td class="num" id="LN658">658</td><td class="line">        <span class='keyword'>const</span> Operator* less_than = R.javascript.LessThan();</td></tr>
+<tr><td class="num" id="LN659">659</td><td class="line">        Node* cmp = R.Binop(less_than, p0, p1);</td></tr>
+<tr><td class="num" id="LN660">660</td><td class="line">        Node* r = R.reduce(cmp);</td></tr>
+<tr><td class="num" id="LN661">661</td><td class="line">        <span class='keyword'>if</span> (types[i]-&gt;Is(Type::String()) &amp;&amp; types[j]-&gt;Is(Type::String())) {</td></tr>
+<tr><td class="num" id="LN662">662</td><td class="line">          R.CheckBinop(R.simplified.StringLessThan(), r);</td></tr>
+<tr><td class="num" id="LN663">663</td><td class="line">        } <span class='keyword'>else</span> <span class='keyword'>if</span> ((types[i]-&gt;Is(Type::Number()) &amp;&amp;</td></tr>
+<tr><td class="num" id="LN664">664</td><td class="line">                    types[j]-&gt;Is(Type::Number())) ||</td></tr>
+<tr><td class="num" id="LN665">665</td><td class="line">                   (!types[i]-&gt;Maybe(Type::String()) ||</td></tr>
+<tr><td class="num" id="LN666">666</td><td class="line">                    !types[j]-&gt;Maybe(Type::String()))) {</td></tr>
+<tr><td class="num" id="LN667">667</td><td class="line">          R.CheckBinop(R.simplified.NumberLessThan(), r);</td></tr>
+<tr><td class="num" id="LN668">668</td><td class="line">        } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN669">669</td><td class="line">          <span class='comment'>// No reduction of mixed types.</span></td></tr>
+<tr><td class="num" id="LN670">670</td><td class="line">          <span class='macro'>CHECK_EQ(r-&gt;op(), less_than)<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (r-&gt;<br>op()), (less_than), "r-&gt;op()" " " "==" " " "less_than")) {<br> V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 670, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN671">671</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN672">672</td><td class="line">      }</td></tr>
+<tr><td class="num" id="LN673">673</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN674">674</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN675">675</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN676">676</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN677">677</td><td class="line"><span class='macro'>TEST(RemoveToNumberEffects)<span class='expansion'>static void TestRemoveToNumberEffects(); CcTest register_test_RemoveToNumberEffects<br>(TestRemoveToNumberEffects, "../test/cctest/compiler/test-js-typed-lowering.cc"<br>, "RemoveToNumberEffects", __null, true, true); static void TestRemoveToNumberEffects<br>()</span></span> {</td></tr>
+<tr><td class="num" id="LN678">678</td><td class="line">  JSTypedLoweringTester R;</td></tr>
+<tr><td class="num" id="LN679">679</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN680">680</td><td class="line">  Node* effect_use = <span class='macro'>NULL<span class='expansion'>__null</span></span>;</td></tr>
+<tr><td class="num" id="LN681">681</td><td class="line">  <span class='keyword'>for</span> (<span class='keyword'>int</span> i = 0; i &lt; 10; i++) {</td></tr>
+<tr><td class="num" id="LN682">682</td><td class="line">    Node* p0 = R.Parameter(Type::Number());</td></tr>
+<tr><td class="num" id="LN683">683</td><td class="line">    Node* ton = R.Unop(R.javascript.ToNumber(), p0);</td></tr>
+<tr><td class="num" id="LN684">684</td><td class="line">    Node* frame_state = R.EmptyFrameState(R.context());</td></tr>
+<tr><td class="num" id="LN685">685</td><td class="line">    effect_use = <span class='macro'>NULL<span class='expansion'>__null</span></span>;</td></tr>
+<tr><td class="num" id="LN686">686</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN687">687</td><td class="line">    <span class='keyword'>switch</span> (i) {</td></tr>
+<tr><td class="num" id="LN688">688</td><td class="line">      <span class='keyword'>case</span> 0:</td></tr>
+<tr><td class="num" id="LN689">689</td><td class="line">        <span class='macro'>CHECK_EQ(1, OperatorProperties::GetFrameStateInputCount(<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (1), (OperatorProperties<br>::GetFrameStateInputCount( R.javascript.ToNumber())), "1" " "<br> "==" " " "OperatorProperties::GetFrameStateInputCount( R.javascript.ToNumber())"<br>)) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 690, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span></td></tr>
+<tr><td class="num" id="LN690">690</td><td class="line">                        <span class='macro'>R.javascript.ToNumber()))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (1), (OperatorProperties<br>::GetFrameStateInputCount( R.javascript.ToNumber())), "1" " "<br> "==" " " "OperatorProperties::GetFrameStateInputCount( R.javascript.ToNumber())"<br>)) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 690, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN691">691</td><td class="line">        effect_use = R.graph.NewNode(R.javascript.ToNumber(), p0, R.context(),</td></tr>
+<tr><td class="num" id="LN692">692</td><td class="line">                                     frame_state, ton, R.start());</td></tr>
+<tr><td class="num" id="LN693">693</td><td class="line">        <span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN694">694</td><td class="line">      <span class='keyword'>case</span> 1:</td></tr>
+<tr><td class="num" id="LN695">695</td><td class="line">        <span class='macro'>CHECK_EQ(1, OperatorProperties::GetFrameStateInputCount(<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (1), (OperatorProperties<br>::GetFrameStateInputCount( R.javascript.ToNumber())), "1" " "<br> "==" " " "OperatorProperties::GetFrameStateInputCount( R.javascript.ToNumber())"<br>)) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 696, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span></td></tr>
+<tr><td class="num" id="LN696">696</td><td class="line">                        <span class='macro'>R.javascript.ToNumber()))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (1), (OperatorProperties<br>::GetFrameStateInputCount( R.javascript.ToNumber())), "1" " "<br> "==" " " "OperatorProperties::GetFrameStateInputCount( R.javascript.ToNumber())"<br>)) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 696, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN697">697</td><td class="line">        effect_use = R.graph.NewNode(R.javascript.ToNumber(), ton, R.context(),</td></tr>
+<tr><td class="num" id="LN698">698</td><td class="line">                                     frame_state, ton, R.start());</td></tr>
+<tr><td class="num" id="LN699">699</td><td class="line">        <span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN700">700</td><td class="line">      <span class='keyword'>case</span> 2:</td></tr>
+<tr><td class="num" id="LN701">701</td><td class="line">        effect_use = <span class="mrange">R.graph.NewNode(R.common.EffectPhi(1), ton, R.start())</span>;</td></tr>
+<tr><td class="num"></td><td class="line"><div id="EndPath" class="msg msgEvent" style="margin-left:9ex">Value stored to 'effect_use' is never read</div></td></tr>
+<tr><td class="num" id="LN702">702</td><td class="line">      <span class='keyword'>case</span> 3:</td></tr>
+<tr><td class="num" id="LN703">703</td><td class="line">        effect_use =</td></tr>
+<tr><td class="num" id="LN704">704</td><td class="line">            R.graph.NewNode(R.javascript.Add(R.hints), ton, ton, R.context(),</td></tr>
+<tr><td class="num" id="LN705">705</td><td class="line">                            frame_state, frame_state, ton, R.start());</td></tr>
+<tr><td class="num" id="LN706">706</td><td class="line">        <span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN707">707</td><td class="line">      <span class='keyword'>case</span> 4:</td></tr>
+<tr><td class="num" id="LN708">708</td><td class="line">        effect_use =</td></tr>
+<tr><td class="num" id="LN709">709</td><td class="line">            R.graph.NewNode(R.javascript.Add(R.hints), p0, p0, R.context(),</td></tr>
+<tr><td class="num" id="LN710">710</td><td class="line">                            frame_state, frame_state, ton, R.start());</td></tr>
+<tr><td class="num" id="LN711">711</td><td class="line">        <span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN712">712</td><td class="line">      <span class='keyword'>case</span> 5:</td></tr>
+<tr><td class="num" id="LN713">713</td><td class="line">        effect_use = R.graph.NewNode(R.common.Return(), p0, ton, R.start());</td></tr>
+<tr><td class="num" id="LN714">714</td><td class="line">        <span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN715">715</td><td class="line">      <span class='keyword'>case</span> 6:</td></tr>
+<tr><td class="num" id="LN716">716</td><td class="line">        effect_use = R.graph.NewNode(R.common.Return(), ton, ton, R.start());</td></tr>
+<tr><td class="num" id="LN717">717</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN718">718</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN719">719</td><td class="line">    R.CheckEffectInput(R.start(), ton);</td></tr>
+<tr><td class="num" id="LN720">720</td><td class="line">    <span class='keyword'>if</span> (effect_use != <span class='macro'>NULL<span class='expansion'>__null</span></span>) R.CheckEffectInput(ton, effect_use);</td></tr>
+<tr><td class="num" id="LN721">721</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN722">722</td><td class="line">    Node* r = R.reduce(ton);</td></tr>
+<tr><td class="num" id="LN723">723</td><td class="line">    <span class='macro'>CHECK_EQ(p0, r)<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (p0), (<br>r), "p0" " " "==" " " "r")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 723, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN724">724</td><td class="line">    <span class='macro'>CHECK_NE(R.start(), r)<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckNEImpl( (R.start<br>()), (r), "R.start()" " " "!=" " " "r")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 724, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN725">725</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN726">726</td><td class="line">    <span class='keyword'>if</span> (effect_use != <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num" id="LN727">727</td><td class="line">      R.CheckEffectInput(R.start(), effect_use);</td></tr>
+<tr><td class="num" id="LN728">728</td><td class="line">      <span class='comment'>// Check that value uses of ToNumber() do not go to start().</span></td></tr>
+<tr><td class="num" id="LN729">729</td><td class="line">      <span class='keyword'>for</span> (<span class='keyword'>int</span> i = 0; i &lt; effect_use-&gt;op()-&gt;ValueInputCount(); i++) {</td></tr>
+<tr><td class="num" id="LN730">730</td><td class="line">        <span class='macro'>CHECK_NE(R.start(), effect_use-&gt;InputAt(i))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckNEImpl( (R.start<br>()), (effect_use-&gt;InputAt(i)), "R.start()" " " "!=" " " "effect_use-&gt;InputAt(i)"<br>)) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 730, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN731">731</td><td class="line">      }</td></tr>
+<tr><td class="num" id="LN732">732</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN733">733</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN734">734</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN735">735</td><td class="line">  <span class='macro'>CHECK(!effect_use)<span class='expansion'>do { if ((__builtin_expect(!!(!(!effect_use)), 0))) { V8_Fatal<br>("../test/cctest/compiler/test-js-typed-lowering.cc", 735, "Check failed: %s."<br>, "!effect_use"); } } while (0)</span></span>;  <span class='comment'>// should have done all cases above.</span></td></tr>
+<tr><td class="num" id="LN736">736</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN737">737</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN738">738</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN739">739</td><td class="line"><span class='comment'>// Helper class for testing the reduction of a single binop.</span></td></tr>
+<tr><td class="num" id="LN740">740</td><td class="line"><span class='keyword'>class</span> BinopEffectsTester {</td></tr>
+<tr><td class="num" id="LN741">741</td><td class="line"> <span class='keyword'>public</span>:</td></tr>
+<tr><td class="num" id="LN742">742</td><td class="line">  <span class='keyword'>explicit</span> BinopEffectsTester(<span class='keyword'>const</span> Operator* op, Type* t0, Type* t1)</td></tr>
+<tr><td class="num" id="LN743">743</td><td class="line">      : R(),</td></tr>
+<tr><td class="num" id="LN744">744</td><td class="line">        p0(R.Parameter(t0, 0)),</td></tr>
+<tr><td class="num" id="LN745">745</td><td class="line">        p1(R.Parameter(t1, 1)),</td></tr>
+<tr><td class="num" id="LN746">746</td><td class="line">        binop(R.Binop(op, p0, p1)),</td></tr>
+<tr><td class="num" id="LN747">747</td><td class="line">        effect_use(R.graph.NewNode(R.common.EffectPhi(1), binop, R.start())) {</td></tr>
+<tr><td class="num" id="LN748">748</td><td class="line">    <span class='comment'>// Effects should be ordered start -&gt; binop -&gt; effect_use</span></td></tr>
+<tr><td class="num" id="LN749">749</td><td class="line">    R.CheckEffectInput(R.start(), binop);</td></tr>
+<tr><td class="num" id="LN750">750</td><td class="line">    R.CheckEffectInput(binop, effect_use);</td></tr>
+<tr><td class="num" id="LN751">751</td><td class="line">    result = R.reduce(binop);</td></tr>
+<tr><td class="num" id="LN752">752</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN753">753</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN754">754</td><td class="line">  JSTypedLoweringTester R;</td></tr>
+<tr><td class="num" id="LN755">755</td><td class="line">  Node* p0;</td></tr>
+<tr><td class="num" id="LN756">756</td><td class="line">  Node* p1;</td></tr>
+<tr><td class="num" id="LN757">757</td><td class="line">  Node* binop;</td></tr>
+<tr><td class="num" id="LN758">758</td><td class="line">  Node* effect_use;</td></tr>
+<tr><td class="num" id="LN759">759</td><td class="line">  Node* result;</td></tr>
+<tr><td class="num" id="LN760">760</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN761">761</td><td class="line">  <span class='keyword'>void</span> CheckEffectsRemoved() { R.CheckEffectInput(R.start(), effect_use); }</td></tr>
+<tr><td class="num" id="LN762">762</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN763">763</td><td class="line">  <span class='keyword'>void</span> CheckEffectOrdering(Node* n0) {</td></tr>
+<tr><td class="num" id="LN764">764</td><td class="line">    R.CheckEffectInput(R.start(), n0);</td></tr>
+<tr><td class="num" id="LN765">765</td><td class="line">    R.CheckEffectInput(n0, effect_use);</td></tr>
+<tr><td class="num" id="LN766">766</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN767">767</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN768">768</td><td class="line">  <span class='keyword'>void</span> CheckEffectOrdering(Node* n0, Node* n1) {</td></tr>
+<tr><td class="num" id="LN769">769</td><td class="line">    R.CheckEffectInput(R.start(), n0);</td></tr>
+<tr><td class="num" id="LN770">770</td><td class="line">    R.CheckEffectInput(n0, n1);</td></tr>
+<tr><td class="num" id="LN771">771</td><td class="line">    R.CheckEffectInput(n1, effect_use);</td></tr>
+<tr><td class="num" id="LN772">772</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN773">773</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN774">774</td><td class="line">  Node* CheckConvertedInput(IrOpcode::Value opcode, <span class='keyword'>int</span> which, <span class='keyword'>bool</span> effects) {</td></tr>
+<tr><td class="num" id="LN775">775</td><td class="line">    <span class='keyword'>return</span> CheckConverted(opcode, result-&gt;InputAt(which), effects);</td></tr>
+<tr><td class="num" id="LN776">776</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN777">777</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN778">778</td><td class="line">  Node* CheckConverted(IrOpcode::Value opcode, Node* node, <span class='keyword'>bool</span> effects) {</td></tr>
+<tr><td class="num" id="LN779">779</td><td class="line">    <span class='macro'>CHECK_EQ(opcode, node-&gt;opcode())<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (opcode<br>), (node-&gt;opcode()), "opcode" " " "==" " " "node-&gt;opcode()"<br>)) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 779, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN780">780</td><td class="line">    <span class='keyword'>if</span> (effects) {</td></tr>
+<tr><td class="num" id="LN781">781</td><td class="line">      <span class='macro'>CHECK_LT(0, node-&gt;op()-&gt;EffectInputCount())<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckLTImpl( (0), (node<br>-&gt;op()-&gt;EffectInputCount()), "0" " " "&lt;" " " "node-&gt;op()-&gt;EffectInputCount()"<br>)) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 781, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN782">782</td><td class="line">    } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN783">783</td><td class="line">      <span class='macro'>CHECK_EQ(0, node-&gt;op()-&gt;EffectInputCount())<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (0), (node<br>-&gt;op()-&gt;EffectInputCount()), "0" " " "==" " " "node-&gt;op()-&gt;EffectInputCount()"<br>)) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 783, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN784">784</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN785">785</td><td class="line">    <span class='keyword'>return</span> node;</td></tr>
+<tr><td class="num" id="LN786">786</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN787">787</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN788">788</td><td class="line">  Node* CheckNoOp(<span class='keyword'>int</span> which) {</td></tr>
+<tr><td class="num" id="LN789">789</td><td class="line">    <span class='macro'>CHECK_EQ(which == 0 ? p0 : p1, result-&gt;InputAt(which))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (which ==<br> 0 ? p0 : p1), (result-&gt;InputAt(which)), "which == 0 ? p0 : p1"<br> " " "==" " " "result-&gt;InputAt(which)")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 789, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN790">790</td><td class="line">    <span class='keyword'>return</span> result-&gt;InputAt(which);</td></tr>
+<tr><td class="num" id="LN791">791</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN792">792</td><td class="line">};</td></tr>
+<tr><td class="num" id="LN793">793</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN794">794</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN795">795</td><td class="line"><span class='comment'>// Helper function for strict and non-strict equality reductions.</span></td></tr>
+<tr><td class="num" id="LN796">796</td><td class="line"><span class='keyword'>void</span> CheckEqualityReduction(JSTypedLoweringTester* R, <span class='keyword'>bool</span> strict, Node* l,</td></tr>
+<tr><td class="num" id="LN797">797</td><td class="line">                            Node* r, IrOpcode::Value expected) {</td></tr>
+<tr><td class="num" id="LN798">798</td><td class="line">  <span class='keyword'>for</span> (<span class='keyword'>int</span> j = 0; j &lt; 2; j++) {</td></tr>
+<tr><td class="num" id="LN799">799</td><td class="line">    Node* p0 = j == 0 ? l : r;</td></tr>
+<tr><td class="num" id="LN800">800</td><td class="line">    Node* p1 = j == 1 ? l : r;</td></tr>
+<tr><td class="num" id="LN801">801</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN802">802</td><td class="line">    {</td></tr>
+<tr><td class="num" id="LN803">803</td><td class="line">      <span class='keyword'>const</span> Operator* op =</td></tr>
+<tr><td class="num" id="LN804">804</td><td class="line">          strict ? R-&gt;javascript.StrictEqual() : R-&gt;javascript.Equal();</td></tr>
+<tr><td class="num" id="LN805">805</td><td class="line">      Node* eq = R-&gt;Binop(op, p0, p1);</td></tr>
+<tr><td class="num" id="LN806">806</td><td class="line">      Node* r = R-&gt;reduce(eq);</td></tr>
+<tr><td class="num" id="LN807">807</td><td class="line">      R-&gt;CheckBinop(expected, r);</td></tr>
+<tr><td class="num" id="LN808">808</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN809">809</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN810">810</td><td class="line">    {</td></tr>
+<tr><td class="num" id="LN811">811</td><td class="line">      <span class='keyword'>const</span> Operator* op =</td></tr>
+<tr><td class="num" id="LN812">812</td><td class="line">          strict ? R-&gt;javascript.StrictNotEqual() : R-&gt;javascript.NotEqual();</td></tr>
+<tr><td class="num" id="LN813">813</td><td class="line">      Node* ne = R-&gt;Binop(op, p0, p1);</td></tr>
+<tr><td class="num" id="LN814">814</td><td class="line">      Node* n = R-&gt;reduce(ne);</td></tr>
+<tr><td class="num" id="LN815">815</td><td class="line">      <span class='macro'>CHECK_EQ(IrOpcode::kBooleanNot, n-&gt;opcode())<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (IrOpcode<br>::kBooleanNot), (n-&gt;opcode()), "IrOpcode::kBooleanNot" " "<br> "==" " " "n-&gt;opcode()")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 815, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN816">816</td><td class="line">      Node* r = n-&gt;InputAt(0);</td></tr>
+<tr><td class="num" id="LN817">817</td><td class="line">      R-&gt;CheckBinop(expected, r);</td></tr>
+<tr><td class="num" id="LN818">818</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN819">819</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN820">820</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN821">821</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN822">822</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN823">823</td><td class="line"><span class='macro'>TEST(EqualityForNumbers)<span class='expansion'>static void TestEqualityForNumbers(); CcTest register_test_EqualityForNumbers<br>(TestEqualityForNumbers, "../test/cctest/compiler/test-js-typed-lowering.cc"<br>, "EqualityForNumbers", __null, true, true); static void TestEqualityForNumbers<br>()</span></span> {</td></tr>
+<tr><td class="num" id="LN824">824</td><td class="line">  JSTypedLoweringTester R;</td></tr>
+<tr><td class="num" id="LN825">825</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN826">826</td><td class="line">  Type* simple_number_types[] = {Type::UnsignedSmall(), Type::SignedSmall(),</td></tr>
+<tr><td class="num" id="LN827">827</td><td class="line">                                 Type::Signed32(), Type::Unsigned32(),</td></tr>
+<tr><td class="num" id="LN828">828</td><td class="line">                                 Type::Number()};</td></tr>
+<tr><td class="num" id="LN829">829</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN830">830</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN831">831</td><td class="line">  <span class='keyword'>for</span> (size_t i = 0; i &lt; <span class='macro'>arraysize(simple_number_types)<span class='expansion'>(sizeof(ArraySizeHelper(simple_number_types)))</span></span>; ++i) {</td></tr>
+<tr><td class="num" id="LN832">832</td><td class="line">    Node* p0 = R.Parameter(simple_number_types[i], 0);</td></tr>
+<tr><td class="num" id="LN833">833</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN834">834</td><td class="line">    <span class='keyword'>for</span> (size_t j = 0; j &lt; <span class='macro'>arraysize(simple_number_types)<span class='expansion'>(sizeof(ArraySizeHelper(simple_number_types)))</span></span>; ++j) {</td></tr>
+<tr><td class="num" id="LN835">835</td><td class="line">      Node* p1 = R.Parameter(simple_number_types[j], 1);</td></tr>
+<tr><td class="num" id="LN836">836</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN837">837</td><td class="line">      CheckEqualityReduction(&amp;R, <span class='keyword'>true</span>, p0, p1, IrOpcode::kNumberEqual);</td></tr>
+<tr><td class="num" id="LN838">838</td><td class="line">      CheckEqualityReduction(&amp;R, <span class='keyword'>false</span>, p0, p1, IrOpcode::kNumberEqual);</td></tr>
+<tr><td class="num" id="LN839">839</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN840">840</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN841">841</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN842">842</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN843">843</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN844">844</td><td class="line"><span class='macro'>TEST(StrictEqualityForRefEqualTypes)<span class='expansion'>static void TestStrictEqualityForRefEqualTypes(); CcTest register_test_StrictEqualityForRefEqualTypes<br>(TestStrictEqualityForRefEqualTypes, "../test/cctest/compiler/test-js-typed-lowering.cc"<br>, "StrictEqualityForRefEqualTypes", __null, true, true); static<br> void TestStrictEqualityForRefEqualTypes()</span></span> {</td></tr>
+<tr><td class="num" id="LN845">845</td><td class="line">  JSTypedLoweringTester R;</td></tr>
+<tr><td class="num" id="LN846">846</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN847">847</td><td class="line">  Type* types[] = {Type::Undefined(), Type::Null(), Type::Boolean(),</td></tr>
+<tr><td class="num" id="LN848">848</td><td class="line">                   Type::Object(), Type::Receiver()};</td></tr>
+<tr><td class="num" id="LN849">849</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN850">850</td><td class="line">  Node* p0 = R.Parameter(Type::Any());</td></tr>
+<tr><td class="num" id="LN851">851</td><td class="line">  <span class='keyword'>for</span> (size_t i = 0; i &lt; <span class='macro'>arraysize(types)<span class='expansion'>(sizeof(ArraySizeHelper(types)))</span></span>; i++) {</td></tr>
+<tr><td class="num" id="LN852">852</td><td class="line">    Node* p1 = R.Parameter(types[i]);</td></tr>
+<tr><td class="num" id="LN853">853</td><td class="line">    CheckEqualityReduction(&amp;R, <span class='keyword'>true</span>, p0, p1, IrOpcode::kReferenceEqual);</td></tr>
+<tr><td class="num" id="LN854">854</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN855">855</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN856">856</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN857">857</td><td class="line"><span class='macro'>TEST(StrictEqualityForUnique)<span class='expansion'>static void TestStrictEqualityForUnique(); CcTest register_test_StrictEqualityForUnique<br>(TestStrictEqualityForUnique, "../test/cctest/compiler/test-js-typed-lowering.cc"<br>, "StrictEqualityForUnique", __null, true, true); static void<br> TestStrictEqualityForUnique()</span></span> {</td></tr>
+<tr><td class="num" id="LN858">858</td><td class="line">  JSTypedLoweringTester R;</td></tr>
+<tr><td class="num" id="LN859">859</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN860">860</td><td class="line">  Node* p0 = R.Parameter(Type::Unique());</td></tr>
+<tr><td class="num" id="LN861">861</td><td class="line">  Node* p1 = R.Parameter(Type::Unique());</td></tr>
+<tr><td class="num" id="LN862">862</td><td class="line">  CheckEqualityReduction(&amp;R, <span class='keyword'>true</span>, p0, p1, IrOpcode::kReferenceEqual);</td></tr>
+<tr><td class="num" id="LN863">863</td><td class="line">  CheckEqualityReduction(&amp;R, <span class='keyword'>true</span>, p1, p0, IrOpcode::kReferenceEqual);</td></tr>
+<tr><td class="num" id="LN864">864</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN865">865</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN866">866</td><td class="line"><span class='macro'>TEST(StringEquality)<span class='expansion'>static void TestStringEquality(); CcTest register_test_StringEquality<br>(TestStringEquality, "../test/cctest/compiler/test-js-typed-lowering.cc"<br>, "StringEquality", __null, true, true); static void TestStringEquality<br>()</span></span> {</td></tr>
+<tr><td class="num" id="LN867">867</td><td class="line">  JSTypedLoweringTester R;</td></tr>
+<tr><td class="num" id="LN868">868</td><td class="line">  Node* p0 = R.Parameter(Type::String());</td></tr>
+<tr><td class="num" id="LN869">869</td><td class="line">  Node* p1 = R.Parameter(Type::String());</td></tr>
+<tr><td class="num" id="LN870">870</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN871">871</td><td class="line">  CheckEqualityReduction(&amp;R, <span class='keyword'>true</span>, p0, p1, IrOpcode::kStringEqual);</td></tr>
+<tr><td class="num" id="LN872">872</td><td class="line">  CheckEqualityReduction(&amp;R, <span class='keyword'>false</span>, p0, p1, IrOpcode::kStringEqual);</td></tr>
+<tr><td class="num" id="LN873">873</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN874">874</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN875">875</td><td class="line"><span class='macro'>TEST(RemovePureNumberBinopEffects)<span class='expansion'>static void TestRemovePureNumberBinopEffects(); CcTest register_test_RemovePureNumberBinopEffects<br>(TestRemovePureNumberBinopEffects, "../test/cctest/compiler/test-js-typed-lowering.cc"<br>, "RemovePureNumberBinopEffects", __null, true, true); static<br> void TestRemovePureNumberBinopEffects()</span></span> {</td></tr>
+<tr><td class="num" id="LN876">876</td><td class="line">  JSTypedLoweringTester R;</td></tr>
+<tr><td class="num" id="LN877">877</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN878">878</td><td class="line">  <span class='keyword'>const</span> Operator* ops[] = {</td></tr>
+<tr><td class="num" id="LN879">879</td><td class="line">      R.javascript.Equal(),           R.simplified.NumberEqual(),</td></tr>
+<tr><td class="num" id="LN880">880</td><td class="line">      R.javascript.Add(R.hints),      R.simplified.NumberAdd(),</td></tr>
+<tr><td class="num" id="LN881">881</td><td class="line">      R.javascript.Subtract(R.hints), R.simplified.NumberSubtract(),</td></tr>
+<tr><td class="num" id="LN882">882</td><td class="line">      R.javascript.Multiply(R.hints), R.simplified.NumberMultiply(),</td></tr>
+<tr><td class="num" id="LN883">883</td><td class="line">      R.javascript.Divide(R.hints),   R.simplified.NumberDivide(),</td></tr>
+<tr><td class="num" id="LN884">884</td><td class="line">      R.javascript.Modulus(R.hints),  R.simplified.NumberModulus(),</td></tr>
+<tr><td class="num" id="LN885">885</td><td class="line">      R.javascript.LessThan(),        R.simplified.NumberLessThan(),</td></tr>
+<tr><td class="num" id="LN886">886</td><td class="line">      R.javascript.LessThanOrEqual(), R.simplified.NumberLessThanOrEqual(),</td></tr>
+<tr><td class="num" id="LN887">887</td><td class="line">  };</td></tr>
+<tr><td class="num" id="LN888">888</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN889">889</td><td class="line">  <span class='keyword'>for</span> (size_t j = 0; j &lt; <span class='macro'>arraysize(ops)<span class='expansion'>(sizeof(ArraySizeHelper(ops)))</span></span>; j += 2) {</td></tr>
+<tr><td class="num" id="LN890">890</td><td class="line">    BinopEffectsTester B(ops[j], Type::Number(), Type::Number());</td></tr>
+<tr><td class="num" id="LN891">891</td><td class="line">    <span class='macro'>CHECK_EQ(ops[j + 1]-&gt;opcode(), B.result-&gt;op()-&gt;opcode())<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (ops[j +<br> 1]-&gt;opcode()), (B.result-&gt;op()-&gt;opcode()), "ops[j + 1]-&gt;opcode()"<br> " " "==" " " "B.result-&gt;op()-&gt;opcode()")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 891, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN892">892</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN893">893</td><td class="line">    B.R.CheckBinop(B.result-&gt;opcode(), B.result);</td></tr>
+<tr><td class="num" id="LN894">894</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN895">895</td><td class="line">    B.CheckNoOp(0);</td></tr>
+<tr><td class="num" id="LN896">896</td><td class="line">    B.CheckNoOp(1);</td></tr>
+<tr><td class="num" id="LN897">897</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN898">898</td><td class="line">    B.CheckEffectsRemoved();</td></tr>
+<tr><td class="num" id="LN899">899</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN900">900</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN901">901</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN902">902</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN903">903</td><td class="line"><span class='macro'>TEST(OrderNumberBinopEffects1)<span class='expansion'>static void TestOrderNumberBinopEffects1(); CcTest register_test_OrderNumberBinopEffects1<br>(TestOrderNumberBinopEffects1, "../test/cctest/compiler/test-js-typed-lowering.cc"<br>, "OrderNumberBinopEffects1", __null, true, true); static void<br> TestOrderNumberBinopEffects1()</span></span> {</td></tr>
+<tr><td class="num" id="LN904">904</td><td class="line">  JSTypedLoweringTester R;</td></tr>
+<tr><td class="num" id="LN905">905</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN906">906</td><td class="line">  <span class='keyword'>const</span> Operator* ops[] = {</td></tr>
+<tr><td class="num" id="LN907">907</td><td class="line">      R.javascript.Subtract(R.hints), R.simplified.NumberSubtract(),</td></tr>
+<tr><td class="num" id="LN908">908</td><td class="line">      R.javascript.Multiply(R.hints), R.simplified.NumberMultiply(),</td></tr>
+<tr><td class="num" id="LN909">909</td><td class="line">      R.javascript.Divide(R.hints),   R.simplified.NumberDivide(),</td></tr>
+<tr><td class="num" id="LN910">910</td><td class="line">  };</td></tr>
+<tr><td class="num" id="LN911">911</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN912">912</td><td class="line">  <span class='keyword'>for</span> (size_t j = 0; j &lt; <span class='macro'>arraysize(ops)<span class='expansion'>(sizeof(ArraySizeHelper(ops)))</span></span>; j += 2) {</td></tr>
+<tr><td class="num" id="LN913">913</td><td class="line">    BinopEffectsTester B(ops[j], Type::Symbol(), Type::Symbol());</td></tr>
+<tr><td class="num" id="LN914">914</td><td class="line">    <span class='macro'>CHECK_EQ(ops[j + 1]-&gt;opcode(), B.result-&gt;op()-&gt;opcode())<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (ops[j +<br> 1]-&gt;opcode()), (B.result-&gt;op()-&gt;opcode()), "ops[j + 1]-&gt;opcode()"<br> " " "==" " " "B.result-&gt;op()-&gt;opcode()")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 914, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN915">915</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN916">916</td><td class="line">    Node* i0 = B.CheckConvertedInput(IrOpcode::kJSToNumber, 0, <span class='keyword'>true</span>);</td></tr>
+<tr><td class="num" id="LN917">917</td><td class="line">    Node* i1 = B.CheckConvertedInput(IrOpcode::kJSToNumber, 1, <span class='keyword'>true</span>);</td></tr>
+<tr><td class="num" id="LN918">918</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN919">919</td><td class="line">    <span class='macro'>CHECK_EQ(B.p0, i0-&gt;InputAt(0))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (B.p0),<br> (i0-&gt;InputAt(0)), "B.p0" " " "==" " " "i0-&gt;InputAt(0)"<br>)) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 919, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN920">920</td><td class="line">    <span class='macro'>CHECK_EQ(B.p1, i1-&gt;InputAt(0))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (B.p1),<br> (i1-&gt;InputAt(0)), "B.p1" " " "==" " " "i1-&gt;InputAt(0)"<br>)) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 920, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN921">921</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN922">922</td><td class="line">    <span class='comment'>// Effects should be ordered start -&gt; i0 -&gt; i1 -&gt; effect_use</span></td></tr>
+<tr><td class="num" id="LN923">923</td><td class="line">    B.CheckEffectOrdering(i0, i1);</td></tr>
+<tr><td class="num" id="LN924">924</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN925">925</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN926">926</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN927">927</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN928">928</td><td class="line"><span class='macro'>TEST(OrderNumberBinopEffects2)<span class='expansion'>static void TestOrderNumberBinopEffects2(); CcTest register_test_OrderNumberBinopEffects2<br>(TestOrderNumberBinopEffects2, "../test/cctest/compiler/test-js-typed-lowering.cc"<br>, "OrderNumberBinopEffects2", __null, true, true); static void<br> TestOrderNumberBinopEffects2()</span></span> {</td></tr>
+<tr><td class="num" id="LN929">929</td><td class="line">  JSTypedLoweringTester R;</td></tr>
+<tr><td class="num" id="LN930">930</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN931">931</td><td class="line">  <span class='keyword'>const</span> Operator* ops[] = {</td></tr>
+<tr><td class="num" id="LN932">932</td><td class="line">      R.javascript.Add(R.hints),      R.simplified.NumberAdd(),</td></tr>
+<tr><td class="num" id="LN933">933</td><td class="line">      R.javascript.Subtract(R.hints), R.simplified.NumberSubtract(),</td></tr>
+<tr><td class="num" id="LN934">934</td><td class="line">      R.javascript.Multiply(R.hints), R.simplified.NumberMultiply(),</td></tr>
+<tr><td class="num" id="LN935">935</td><td class="line">      R.javascript.Divide(R.hints),   R.simplified.NumberDivide(),</td></tr>
+<tr><td class="num" id="LN936">936</td><td class="line">  };</td></tr>
+<tr><td class="num" id="LN937">937</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN938">938</td><td class="line">  <span class='keyword'>for</span> (size_t j = 0; j &lt; <span class='macro'>arraysize(ops)<span class='expansion'>(sizeof(ArraySizeHelper(ops)))</span></span>; j += 2) {</td></tr>
+<tr><td class="num" id="LN939">939</td><td class="line">    BinopEffectsTester B(ops[j], Type::Number(), Type::Symbol());</td></tr>
+<tr><td class="num" id="LN940">940</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN941">941</td><td class="line">    Node* i0 = B.CheckNoOp(0);</td></tr>
+<tr><td class="num" id="LN942">942</td><td class="line">    Node* i1 = B.CheckConvertedInput(IrOpcode::kJSToNumber, 1, <span class='keyword'>true</span>);</td></tr>
+<tr><td class="num" id="LN943">943</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN944">944</td><td class="line">    <span class='macro'>CHECK_EQ(B.p0, i0)<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (B.p0),<br> (i0), "B.p0" " " "==" " " "i0")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 944, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN945">945</td><td class="line">    <span class='macro'>CHECK_EQ(B.p1, i1-&gt;InputAt(0))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (B.p1),<br> (i1-&gt;InputAt(0)), "B.p1" " " "==" " " "i1-&gt;InputAt(0)"<br>)) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 945, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN946">946</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN947">947</td><td class="line">    <span class='comment'>// Effects should be ordered start -&gt; i1 -&gt; effect_use</span></td></tr>
+<tr><td class="num" id="LN948">948</td><td class="line">    B.CheckEffectOrdering(i1);</td></tr>
+<tr><td class="num" id="LN949">949</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN950">950</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN951">951</td><td class="line">  <span class='keyword'>for</span> (size_t j = 0; j &lt; <span class='macro'>arraysize(ops)<span class='expansion'>(sizeof(ArraySizeHelper(ops)))</span></span>; j += 2) {</td></tr>
+<tr><td class="num" id="LN952">952</td><td class="line">    BinopEffectsTester B(ops[j], Type::Symbol(), Type::Number());</td></tr>
+<tr><td class="num" id="LN953">953</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN954">954</td><td class="line">    Node* i0 = B.CheckConvertedInput(IrOpcode::kJSToNumber, 0, <span class='keyword'>true</span>);</td></tr>
+<tr><td class="num" id="LN955">955</td><td class="line">    Node* i1 = B.CheckNoOp(1);</td></tr>
+<tr><td class="num" id="LN956">956</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN957">957</td><td class="line">    <span class='macro'>CHECK_EQ(B.p0, i0-&gt;InputAt(0))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (B.p0),<br> (i0-&gt;InputAt(0)), "B.p0" " " "==" " " "i0-&gt;InputAt(0)"<br>)) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 957, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN958">958</td><td class="line">    <span class='macro'>CHECK_EQ(B.p1, i1)<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (B.p1),<br> (i1), "B.p1" " " "==" " " "i1")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 958, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN959">959</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN960">960</td><td class="line">    <span class='comment'>// Effects should be ordered start -&gt; i0 -&gt; effect_use</span></td></tr>
+<tr><td class="num" id="LN961">961</td><td class="line">    B.CheckEffectOrdering(i0);</td></tr>
+<tr><td class="num" id="LN962">962</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN963">963</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN964">964</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN965">965</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN966">966</td><td class="line"><span class='macro'>TEST(OrderCompareEffects)<span class='expansion'>static void TestOrderCompareEffects(); CcTest register_test_OrderCompareEffects<br>(TestOrderCompareEffects, "../test/cctest/compiler/test-js-typed-lowering.cc"<br>, "OrderCompareEffects", __null, true, true); static void TestOrderCompareEffects<br>()</span></span> {</td></tr>
+<tr><td class="num" id="LN967">967</td><td class="line">  JSTypedLoweringTester R;</td></tr>
+<tr><td class="num" id="LN968">968</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN969">969</td><td class="line">  <span class='keyword'>const</span> Operator* ops[] = {</td></tr>
+<tr><td class="num" id="LN970">970</td><td class="line">      R.javascript.GreaterThan(), R.simplified.NumberLessThan(),</td></tr>
+<tr><td class="num" id="LN971">971</td><td class="line">      R.javascript.GreaterThanOrEqual(), R.simplified.NumberLessThanOrEqual(),</td></tr>
+<tr><td class="num" id="LN972">972</td><td class="line">  };</td></tr>
+<tr><td class="num" id="LN973">973</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN974">974</td><td class="line">  <span class='keyword'>for</span> (size_t j = 0; j &lt; <span class='macro'>arraysize(ops)<span class='expansion'>(sizeof(ArraySizeHelper(ops)))</span></span>; j += 2) {</td></tr>
+<tr><td class="num" id="LN975">975</td><td class="line">    BinopEffectsTester B(ops[j], Type::Symbol(), Type::String());</td></tr>
+<tr><td class="num" id="LN976">976</td><td class="line">    <span class='macro'>CHECK_EQ(ops[j + 1]-&gt;opcode(), B.result-&gt;op()-&gt;opcode())<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (ops[j +<br> 1]-&gt;opcode()), (B.result-&gt;op()-&gt;opcode()), "ops[j + 1]-&gt;opcode()"<br> " " "==" " " "B.result-&gt;op()-&gt;opcode()")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 976, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN977">977</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN978">978</td><td class="line">    Node* i0 = B.CheckConvertedInput(IrOpcode::kJSToNumber, 0, <span class='keyword'>true</span>);</td></tr>
+<tr><td class="num" id="LN979">979</td><td class="line">    Node* i1 = B.CheckConvertedInput(IrOpcode::kJSToNumber, 1, <span class='keyword'>true</span>);</td></tr>
+<tr><td class="num" id="LN980">980</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN981">981</td><td class="line">    <span class='comment'>// Inputs should be commuted.</span></td></tr>
+<tr><td class="num" id="LN982">982</td><td class="line">    <span class='macro'>CHECK_EQ(B.p1, i0-&gt;InputAt(0))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (B.p1),<br> (i0-&gt;InputAt(0)), "B.p1" " " "==" " " "i0-&gt;InputAt(0)"<br>)) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 982, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN983">983</td><td class="line">    <span class='macro'>CHECK_EQ(B.p0, i1-&gt;InputAt(0))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (B.p0),<br> (i1-&gt;InputAt(0)), "B.p0" " " "==" " " "i1-&gt;InputAt(0)"<br>)) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 983, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN984">984</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN985">985</td><td class="line">    <span class='comment'>// But effects should be ordered start -&gt; i1 -&gt; effect_use</span></td></tr>
+<tr><td class="num" id="LN986">986</td><td class="line">    B.CheckEffectOrdering(i1);</td></tr>
+<tr><td class="num" id="LN987">987</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN988">988</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN989">989</td><td class="line">  <span class='keyword'>for</span> (size_t j = 0; j &lt; <span class='macro'>arraysize(ops)<span class='expansion'>(sizeof(ArraySizeHelper(ops)))</span></span>; j += 2) {</td></tr>
+<tr><td class="num" id="LN990">990</td><td class="line">    BinopEffectsTester B(ops[j], Type::Number(), Type::Symbol());</td></tr>
+<tr><td class="num" id="LN991">991</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN992">992</td><td class="line">    Node* i0 = B.CheckConvertedInput(IrOpcode::kJSToNumber, 0, <span class='keyword'>true</span>);</td></tr>
+<tr><td class="num" id="LN993">993</td><td class="line">    Node* i1 = B.result-&gt;InputAt(1);</td></tr>
+<tr><td class="num" id="LN994">994</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN995">995</td><td class="line">    <span class='macro'>CHECK_EQ(B.p1, i0-&gt;InputAt(0))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (B.p1),<br> (i0-&gt;InputAt(0)), "B.p1" " " "==" " " "i0-&gt;InputAt(0)"<br>)) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 995, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;  <span class='comment'>// Should be commuted.</span></td></tr>
+<tr><td class="num" id="LN996">996</td><td class="line">    <span class='macro'>CHECK_EQ(B.p0, i1)<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (B.p0),<br> (i1), "B.p0" " " "==" " " "i1")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 996, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN997">997</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN998">998</td><td class="line">    <span class='comment'>// Effects should be ordered start -&gt; i1 -&gt; effect_use</span></td></tr>
+<tr><td class="num" id="LN999">999</td><td class="line">    B.CheckEffectOrdering(i0);</td></tr>
+<tr><td class="num" id="LN1000">1000</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN1001">1001</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1002">1002</td><td class="line">  <span class='keyword'>for</span> (size_t j = 0; j &lt; <span class='macro'>arraysize(ops)<span class='expansion'>(sizeof(ArraySizeHelper(ops)))</span></span>; j += 2) {</td></tr>
+<tr><td class="num" id="LN1003">1003</td><td class="line">    BinopEffectsTester B(ops[j], Type::Symbol(), Type::Number());</td></tr>
+<tr><td class="num" id="LN1004">1004</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1005">1005</td><td class="line">    Node* i0 = B.result-&gt;InputAt(0);</td></tr>
+<tr><td class="num" id="LN1006">1006</td><td class="line">    Node* i1 = B.CheckConvertedInput(IrOpcode::kJSToNumber, 1, <span class='keyword'>true</span>);</td></tr>
+<tr><td class="num" id="LN1007">1007</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1008">1008</td><td class="line">    <span class='macro'>CHECK_EQ(B.p1, i0)<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (B.p1),<br> (i0), "B.p1" " " "==" " " "i0")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 1008, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;  <span class='comment'>// Should be commuted.</span></td></tr>
+<tr><td class="num" id="LN1009">1009</td><td class="line">    <span class='macro'>CHECK_EQ(B.p0, i1-&gt;InputAt(0))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (B.p0),<br> (i1-&gt;InputAt(0)), "B.p0" " " "==" " " "i1-&gt;InputAt(0)"<br>)) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 1009, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN1010">1010</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1011">1011</td><td class="line">    <span class='comment'>// Effects should be ordered start -&gt; i0 -&gt; effect_use</span></td></tr>
+<tr><td class="num" id="LN1012">1012</td><td class="line">    B.CheckEffectOrdering(i1);</td></tr>
+<tr><td class="num" id="LN1013">1013</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN1014">1014</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN1015">1015</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1016">1016</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1017">1017</td><td class="line"><span class='macro'>TEST(Int32BinopEffects)<span class='expansion'>static void TestInt32BinopEffects(); CcTest register_test_Int32BinopEffects<br>(TestInt32BinopEffects, "../test/cctest/compiler/test-js-typed-lowering.cc"<br>, "Int32BinopEffects", __null, true, true); static void TestInt32BinopEffects<br>()</span></span> {</td></tr>
+<tr><td class="num" id="LN1018">1018</td><td class="line">  JSBitwiseTypedLoweringTester R;</td></tr>
+<tr><td class="num" id="LN1019">1019</td><td class="line">  <span class='keyword'>for</span> (<span class='keyword'>int</span> j = 0; j &lt; R.kNumberOps; j += 2) {</td></tr>
+<tr><td class="num" id="LN1020">1020</td><td class="line">    <span class='keyword'>bool</span> signed_left = R.signedness[j], signed_right = R.signedness[j + 1];</td></tr>
+<tr><td class="num" id="LN1021">1021</td><td class="line">    BinopEffectsTester B(R.ops[j], I32Type(signed_left), I32Type(signed_right));</td></tr>
+<tr><td class="num" id="LN1022">1022</td><td class="line">    <span class='macro'>CHECK_EQ(R.ops[j + 1]-&gt;opcode(), B.result-&gt;op()-&gt;opcode())<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (R.ops[<br>j + 1]-&gt;opcode()), (B.result-&gt;op()-&gt;opcode()), "R.ops[j + 1]-&gt;opcode()"<br> " " "==" " " "B.result-&gt;op()-&gt;opcode()")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 1022, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN1023">1023</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1024">1024</td><td class="line">    B.R.CheckBinop(B.result-&gt;opcode(), B.result);</td></tr>
+<tr><td class="num" id="LN1025">1025</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1026">1026</td><td class="line">    B.CheckNoOp(0);</td></tr>
+<tr><td class="num" id="LN1027">1027</td><td class="line">    B.CheckNoOp(1);</td></tr>
+<tr><td class="num" id="LN1028">1028</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1029">1029</td><td class="line">    B.CheckEffectsRemoved();</td></tr>
+<tr><td class="num" id="LN1030">1030</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN1031">1031</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1032">1032</td><td class="line">  <span class='keyword'>for</span> (<span class='keyword'>int</span> j = 0; j &lt; R.kNumberOps; j += 2) {</td></tr>
+<tr><td class="num" id="LN1033">1033</td><td class="line">    <span class='keyword'>bool</span> signed_left = R.signedness[j], signed_right = R.signedness[j + 1];</td></tr>
+<tr><td class="num" id="LN1034">1034</td><td class="line">    BinopEffectsTester B(R.ops[j], Type::Number(), Type::Number());</td></tr>
+<tr><td class="num" id="LN1035">1035</td><td class="line">    <span class='macro'>CHECK_EQ(R.ops[j + 1]-&gt;opcode(), B.result-&gt;op()-&gt;opcode())<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (R.ops[<br>j + 1]-&gt;opcode()), (B.result-&gt;op()-&gt;opcode()), "R.ops[j + 1]-&gt;opcode()"<br> " " "==" " " "B.result-&gt;op()-&gt;opcode()")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 1035, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN1036">1036</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1037">1037</td><td class="line">    B.R.CheckBinop(B.result-&gt;opcode(), B.result);</td></tr>
+<tr><td class="num" id="LN1038">1038</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1039">1039</td><td class="line">    B.CheckConvertedInput(NumberToI32(signed_left), 0, <span class='keyword'>false</span>);</td></tr>
+<tr><td class="num" id="LN1040">1040</td><td class="line">    B.CheckConvertedInput(NumberToI32(signed_right), 1, <span class='keyword'>false</span>);</td></tr>
+<tr><td class="num" id="LN1041">1041</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1042">1042</td><td class="line">    B.CheckEffectsRemoved();</td></tr>
+<tr><td class="num" id="LN1043">1043</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN1044">1044</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1045">1045</td><td class="line">  <span class='keyword'>for</span> (<span class='keyword'>int</span> j = 0; j &lt; R.kNumberOps; j += 2) {</td></tr>
+<tr><td class="num" id="LN1046">1046</td><td class="line">    <span class='keyword'>bool</span> signed_left = R.signedness[j], signed_right = R.signedness[j + 1];</td></tr>
+<tr><td class="num" id="LN1047">1047</td><td class="line">    BinopEffectsTester B(R.ops[j], Type::Number(), Type::Primitive());</td></tr>
+<tr><td class="num" id="LN1048">1048</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1049">1049</td><td class="line">    B.R.CheckBinop(B.result-&gt;opcode(), B.result);</td></tr>
+<tr><td class="num" id="LN1050">1050</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1051">1051</td><td class="line">    Node* i0 = B.CheckConvertedInput(NumberToI32(signed_left), 0, <span class='keyword'>false</span>);</td></tr>
+<tr><td class="num" id="LN1052">1052</td><td class="line">    Node* i1 = B.CheckConvertedInput(NumberToI32(signed_right), 1, <span class='keyword'>false</span>);</td></tr>
+<tr><td class="num" id="LN1053">1053</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1054">1054</td><td class="line">    <span class='macro'>CHECK_EQ(B.p0, i0-&gt;InputAt(0))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (B.p0),<br> (i0-&gt;InputAt(0)), "B.p0" " " "==" " " "i0-&gt;InputAt(0)"<br>)) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 1054, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN1055">1055</td><td class="line">    Node* ii1 = B.CheckConverted(IrOpcode::kJSToNumber, i1-&gt;InputAt(0), <span class='keyword'>true</span>);</td></tr>
+<tr><td class="num" id="LN1056">1056</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1057">1057</td><td class="line">    <span class='macro'>CHECK_EQ(B.p1, ii1-&gt;InputAt(0))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (B.p1),<br> (ii1-&gt;InputAt(0)), "B.p1" " " "==" " " "ii1-&gt;InputAt(0)"<br>)) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 1057, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN1058">1058</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1059">1059</td><td class="line">    B.CheckEffectOrdering(ii1);</td></tr>
+<tr><td class="num" id="LN1060">1060</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN1061">1061</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1062">1062</td><td class="line">  <span class='keyword'>for</span> (<span class='keyword'>int</span> j = 0; j &lt; R.kNumberOps; j += 2) {</td></tr>
+<tr><td class="num" id="LN1063">1063</td><td class="line">    <span class='keyword'>bool</span> signed_left = R.signedness[j], signed_right = R.signedness[j + 1];</td></tr>
+<tr><td class="num" id="LN1064">1064</td><td class="line">    BinopEffectsTester B(R.ops[j], Type::Primitive(), Type::Number());</td></tr>
+<tr><td class="num" id="LN1065">1065</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1066">1066</td><td class="line">    B.R.CheckBinop(B.result-&gt;opcode(), B.result);</td></tr>
+<tr><td class="num" id="LN1067">1067</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1068">1068</td><td class="line">    Node* i0 = B.CheckConvertedInput(NumberToI32(signed_left), 0, <span class='keyword'>false</span>);</td></tr>
+<tr><td class="num" id="LN1069">1069</td><td class="line">    Node* i1 = B.CheckConvertedInput(NumberToI32(signed_right), 1, <span class='keyword'>false</span>);</td></tr>
+<tr><td class="num" id="LN1070">1070</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1071">1071</td><td class="line">    Node* ii0 = B.CheckConverted(IrOpcode::kJSToNumber, i0-&gt;InputAt(0), <span class='keyword'>true</span>);</td></tr>
+<tr><td class="num" id="LN1072">1072</td><td class="line">    <span class='macro'>CHECK_EQ(B.p1, i1-&gt;InputAt(0))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (B.p1),<br> (i1-&gt;InputAt(0)), "B.p1" " " "==" " " "i1-&gt;InputAt(0)"<br>)) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 1072, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN1073">1073</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1074">1074</td><td class="line">    <span class='macro'>CHECK_EQ(B.p0, ii0-&gt;InputAt(0))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (B.p0),<br> (ii0-&gt;InputAt(0)), "B.p0" " " "==" " " "ii0-&gt;InputAt(0)"<br>)) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 1074, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN1075">1075</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1076">1076</td><td class="line">    B.CheckEffectOrdering(ii0);</td></tr>
+<tr><td class="num" id="LN1077">1077</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN1078">1078</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1079">1079</td><td class="line">  <span class='keyword'>for</span> (<span class='keyword'>int</span> j = 0; j &lt; R.kNumberOps; j += 2) {</td></tr>
+<tr><td class="num" id="LN1080">1080</td><td class="line">    <span class='keyword'>bool</span> signed_left = R.signedness[j], signed_right = R.signedness[j + 1];</td></tr>
+<tr><td class="num" id="LN1081">1081</td><td class="line">    BinopEffectsTester B(R.ops[j], Type::Primitive(), Type::Primitive());</td></tr>
+<tr><td class="num" id="LN1082">1082</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1083">1083</td><td class="line">    B.R.CheckBinop(B.result-&gt;opcode(), B.result);</td></tr>
+<tr><td class="num" id="LN1084">1084</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1085">1085</td><td class="line">    Node* i0 = B.CheckConvertedInput(NumberToI32(signed_left), 0, <span class='keyword'>false</span>);</td></tr>
+<tr><td class="num" id="LN1086">1086</td><td class="line">    Node* i1 = B.CheckConvertedInput(NumberToI32(signed_right), 1, <span class='keyword'>false</span>);</td></tr>
+<tr><td class="num" id="LN1087">1087</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1088">1088</td><td class="line">    Node* ii0 = B.CheckConverted(IrOpcode::kJSToNumber, i0-&gt;InputAt(0), <span class='keyword'>true</span>);</td></tr>
+<tr><td class="num" id="LN1089">1089</td><td class="line">    Node* ii1 = B.CheckConverted(IrOpcode::kJSToNumber, i1-&gt;InputAt(0), <span class='keyword'>true</span>);</td></tr>
+<tr><td class="num" id="LN1090">1090</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1091">1091</td><td class="line">    <span class='macro'>CHECK_EQ(B.p0, ii0-&gt;InputAt(0))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (B.p0),<br> (ii0-&gt;InputAt(0)), "B.p0" " " "==" " " "ii0-&gt;InputAt(0)"<br>)) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 1091, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN1092">1092</td><td class="line">    <span class='macro'>CHECK_EQ(B.p1, ii1-&gt;InputAt(0))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (B.p1),<br> (ii1-&gt;InputAt(0)), "B.p1" " " "==" " " "ii1-&gt;InputAt(0)"<br>)) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 1092, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN1093">1093</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1094">1094</td><td class="line">    B.CheckEffectOrdering(ii0, ii1);</td></tr>
+<tr><td class="num" id="LN1095">1095</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN1096">1096</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN1097">1097</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1098">1098</td><td class="line"><span class='macro'>TEST(Int32AddNarrowing)<span class='expansion'>static void TestInt32AddNarrowing(); CcTest register_test_Int32AddNarrowing<br>(TestInt32AddNarrowing, "../test/cctest/compiler/test-js-typed-lowering.cc"<br>, "Int32AddNarrowing", __null, true, true); static void TestInt32AddNarrowing<br>()</span></span> {</td></tr>
+<tr><td class="num" id="LN1099">1099</td><td class="line">  {</td></tr>
+<tr><td class="num" id="LN1100">1100</td><td class="line">    JSBitwiseTypedLoweringTester R;</td></tr>
+<tr><td class="num" id="LN1101">1101</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1102">1102</td><td class="line">    <span class='keyword'>for</span> (<span class='keyword'>int</span> o = 0; o &lt; R.kNumberOps; o += 2) {</td></tr>
+<tr><td class="num" id="LN1103">1103</td><td class="line">      <span class='keyword'>for</span> (size_t i = 0; i &lt; <span class='macro'>arraysize(kInt32Types)<span class='expansion'>(sizeof(ArraySizeHelper(kInt32Types)))</span></span>; i++) {</td></tr>
+<tr><td class="num" id="LN1104">1104</td><td class="line">        Node* n0 = R.Parameter(kInt32Types[i]);</td></tr>
+<tr><td class="num" id="LN1105">1105</td><td class="line">        <span class='keyword'>for</span> (size_t j = 0; j &lt; <span class='macro'>arraysize(kInt32Types)<span class='expansion'>(sizeof(ArraySizeHelper(kInt32Types)))</span></span>; j++) {</td></tr>
+<tr><td class="num" id="LN1106">1106</td><td class="line">          Node* n1 = R.Parameter(kInt32Types[j]);</td></tr>
+<tr><td class="num" id="LN1107">1107</td><td class="line">          Node* one = R.graph.NewNode(R.common.NumberConstant(1));</td></tr>
+<tr><td class="num" id="LN1108">1108</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1109">1109</td><td class="line">          <span class='keyword'>for</span> (<span class='keyword'>int</span> l = 0; l &lt; 2; l++) {</td></tr>
+<tr><td class="num" id="LN1110">1110</td><td class="line">            Node* add_node = R.Binop(R.simplified.NumberAdd(), n0, n1);</td></tr>
+<tr><td class="num" id="LN1111">1111</td><td class="line">            Node* or_node =</td></tr>
+<tr><td class="num" id="LN1112">1112</td><td class="line">                R.Binop(R.ops[o], l ? add_node : one, l ? one : add_node);</td></tr>
+<tr><td class="num" id="LN1113">1113</td><td class="line">            Node* r = R.reduce(or_node);</td></tr>
+<tr><td class="num" id="LN1114">1114</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1115">1115</td><td class="line">            <span class='macro'>CHECK_EQ(R.ops[o + 1]-&gt;opcode(), r-&gt;op()-&gt;opcode())<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (R.ops[<br>o + 1]-&gt;opcode()), (r-&gt;op()-&gt;opcode()), "R.ops[o + 1]-&gt;opcode()"<br> " " "==" " " "r-&gt;op()-&gt;opcode()")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 1115, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN1116">1116</td><td class="line">            <span class='macro'>CHECK_EQ(IrOpcode::kNumberAdd, add_node-&gt;opcode())<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (IrOpcode<br>::kNumberAdd), (add_node-&gt;opcode()), "IrOpcode::kNumberAdd"<br> " " "==" " " "add_node-&gt;opcode()")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 1116, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN1117">1117</td><td class="line">          }</td></tr>
+<tr><td class="num" id="LN1118">1118</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN1119">1119</td><td class="line">      }</td></tr>
+<tr><td class="num" id="LN1120">1120</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN1121">1121</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN1122">1122</td><td class="line">  {</td></tr>
+<tr><td class="num" id="LN1123">1123</td><td class="line">    JSBitwiseShiftTypedLoweringTester R;</td></tr>
+<tr><td class="num" id="LN1124">1124</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1125">1125</td><td class="line">    <span class='keyword'>for</span> (<span class='keyword'>int</span> o = 0; o &lt; R.kNumberOps; o += 2) {</td></tr>
+<tr><td class="num" id="LN1126">1126</td><td class="line">      <span class='keyword'>for</span> (size_t i = 0; i &lt; <span class='macro'>arraysize(kInt32Types)<span class='expansion'>(sizeof(ArraySizeHelper(kInt32Types)))</span></span>; i++) {</td></tr>
+<tr><td class="num" id="LN1127">1127</td><td class="line">        Node* n0 = R.Parameter(kInt32Types[i]);</td></tr>
+<tr><td class="num" id="LN1128">1128</td><td class="line">        <span class='keyword'>for</span> (size_t j = 0; j &lt; <span class='macro'>arraysize(kInt32Types)<span class='expansion'>(sizeof(ArraySizeHelper(kInt32Types)))</span></span>; j++) {</td></tr>
+<tr><td class="num" id="LN1129">1129</td><td class="line">          Node* n1 = R.Parameter(kInt32Types[j]);</td></tr>
+<tr><td class="num" id="LN1130">1130</td><td class="line">          Node* one = R.graph.NewNode(R.common.NumberConstant(1));</td></tr>
+<tr><td class="num" id="LN1131">1131</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1132">1132</td><td class="line">          <span class='keyword'>for</span> (<span class='keyword'>int</span> l = 0; l &lt; 2; l++) {</td></tr>
+<tr><td class="num" id="LN1133">1133</td><td class="line">            Node* add_node = R.Binop(R.simplified.NumberAdd(), n0, n1);</td></tr>
+<tr><td class="num" id="LN1134">1134</td><td class="line">            Node* or_node =</td></tr>
+<tr><td class="num" id="LN1135">1135</td><td class="line">                R.Binop(R.ops[o], l ? add_node : one, l ? one : add_node);</td></tr>
+<tr><td class="num" id="LN1136">1136</td><td class="line">            Node* r = R.reduce(or_node);</td></tr>
+<tr><td class="num" id="LN1137">1137</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1138">1138</td><td class="line">            <span class='macro'>CHECK_EQ(R.ops[o + 1]-&gt;opcode(), r-&gt;op()-&gt;opcode())<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (R.ops[<br>o + 1]-&gt;opcode()), (r-&gt;op()-&gt;opcode()), "R.ops[o + 1]-&gt;opcode()"<br> " " "==" " " "r-&gt;op()-&gt;opcode()")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 1138, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN1139">1139</td><td class="line">            <span class='macro'>CHECK_EQ(IrOpcode::kNumberAdd, add_node-&gt;opcode())<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (IrOpcode<br>::kNumberAdd), (add_node-&gt;opcode()), "IrOpcode::kNumberAdd"<br> " " "==" " " "add_node-&gt;opcode()")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 1139, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN1140">1140</td><td class="line">          }</td></tr>
+<tr><td class="num" id="LN1141">1141</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN1142">1142</td><td class="line">      }</td></tr>
+<tr><td class="num" id="LN1143">1143</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN1144">1144</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN1145">1145</td><td class="line">  {</td></tr>
+<tr><td class="num" id="LN1146">1146</td><td class="line">    JSBitwiseTypedLoweringTester R;</td></tr>
+<tr><td class="num" id="LN1147">1147</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1148">1148</td><td class="line">    <span class='keyword'>for</span> (<span class='keyword'>int</span> o = 0; o &lt; R.kNumberOps; o += 2) {</td></tr>
+<tr><td class="num" id="LN1149">1149</td><td class="line">      Node* n0 = R.Parameter(I32Type(R.signedness[o]));</td></tr>
+<tr><td class="num" id="LN1150">1150</td><td class="line">      Node* n1 = R.Parameter(I32Type(R.signedness[o + 1]));</td></tr>
+<tr><td class="num" id="LN1151">1151</td><td class="line">      Node* one = R.graph.NewNode(R.common.NumberConstant(1));</td></tr>
+<tr><td class="num" id="LN1152">1152</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1153">1153</td><td class="line">      Node* add_node = R.Binop(R.simplified.NumberAdd(), n0, n1);</td></tr>
+<tr><td class="num" id="LN1154">1154</td><td class="line">      Node* or_node = R.Binop(R.ops[o], add_node, one);</td></tr>
+<tr><td class="num" id="LN1155">1155</td><td class="line">      Node* other_use = R.Binop(R.simplified.NumberAdd(), add_node, one);</td></tr>
+<tr><td class="num" id="LN1156">1156</td><td class="line">      Node* r = R.reduce(or_node);</td></tr>
+<tr><td class="num" id="LN1157">1157</td><td class="line">      <span class='macro'>CHECK_EQ(R.ops[o + 1]-&gt;opcode(), r-&gt;op()-&gt;opcode())<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (R.ops[<br>o + 1]-&gt;opcode()), (r-&gt;op()-&gt;opcode()), "R.ops[o + 1]-&gt;opcode()"<br> " " "==" " " "r-&gt;op()-&gt;opcode()")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 1157, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN1158">1158</td><td class="line">      <span class='macro'>CHECK_EQ(IrOpcode::kNumberAdd, add_node-&gt;opcode())<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (IrOpcode<br>::kNumberAdd), (add_node-&gt;opcode()), "IrOpcode::kNumberAdd"<br> " " "==" " " "add_node-&gt;opcode()")) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 1158, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN1159">1159</td><td class="line">      <span class='comment'>// Conversion to int32 should be done.</span></td></tr>
+<tr><td class="num" id="LN1160">1160</td><td class="line">      CheckToI32(add_node, r-&gt;InputAt(0), R.signedness[o]);</td></tr>
+<tr><td class="num" id="LN1161">1161</td><td class="line">      CheckToI32(one, r-&gt;InputAt(1), R.signedness[o + 1]);</td></tr>
+<tr><td class="num" id="LN1162">1162</td><td class="line">      <span class='comment'>// The other use should also not be touched.</span></td></tr>
+<tr><td class="num" id="LN1163">1163</td><td class="line">      <span class='macro'>CHECK_EQ(add_node, other_use-&gt;InputAt(0))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (add_node<br>), (other_use-&gt;InputAt(0)), "add_node" " " "==" " " "other_use-&gt;InputAt(0)"<br>)) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 1163, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN1164">1164</td><td class="line">      <span class='macro'>CHECK_EQ(one, other_use-&gt;InputAt(1))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (one), (<br>other_use-&gt;InputAt(1)), "one" " " "==" " " "other_use-&gt;InputAt(1)"<br>)) { V8_Fatal("../test/cctest/compiler/test-js-typed-lowering.cc"<br>, 1164, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN1165">1165</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN1166">1166</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN1167">1167</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN1168">1168</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1169">1169</td><td class="line"><span class='macro'>TEST(Int32Comparisons)<span class='expansion'>static void TestInt32Comparisons(); CcTest register_test_Int32Comparisons<br>(TestInt32Comparisons, "../test/cctest/compiler/test-js-typed-lowering.cc"<br>, "Int32Comparisons", __null, true, true); static void TestInt32Comparisons<br>()</span></span> {</td></tr>
+<tr><td class="num" id="LN1170">1170</td><td class="line">  JSTypedLoweringTester R;</td></tr>
+<tr><td class="num" id="LN1171">1171</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1172">1172</td><td class="line">  <span class='keyword'>struct</span> Entry {</td></tr>
+<tr><td class="num" id="LN1173">1173</td><td class="line">    <span class='keyword'>const</span> Operator* js_op;</td></tr>
+<tr><td class="num" id="LN1174">1174</td><td class="line">    <span class='keyword'>const</span> Operator* uint_op;</td></tr>
+<tr><td class="num" id="LN1175">1175</td><td class="line">    <span class='keyword'>const</span> Operator* int_op;</td></tr>
+<tr><td class="num" id="LN1176">1176</td><td class="line">    <span class='keyword'>const</span> Operator* num_op;</td></tr>
+<tr><td class="num" id="LN1177">1177</td><td class="line">    <span class='keyword'>bool</span> commute;</td></tr>
+<tr><td class="num" id="LN1178">1178</td><td class="line">  };</td></tr>
+<tr><td class="num" id="LN1179">1179</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1180">1180</td><td class="line">  Entry ops[] = {</td></tr>
+<tr><td class="num" id="LN1181">1181</td><td class="line">      {R.javascript.LessThan(), R.machine.Uint32LessThan(),</td></tr>
+<tr><td class="num" id="LN1182">1182</td><td class="line">       R.machine.Int32LessThan(), R.simplified.NumberLessThan(), <span class='keyword'>false</span>},</td></tr>
+<tr><td class="num" id="LN1183">1183</td><td class="line">      {R.javascript.LessThanOrEqual(), R.machine.Uint32LessThanOrEqual(),</td></tr>
+<tr><td class="num" id="LN1184">1184</td><td class="line">       R.machine.Int32LessThanOrEqual(), R.simplified.NumberLessThanOrEqual(),</td></tr>
+<tr><td class="num" id="LN1185">1185</td><td class="line">       <span class='keyword'>false</span>},</td></tr>
+<tr><td class="num" id="LN1186">1186</td><td class="line">      {R.javascript.GreaterThan(), R.machine.Uint32LessThan(),</td></tr>
+<tr><td class="num" id="LN1187">1187</td><td class="line">       R.machine.Int32LessThan(), R.simplified.NumberLessThan(), <span class='keyword'>true</span>},</td></tr>
+<tr><td class="num" id="LN1188">1188</td><td class="line">      {R.javascript.GreaterThanOrEqual(), R.machine.Uint32LessThanOrEqual(),</td></tr>
+<tr><td class="num" id="LN1189">1189</td><td class="line">       R.machine.Int32LessThanOrEqual(), R.simplified.NumberLessThanOrEqual(),</td></tr>
+<tr><td class="num" id="LN1190">1190</td><td class="line">       <span class='keyword'>true</span>}};</td></tr>
+<tr><td class="num" id="LN1191">1191</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1192">1192</td><td class="line">  <span class='keyword'>for</span> (size_t o = 0; o &lt; <span class='macro'>arraysize(ops)<span class='expansion'>(sizeof(ArraySizeHelper(ops)))</span></span>; o++) {</td></tr>
+<tr><td class="num" id="LN1193">1193</td><td class="line">    <span class='keyword'>for</span> (size_t i = 0; i &lt; <span class='macro'>arraysize(kNumberTypes)<span class='expansion'>(sizeof(ArraySizeHelper(kNumberTypes)))</span></span>; i++) {</td></tr>
+<tr><td class="num" id="LN1194">1194</td><td class="line">      Type* t0 = kNumberTypes[i];</td></tr>
+<tr><td class="num" id="LN1195">1195</td><td class="line">      Node* p0 = R.Parameter(t0, 0);</td></tr>
+<tr><td class="num" id="LN1196">1196</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1197">1197</td><td class="line">      <span class='keyword'>for</span> (size_t j = 0; j &lt; <span class='macro'>arraysize(kNumberTypes)<span class='expansion'>(sizeof(ArraySizeHelper(kNumberTypes)))</span></span>; j++) {</td></tr>
+<tr><td class="num" id="LN1198">1198</td><td class="line">        Type* t1 = kNumberTypes[j];</td></tr>
+<tr><td class="num" id="LN1199">1199</td><td class="line">        Node* p1 = R.Parameter(t1, 1);</td></tr>
+<tr><td class="num" id="LN1200">1200</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1201">1201</td><td class="line">        Node* cmp = R.Binop(ops[o].js_op, p0, p1);</td></tr>
+<tr><td class="num" id="LN1202">1202</td><td class="line">        Node* r = R.reduce(cmp);</td></tr>
+<tr><td class="num" id="LN1203">1203</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1204">1204</td><td class="line">        <span class='keyword'>const</span> Operator* expected;</td></tr>
+<tr><td class="num" id="LN1205">1205</td><td class="line">        <span class='keyword'>if</span> (t0-&gt;Is(Type::Unsigned32()) &amp;&amp; t1-&gt;Is(Type::Unsigned32())) {</td></tr>
+<tr><td class="num" id="LN1206">1206</td><td class="line">          expected = ops[o].uint_op;</td></tr>
+<tr><td class="num" id="LN1207">1207</td><td class="line">        } <span class='keyword'>else</span> <span class='keyword'>if</span> (t0-&gt;Is(Type::Signed32()) &amp;&amp; t1-&gt;Is(Type::Signed32())) {</td></tr>
+<tr><td class="num" id="LN1208">1208</td><td class="line">          expected = ops[o].int_op;</td></tr>
+<tr><td class="num" id="LN1209">1209</td><td class="line">        } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN1210">1210</td><td class="line">          expected = ops[o].num_op;</td></tr>
+<tr><td class="num" id="LN1211">1211</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN1212">1212</td><td class="line">        R.CheckBinop(expected, r);</td></tr>
+<tr><td class="num" id="LN1213">1213</td><td class="line">        <span class='keyword'>if</span> (ops[o].commute) {</td></tr>
+<tr><td class="num" id="LN1214">1214</td><td class="line">          <span class='macro'>CHECK_EQ(p1, r-&gt;InputAt(0))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (p1), (<br>r-&gt;InputAt(0)), "p1" " " "==" " " "r-&gt;InputAt(0)")) { V8_Fatal<br>("../test/cctest/compiler/test-js-typed-lowering.cc", 1214, "Check failed: %s."<br>, _msg-&gt;c_str()); delete _msg; } } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN1215">1215</td><td class="line">          <span class='macro'>CHECK_EQ(p0, r-&gt;InputAt(1))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (p0), (<br>r-&gt;InputAt(1)), "p0" " " "==" " " "r-&gt;InputAt(1)")) { V8_Fatal<br>("../test/cctest/compiler/test-js-typed-lowering.cc", 1215, "Check failed: %s."<br>, _msg-&gt;c_str()); delete _msg; } } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN1216">1216</td><td class="line">        } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN1217">1217</td><td class="line">          <span class='macro'>CHECK_EQ(p0, r-&gt;InputAt(0))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (p0), (<br>r-&gt;InputAt(0)), "p0" " " "==" " " "r-&gt;InputAt(0)")) { V8_Fatal<br>("../test/cctest/compiler/test-js-typed-lowering.cc", 1217, "Check failed: %s."<br>, _msg-&gt;c_str()); delete _msg; } } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN1218">1218</td><td class="line">          <span class='macro'>CHECK_EQ(p1, r-&gt;InputAt(1))<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (p1), (<br>r-&gt;InputAt(1)), "p1" " " "==" " " "r-&gt;InputAt(1)")) { V8_Fatal<br>("../test/cctest/compiler/test-js-typed-lowering.cc", 1218, "Check failed: %s."<br>, _msg-&gt;c_str()); delete _msg; } } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN1219">1219</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN1220">1220</td><td class="line">      }</td></tr>
+<tr><td class="num" id="LN1221">1221</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN1222">1222</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN1223">1223</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN1224">1224</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1225">1225</td><td class="line">}  <span class='comment'>// namespace compiler</span></td></tr>
+<tr><td class="num" id="LN1226">1226</td><td class="line">}  <span class='comment'>// namespace internal</span></td></tr>
+<tr><td class="num" id="LN1227">1227</td><td class="line">}  <span class='comment'>// namespace v8</span></td></tr>
+</table></body></html>

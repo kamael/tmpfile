@@ -1,0 +1,649 @@
+<html>
+<head>
+<title>v8 - scan-build results</title>
+<link type="text/css" rel="stylesheet" href="scanview.css"/>
+<script src="sorttable.js"></script>
+<script language='javascript' type="text/javascript">
+function SetDisplay(RowClass, DisplayVal)
+{
+  var Rows = document.getElementsByTagName("tr");
+  for ( var i = 0 ; i < Rows.length; ++i ) {
+    if (Rows[i].className == RowClass) {
+      Rows[i].style.display = DisplayVal;
+    }
+  }
+}
+
+function CopyCheckedStateToCheckButtons(SummaryCheckButton) {
+  var Inputs = document.getElementsByTagName("input");
+  for ( var i = 0 ; i < Inputs.length; ++i ) {
+    if (Inputs[i].type == "checkbox") {
+      if(Inputs[i] != SummaryCheckButton) {
+        Inputs[i].checked = SummaryCheckButton.checked;
+        Inputs[i].onclick();
+      }
+    }
+  }
+}
+
+function returnObjById( id ) {
+    if (document.getElementById)
+        var returnVar = document.getElementById(id);
+    else if (document.all)
+        var returnVar = document.all[id];
+    else if (document.layers)
+        var returnVar = document.layers[id];
+    return returnVar;
+}
+
+var NumUnchecked = 0;
+
+function ToggleDisplay(CheckButton, ClassName) {
+  if (CheckButton.checked) {
+    SetDisplay(ClassName, "");
+    if (--NumUnchecked == 0) {
+      returnObjById("AllBugsCheck").checked = true;
+    }
+  }
+  else {
+    SetDisplay(ClassName, "none");
+    NumUnchecked++;
+    returnObjById("AllBugsCheck").checked = false;
+  }
+}
+</script>
+<!-- SUMMARYENDHEAD -->
+</head>
+<body>
+<h1>v8 - scan-build results</h1>
+
+<table>
+<tr><th>User:</th><td>haha@192.168.0.103</td></tr>
+<tr><th>Working Directory:</th><td>/home/haha/code/v8_5_0/v8</td></tr>
+<tr><th>Command Line:</th><td>make -j4 x64.debug</td></tr>
+<tr><th>Clang Version:</th><td>clang version 4.0.0 (trunk 282067) (llvm/trunk 282066)
+</td></tr>
+<tr><th>Date:</th><td>Sun Sep 25 05:14:53 2016</td></tr>
+</table>
+<h2>Bug Summary</h2><table>
+<thead><tr><td>Bug Type</td><td>Quantity</td><td class="sorttable_nosort">Display?</td></tr></thead>
+<tr style="font-weight:bold"><td class="SUMM_DESC">All Bugs</td><td class="Q">177</td><td><center><input type="checkbox" id="AllBugsCheck" onClick="CopyCheckedStateToCheckButtons(this);" checked/></center></td></tr>
+<tr><th>API</th><th colspan=2></th></tr>
+<tr><td class="SUMM_DESC">Argument with 'nonnull' attribute passed null</td><td class="Q">14</td><td><center><input type="checkbox" onClick="ToggleDisplay(this,'bt_api_argument_with_nonnull_attribute_passed_null');" checked/></center></td></tr>
+<tr><th>Dead store</th><th colspan=2></th></tr>
+<tr><td class="SUMM_DESC">Dead assignment</td><td class="Q">66</td><td><center><input type="checkbox" onClick="ToggleDisplay(this,'bt_dead_store_dead_assignment');" checked/></center></td></tr>
+<tr><td class="SUMM_DESC">Dead increment</td><td class="Q">8</td><td><center><input type="checkbox" onClick="ToggleDisplay(this,'bt_dead_store_dead_increment');" checked/></center></td></tr>
+<tr><td class="SUMM_DESC">Dead initialization</td><td class="Q">6</td><td><center><input type="checkbox" onClick="ToggleDisplay(this,'bt_dead_store_dead_initialization');" checked/></center></td></tr>
+<tr><th>Logic error</th><th colspan=2></th></tr>
+<tr><td class="SUMM_DESC">Assigned value is garbage or undefined</td><td class="Q">8</td><td><center><input type="checkbox" onClick="ToggleDisplay(this,'bt_logic_error_assigned_value_is_garbage_or_undefined');" checked/></center></td></tr>
+<tr><td class="SUMM_DESC">Branch condition evaluates to a garbage value</td><td class="Q">1</td><td><center><input type="checkbox" onClick="ToggleDisplay(this,'bt_logic_error_branch_condition_evaluates_to_a_garbage_value');" checked/></center></td></tr>
+<tr><td class="SUMM_DESC">Called C++ object pointer is null</td><td class="Q">25</td><td><center><input type="checkbox" onClick="ToggleDisplay(this,'bt_logic_error_called_c++_object_pointer_is_null');" checked/></center></td></tr>
+<tr><td class="SUMM_DESC">Dereference of null pointer</td><td class="Q">26</td><td><center><input type="checkbox" onClick="ToggleDisplay(this,'bt_logic_error_dereference_of_null_pointer');" checked/></center></td></tr>
+<tr><td class="SUMM_DESC">Division by zero</td><td class="Q">1</td><td><center><input type="checkbox" onClick="ToggleDisplay(this,'bt_logic_error_division_by_zero');" checked/></center></td></tr>
+<tr><td class="SUMM_DESC">Result of operation is garbage or undefined</td><td class="Q">6</td><td><center><input type="checkbox" onClick="ToggleDisplay(this,'bt_logic_error_result_of_operation_is_garbage_or_undefined');" checked/></center></td></tr>
+<tr><td class="SUMM_DESC">Return of address to stack-allocated memory</td><td class="Q">1</td><td><center><input type="checkbox" onClick="ToggleDisplay(this,'bt_logic_error_return_of_address_to_stack-allocated_memory');" checked/></center></td></tr>
+<tr><td class="SUMM_DESC">Returning null reference</td><td class="Q">2</td><td><center><input type="checkbox" onClick="ToggleDisplay(this,'bt_logic_error_returning_null_reference');" checked/></center></td></tr>
+<tr><td class="SUMM_DESC">Uninitialized argument value</td><td class="Q">9</td><td><center><input type="checkbox" onClick="ToggleDisplay(this,'bt_logic_error_uninitialized_argument_value');" checked/></center></td></tr>
+<tr><th>Memory Error</th><th colspan=2></th></tr>
+<tr><td class="SUMM_DESC">Memory leak</td><td class="Q">2</td><td><center><input type="checkbox" onClick="ToggleDisplay(this,'bt_memory_error_memory_leak');" checked/></center></td></tr>
+<tr><td class="SUMM_DESC">Use of zero allocated</td><td class="Q">2</td><td><center><input type="checkbox" onClick="ToggleDisplay(this,'bt_memory_error_use_of_zero_allocated');" checked/></center></td></tr>
+</table>
+<h2>Reports</h2>
+
+<table class="sortable" style="table-layout:automatic">
+<thead><tr>
+  <td>Bug Group</td>
+  <td class="sorttable_sorted">Bug Type<span id="sorttable_sortfwdind">&nbsp;&#x25BE;</span></td>
+  <td>File</td>
+  <td>Function/Method</td>
+  <td class="Q">Line</td>
+  <td class="Q">Path Length</td>
+  <td class="sorttable_nosort"></td>
+  <!-- REPORTBUGCOL -->
+</tr></thead>
+<tbody>
+<tr class="bt_api_argument_with_nonnull_attribute_passed_null"><td class="DESC">API</td><td class="DESC">Argument with 'nonnull' attribute passed null</td><td>test/cctest/test-api.cc</td><td class="DESC">checkStackFrame</td><td class="Q">16629</td><td class="Q">8</td><td><a href="report-d6e31c.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-d6e31c.html" -->
+</tr>
+<tr class="bt_api_argument_with_nonnull_attribute_passed_null"><td class="DESC">API</td><td class="DESC">Argument with 'nonnull' attribute passed null</td><td>third_party/icu/source/common/uloc_tag.c</td><td class="DESC">_appendLDMLExtensionAsKeywords</td><td class="Q">1376</td><td class="Q">21</td><td><a href="report-050a28.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-050a28.html" -->
+</tr>
+<tr class="bt_api_argument_with_nonnull_attribute_passed_null"><td class="DESC">API</td><td class="DESC">Argument with 'nonnull' attribute passed null</td><td>third_party/icu/source/common/udata.cpp</td><td class="DESC">isTimeZoneFile</td><td class="Q">1082</td><td class="Q">13</td><td><a href="report-eb39a9.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-eb39a9.html" -->
+</tr>
+<tr class="bt_api_argument_with_nonnull_attribute_passed_null"><td class="DESC">API</td><td class="DESC">Argument with 'nonnull' attribute passed null</td><td>third_party/icu/source/i18n/unum.cpp</td><td class="DESC">unum_parseDecimal_54</td><td class="Q">414</td><td class="Q">8</td><td><a href="report-69abeb.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-69abeb.html" -->
+</tr>
+<tr class="bt_api_argument_with_nonnull_attribute_passed_null"><td class="DESC">API</td><td class="DESC">Argument with 'nonnull' attribute passed null</td><td>third_party/icu/source/i18n/unum.cpp</td><td class="DESC">unum_parseDecimal_54</td><td class="Q">410</td><td class="Q">8</td><td><a href="report-bfb18a.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-bfb18a.html" -->
+</tr>
+<tr class="bt_api_argument_with_nonnull_attribute_passed_null"><td class="DESC">API</td><td class="DESC">Argument with 'nonnull' attribute passed null</td><td>third_party/icu/source/i18n/ucol_sit.cpp</td><td class="DESC">ucol_sit_dumpSpecs</td><td class="Q">376</td><td class="Q">20</td><td><a href="report-ed4c20.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-ed4c20.html" -->
+</tr>
+<tr class="bt_api_argument_with_nonnull_attribute_passed_null"><td class="DESC">API</td><td class="DESC">Argument with 'nonnull' attribute passed null</td><td>third_party/icu/source/i18n/ucol_sit.cpp</td><td class="DESC">ucol_sit_dumpSpecs</td><td class="Q">361</td><td class="Q">25</td><td><a href="report-f151d8.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-f151d8.html" -->
+</tr>
+<tr class="bt_api_argument_with_nonnull_attribute_passed_null"><td class="DESC">API</td><td class="DESC">Argument with 'nonnull' attribute passed null</td><td>third_party/icu/source/i18n/rulebasedcollator.cpp</td><td class="DESC">setReorderCodes</td><td class="Q">665</td><td class="Q">6</td><td><a href="report-d4d56d.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-d4d56d.html" -->
+</tr>
+<tr class="bt_api_argument_with_nonnull_attribute_passed_null"><td class="DESC">API</td><td class="DESC">Argument with 'nonnull' attribute passed null</td><td>third_party/icu/source/i18n/rulebasedcollator.cpp</td><td class="DESC">getReorderCodes</td><td class="Q">649</td><td class="Q">10</td><td><a href="report-ac8460.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-ac8460.html" -->
+</tr>
+<tr class="bt_api_argument_with_nonnull_attribute_passed_null"><td class="DESC">API</td><td class="DESC">Argument with 'nonnull' attribute passed null</td><td>third_party/icu/source/i18n/collationsettings.cpp</td><td class="DESC">setReordering</td><td class="Q">123</td><td class="Q">9</td><td><a href="report-7a5391.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-7a5391.html" -->
+</tr>
+<tr class="bt_api_argument_with_nonnull_attribute_passed_null"><td class="DESC">API</td><td class="DESC">Argument with 'nonnull' attribute passed null</td><td>third_party/icu/source/i18n/collationdatawriter.cpp</td><td class="DESC">copyData</td><td class="Q">323</td><td class="Q">24</td><td><a href="report-f28f3c.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-f28f3c.html" -->
+</tr>
+<tr class="bt_api_argument_with_nonnull_attribute_passed_null"><td class="DESC">API</td><td class="DESC">Argument with 'nonnull' attribute passed null</td><td>third_party/icu/source/i18n/collationdatawriter.cpp</td><td class="DESC">write</td><td class="Q">301</td><td class="Q">20</td><td><a href="report-4c763c.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-4c763c.html" -->
+</tr>
+<tr class="bt_api_argument_with_nonnull_attribute_passed_null"><td class="DESC">API</td><td class="DESC">Argument with 'nonnull' attribute passed null</td><td>third_party/icu/source/i18n/collationdatareader.cpp</td><td class="DESC">read</td><td class="Q">374</td><td class="Q">33</td><td><a href="report-516cf1.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-516cf1.html" -->
+</tr>
+<tr class="bt_api_argument_with_nonnull_attribute_passed_null"><td class="DESC">API</td><td class="DESC">Argument with 'nonnull' attribute passed null</td><td>src/wasm/ast-decoder.cc</td><td class="DESC">Split</td><td class="Q">1493</td><td class="Q">7</td><td><a href="report-979932.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-979932.html" -->
+</tr>
+<tr class="bt_logic_error_assigned_value_is_garbage_or_undefined"><td class="DESC">Logic error</td><td class="DESC">Assigned value is garbage or undefined</td><td>third_party/icu/source/common/ustrcase.cpp</td><td class="DESC">u_strcmpFold_54</td><td class="Q">647</td><td class="Q">58</td><td><a href="report-323d23.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-323d23.html" -->
+</tr>
+<tr class="bt_logic_error_assigned_value_is_garbage_or_undefined"><td class="DESC">Logic error</td><td class="DESC">Assigned value is garbage or undefined</td><td>third_party/icu/source/common/uniset.cpp</td><td class="DESC">retain</td><td class="Q">1867</td><td class="Q">21</td><td><a href="report-0dc53f.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-0dc53f.html" -->
+</tr>
+<tr class="bt_logic_error_assigned_value_is_garbage_or_undefined"><td class="DESC">Logic error</td><td class="DESC">Assigned value is garbage or undefined</td><td>third_party/icu/source/common/uniset.cpp</td><td class="DESC">retain</td><td class="Q">1838</td><td class="Q">25</td><td><a href="report-482595.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-482595.html" -->
+</tr>
+<tr class="bt_logic_error_assigned_value_is_garbage_or_undefined"><td class="DESC">Logic error</td><td class="DESC">Assigned value is garbage or undefined</td><td>third_party/icu/source/common/uniset.cpp</td><td class="DESC">exclusiveOr</td><td class="Q">1665</td><td class="Q">21</td><td><a href="report-b687b8.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-b687b8.html" -->
+</tr>
+<tr class="bt_logic_error_assigned_value_is_garbage_or_undefined"><td class="DESC">Logic error</td><td class="DESC">Assigned value is garbage or undefined</td><td>third_party/icu/source/common/unames.cpp</td><td class="DESC">enumAlgNames</td><td class="Q">1039</td><td class="Q">12</td><td><a href="report-55ef59.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-55ef59.html" -->
+</tr>
+<tr class="bt_logic_error_assigned_value_is_garbage_or_undefined"><td class="DESC">Logic error</td><td class="DESC">Assigned value is garbage or undefined</td><td>third_party/icu/source/common/unames.cpp</td><td class="DESC">enumAlgNames</td><td class="Q">1031</td><td class="Q">12</td><td><a href="report-b6c69a.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-b6c69a.html" -->
+</tr>
+<tr class="bt_logic_error_assigned_value_is_garbage_or_undefined"><td class="DESC">Logic error</td><td class="DESC">Assigned value is garbage or undefined</td><td>third_party/icu/source/common/stringtriebuilder.cpp</td><td class="DESC">writeBranchSubNode</td><td class="Q">181</td><td class="Q">13</td><td><a href="report-1ef6a9.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-1ef6a9.html" -->
+</tr>
+<tr class="bt_logic_error_assigned_value_is_garbage_or_undefined"><td class="DESC">Logic error</td><td class="DESC">Assigned value is garbage or undefined</td><td>src/interpreter/bytecode-array-builder.cc</td><td class="DESC">PatchIndirectJumpWith16BitOperand</td><td class="Q">836</td><td class="Q">4</td><td><a href="report-956752.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-956752.html" -->
+</tr>
+<tr class="bt_logic_error_branch_condition_evaluates_to_a_garbage_value"><td class="DESC">Logic error</td><td class="DESC">Branch condition evaluates to a garbage value</td><td>third_party/icu/source/i18n/decimfmt.cpp</td><td class="DESC">parse</td><td class="Q">2310</td><td class="Q">8</td><td><a href="report-4dd3a2.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-4dd3a2.html" -->
+</tr>
+<tr class="bt_logic_error_called_c++_object_pointer_is_null"><td class="DESC">Logic error</td><td class="DESC">Called C++ object pointer is null</td><td>test/unittests/wasm/module-decoder-unittest.cc</td><td class="DESC">TestBody</td><td class="Q">855</td><td class="Q">5</td><td><a href="report-d30219.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-d30219.html" -->
+</tr>
+<tr class="bt_logic_error_called_c++_object_pointer_is_null"><td class="DESC">Logic error</td><td class="DESC">Called C++ object pointer is null</td><td>test/unittests/wasm/module-decoder-unittest.cc</td><td class="DESC">TestBody</td><td class="Q">833</td><td class="Q">5</td><td><a href="report-16a7f4.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-16a7f4.html" -->
+</tr>
+<tr class="bt_logic_error_called_c++_object_pointer_is_null"><td class="DESC">Logic error</td><td class="DESC">Called C++ object pointer is null</td><td>test/unittests/wasm/module-decoder-unittest.cc</td><td class="DESC">TestBody</td><td class="Q">814</td><td class="Q">4</td><td><a href="report-75cdba.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-75cdba.html" -->
+</tr>
+<tr class="bt_logic_error_called_c++_object_pointer_is_null"><td class="DESC">Logic error</td><td class="DESC">Called C++ object pointer is null</td><td>test/unittests/wasm/module-decoder-unittest.cc</td><td class="DESC">TestBody</td><td class="Q">799</td><td class="Q">4</td><td><a href="report-858174.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-858174.html" -->
+</tr>
+<tr class="bt_logic_error_called_c++_object_pointer_is_null"><td class="DESC">Logic error</td><td class="DESC">Called C++ object pointer is null</td><td>test/unittests/wasm/module-decoder-unittest.cc</td><td class="DESC">TestBody</td><td class="Q">786</td><td class="Q">3</td><td><a href="report-c89a89.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-c89a89.html" -->
+</tr>
+<tr class="bt_logic_error_called_c++_object_pointer_is_null"><td class="DESC">Logic error</td><td class="DESC">Called C++ object pointer is null</td><td>test/cctest/test-mementos.cc</td><td class="DESC">SetUpNewSpaceWithPoisonedMementoAtTop</td><td class="Q">50</td><td class="Q">5</td><td><a href="report-830283.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-830283.html" -->
+</tr>
+<tr class="bt_logic_error_called_c++_object_pointer_is_null"><td class="DESC">Logic error</td><td class="DESC">Called C++ object pointer is null</td><td>third_party/icu/source/i18n/ucol_res.cpp</td><td class="DESC">loadFromData</td><td class="Q">454</td><td class="Q">18</td><td><a href="report-a7d19c.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-a7d19c.html" -->
+</tr>
+<tr class="bt_logic_error_called_c++_object_pointer_is_null"><td class="DESC">Logic error</td><td class="DESC">Called C++ object pointer is null</td><td>third_party/icu/source/i18n/ucol.cpp</td><td class="DESC">ucol_safeClone_54</td><td class="Q">99</td><td class="Q">7</td><td><a href="report-d4aa9d.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-d4aa9d.html" -->
+</tr>
+<tr class="bt_logic_error_called_c++_object_pointer_is_null"><td class="DESC">Logic error</td><td class="DESC">Called C++ object pointer is null</td><td>third_party/icu/source/i18n/cpdtrans.cpp</td><td class="DESC">computeMaximumContextLength</td><td class="Q">602</td><td class="Q">11</td><td><a href="report-e61482.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-e61482.html" -->
+</tr>
+<tr class="bt_logic_error_called_c++_object_pointer_is_null"><td class="DESC">Logic error</td><td class="DESC">Called C++ object pointer is null</td><td>third_party/icu/source/i18n/cpdtrans.cpp</td><td class="DESC">operator=</td><td class="Q">301</td><td class="Q">8</td><td><a href="report-0aa189.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-0aa189.html" -->
+</tr>
+<tr class="bt_logic_error_called_c++_object_pointer_is_null"><td class="DESC">Logic error</td><td class="DESC">Called C++ object pointer is null</td><td>src/crankshaft/x64/lithium-codegen-x64.cc</td><td class="DESC">DoCheckMaps</td><td class="Q">5036</td><td class="Q">6</td><td><a href="report-73b0ae.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-73b0ae.html" -->
+</tr>
+<tr class="bt_logic_error_called_c++_object_pointer_is_null"><td class="DESC">Logic error</td><td class="DESC">Called C++ object pointer is null</td><td>src/wasm/wasm-module.cc</td><td class="DESC">operator<<</td><td class="Q">28</td><td class="Q">5</td><td><a href="report-952c9a.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-952c9a.html" -->
+</tr>
+<tr class="bt_logic_error_called_c++_object_pointer_is_null"><td class="DESC">Logic error</td><td class="DESC">Called C++ object pointer is null</td><td>src/wasm/wasm-module.cc</td><td class="DESC">operator<<</td><td class="Q">27</td><td class="Q">4</td><td><a href="report-b4260e.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-b4260e.html" -->
+</tr>
+<tr class="bt_logic_error_called_c++_object_pointer_is_null"><td class="DESC">Logic error</td><td class="DESC">Called C++ object pointer is null</td><td>src/wasm/asm-wasm-builder.cc</td><td class="DESC">VisitFunctionLiteral</td><td class="Q">348</td><td class="Q">8</td><td><a href="report-b105fc.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-b105fc.html" -->
+</tr>
+<tr class="bt_logic_error_called_c++_object_pointer_is_null"><td class="DESC">Logic error</td><td class="DESC">Called C++ object pointer is null</td><td>src/i18n.cc</td><td class="DESC">CreateICUNumberFormat</td><td class="Q">348</td><td class="Q">12</td><td><a href="report-cc5a47.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-cc5a47.html" -->
+</tr>
+<tr class="bt_logic_error_called_c++_object_pointer_is_null"><td class="DESC">Logic error</td><td class="DESC">Called C++ object pointer is null</td><td>src/i18n.cc</td><td class="DESC">CreateICUNumberFormat</td><td class="Q">344</td><td class="Q">12</td><td><a href="report-a463e1.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-a463e1.html" -->
+</tr>
+<tr class="bt_logic_error_called_c++_object_pointer_is_null"><td class="DESC">Logic error</td><td class="DESC">Called C++ object pointer is null</td><td>src/i18n.cc</td><td class="DESC">CreateICUNumberFormat</td><td class="Q">338</td><td class="Q">11</td><td><a href="report-9c60c4.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-9c60c4.html" -->
+</tr>
+<tr class="bt_logic_error_called_c++_object_pointer_is_null"><td class="DESC">Logic error</td><td class="DESC">Called C++ object pointer is null</td><td>src/frames.cc</td><td class="DESC">Print</td><td class="Q">1340</td><td class="Q">10</td><td><a href="report-70b1f8.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-70b1f8.html" -->
+</tr>
+<tr class="bt_logic_error_called_c++_object_pointer_is_null"><td class="DESC">Logic error</td><td class="DESC">Called C++ object pointer is null</td><td>src/crankshaft/hydrogen.cc</td><td class="DESC">ComputeReceiverTypes</td><td class="Q">6844</td><td class="Q">8</td><td><a href="report-cac949.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-cac949.html" -->
+</tr>
+<tr class="bt_logic_error_called_c++_object_pointer_is_null"><td class="DESC">Logic error</td><td class="DESC">Called C++ object pointer is null</td><td>src/debug/debug.cc</td><td class="DESC">MatchingCodeTargets</td><td class="Q">1153</td><td class="Q">24</td><td><a href="report-dadabb.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-dadabb.html" -->
+</tr>
+<tr class="bt_logic_error_called_c++_object_pointer_is_null"><td class="DESC">Logic error</td><td class="DESC">Called C++ object pointer is null</td><td>src/crankshaft/lithium-allocator.cc</td><td class="DESC">ResolveControlFlow</td><td class="Q">1138</td><td class="Q">22</td><td><a href="report-27e0c4.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-27e0c4.html" -->
+</tr>
+<tr class="bt_logic_error_called_c++_object_pointer_is_null"><td class="DESC">Logic error</td><td class="DESC">Called C++ object pointer is null</td><td>src/compiler/register-allocator.cc</td><td class="DESC">SpillRange</td><td class="Q">1282</td><td class="Q">5</td><td><a href="report-960097.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-960097.html" -->
+</tr>
+<tr class="bt_logic_error_called_c++_object_pointer_is_null"><td class="DESC">Logic error</td><td class="DESC">Called C++ object pointer is null</td><td>src/compiler/schedule.cc</td><td class="DESC">AddNode</td><td class="Q">191</td><td class="Q">4</td><td><a href="report-7bb97d.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-7bb97d.html" -->
+</tr>
+<tr class="bt_logic_error_called_c++_object_pointer_is_null"><td class="DESC">Logic error</td><td class="DESC">Called C++ object pointer is null</td><td>src/compiler/osr.cc</td><td class="DESC">Deconstruct</td><td class="Q">294</td><td class="Q">10</td><td><a href="report-72e391.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-72e391.html" -->
+</tr>
+<tr class="bt_logic_error_called_c++_object_pointer_is_null"><td class="DESC">Logic error</td><td class="DESC">Called C++ object pointer is null</td><td>src/code-stubs-hydrogen.cc</td><td class="DESC">BuildGraph</td><td class="Q">195</td><td class="Q">8</td><td><a href="report-a81477.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-a81477.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>test/cctest/test-debug.cc</td><td class="DESC">TestScriptBreakPointLineOffset</td><td class="Q">1918</td><td class="Q">1</td><td><a href="report-dc84f7.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-dc84f7.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>test/cctest/test-debug.cc</td><td class="DESC">TestScriptBreakPointMultiple</td><td class="Q">1850</td><td class="Q">1</td><td><a href="report-1fb8f8.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-1fb8f8.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>test/cctest/compiler/test-js-typed-lowering.cc</td><td class="DESC">TestRemoveToNumberEffects</td><td class="Q">701</td><td class="Q">1</td><td><a href="report-290814.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-290814.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/common/utext.cpp</td><td class="DESC">ucstrTextExtract</td><td class="Q">2527</td><td class="Q">1</td><td><a href="report-15969d.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-15969d.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/common/usprep.cpp</td><td class="DESC">usprep_map</td><td class="Q">532</td><td class="Q">1</td><td><a href="report-f74acb.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-f74acb.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/common/uniset_props.cpp</td><td class="DESC">applyPattern</td><td class="Q">562</td><td class="Q">1</td><td><a href="report-0ac33b.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-0ac33b.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/common/uloc_tag.c</td><td class="DESC">ultag_parse</td><td class="Q">1839</td><td class="Q">1</td><td><a href="report-fc8f3b.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-fc8f3b.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/common/ucnvmbcs.cpp</td><td class="DESC">ucnv_MBCSDoubleFromUnicodeWithOffsets</td><td class="Q">3598</td><td class="Q">1</td><td><a href="report-dbdded.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-dbdded.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/common/ucnvmbcs.cpp</td><td class="DESC">ucnv_MBCSGetNextUChar</td><td class="Q">3120</td><td class="Q">1</td><td><a href="report-1f861c.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-1f861c.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/common/udata.cpp</td><td class="DESC">extendICUData</td><td class="Q">828</td><td class="Q">1</td><td><a href="report-e2256d.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-e2256d.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/common/ucnv_io.cpp</td><td class="DESC">findConverter</td><td class="Q">570</td><td class="Q">1</td><td><a href="report-fa21d8.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-fa21d8.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/common/ucnv_bld.cpp</td><td class="DESC">ucnv_swap_54</td><td class="Q">1482</td><td class="Q">1</td><td><a href="report-a0c042.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-a0c042.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/common/ucnv_bld.cpp</td><td class="DESC">getAlgorithmicTypeFromName</td><td class="Q">382</td><td class="Q">1</td><td><a href="report-87a5e5.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-87a5e5.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/common/rbbi.cpp</td><td class="DESC">handlePrevious</td><td class="Q">1274</td><td class="Q">1</td><td><a href="report-061bdb.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-061bdb.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/common/rbbi.cpp</td><td class="DESC">handleNext</td><td class="Q">1059</td><td class="Q">1</td><td><a href="report-91b588.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-91b588.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/common/rbbi.cpp</td><td class="DESC">previous</td><td class="Q">660</td><td class="Q">1</td><td><a href="report-6ea701.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-6ea701.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/common/normalizer2impl.cpp</td><td class="DESC">unorm2_swap_54</td><td class="Q">2100</td><td class="Q">1</td><td><a href="report-568954.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-568954.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/common/normalizer2impl.cpp</td><td class="DESC">unorm2_swap_54</td><td class="Q">2096</td><td class="Q">1</td><td><a href="report-a6d65a.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-a6d65a.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/common/loclikely.cpp</td><td class="DESC">_uloc_minimizeSubtags</td><td class="Q">1031</td><td class="Q">1</td><td><a href="report-d505b5.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-d505b5.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/common/dictbe.cpp</td><td class="DESC">divideUpDictionaryRange</td><td class="Q">1348</td><td class="Q">1</td><td><a href="report-74c24f.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-74c24f.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/common/dictbe.cpp</td><td class="DESC">divideUpDictionaryRange</td><td class="Q">926</td><td class="Q">1</td><td><a href="report-710e08.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-710e08.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/common/dictbe.cpp</td><td class="DESC">divideUpDictionaryRange</td><td class="Q">720</td><td class="Q">1</td><td><a href="report-90e543.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-90e543.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/common/dictbe.cpp</td><td class="DESC">divideUpDictionaryRange</td><td class="Q">527</td><td class="Q">1</td><td><a href="report-fbca37.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-fbca37.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/common/dictbe.cpp</td><td class="DESC">divideUpDictionaryRange</td><td class="Q">292</td><td class="Q">1</td><td><a href="report-4ae276.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-4ae276.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/common/locid.cpp</td><td class="DESC">init</td><td class="Q">537</td><td class="Q">1</td><td><a href="report-070444.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-070444.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/common/dictionarydata.cpp</td><td class="DESC">udict_swap_54</td><td class="Q">236</td><td class="Q">1</td><td><a href="report-1b9804.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-1b9804.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/common/dictionarydata.cpp</td><td class="DESC">udict_swap_54</td><td class="Q">234</td><td class="Q">1</td><td><a href="report-eb1777.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-eb1777.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/common/dictionarydata.cpp</td><td class="DESC">udict_swap_54</td><td class="Q">232</td><td class="Q">1</td><td><a href="report-e4d2ed.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-e4d2ed.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/common/dictionarydata.cpp</td><td class="DESC">udict_swap_54</td><td class="Q">214</td><td class="Q">1</td><td><a href="report-9a3524.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-9a3524.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/i18n/zonemeta.cpp</td><td class="DESC">getCanonicalCLDRID</td><td class="Q">357</td><td class="Q">1</td><td><a href="report-988cdc.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-988cdc.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/i18n/zonemeta.cpp</td><td class="DESC">getCanonicalCLDRID</td><td class="Q">349</td><td class="Q">1</td><td><a href="report-c5cc71.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-c5cc71.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/i18n/tzfmt.cpp</td><td class="DESC">parseOffsetFieldWithLocalizedDigits</td><td class="Q">2089</td><td class="Q">1</td><td><a href="report-94f40a.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-94f40a.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/i18n/ucal.cpp</td><td class="DESC">ucal_getKeywordValuesForLocale_54</td><td class="Q">679</td><td class="Q">1</td><td><a href="report-09f497.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-09f497.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/i18n/stsearch.cpp</td><td class="DESC">safeClone</td><td class="Q">292</td><td class="Q">1</td><td><a href="report-3f9518.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-3f9518.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/i18n/rematch.cpp</td><td class="DESC">MatchChunkAt</td><td class="Q">5222</td><td class="Q">1</td><td><a href="report-f65e04.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-f65e04.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/i18n/rematch.cpp</td><td class="DESC">MatchChunkAt</td><td class="Q">4327</td><td class="Q">1</td><td><a href="report-e4ee5a.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-e4ee5a.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/i18n/rematch.cpp</td><td class="DESC">MatchAt</td><td class="Q">3780</td><td class="Q">1</td><td><a href="report-584a46.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-584a46.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/i18n/rematch.cpp</td><td class="DESC">MatchAt</td><td class="Q">3181</td><td class="Q">1</td><td><a href="report-cce855.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-cce855.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/i18n/rematch.cpp</td><td class="DESC">MatchAt</td><td class="Q">2824</td><td class="Q">1</td><td><a href="report-3756f8.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-3756f8.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/i18n/regexcmp.cpp</td><td class="DESC">matchStartType</td><td class="Q">2942</td><td class="Q">1</td><td><a href="report-f20f13.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-f20f13.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/i18n/rbt_data.cpp</td><td class="DESC">TransliterationRuleData</td><td class="Q">62</td><td class="Q">1</td><td><a href="report-8efb4e.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-8efb4e.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/i18n/decimfmt.cpp</td><td class="DESC">compareComplexAffix</td><td class="Q">3455</td><td class="Q">1</td><td><a href="report-948239.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-948239.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/i18n/decimfmt.cpp</td><td class="DESC">subparse</td><td class="Q">2786</td><td class="Q">1</td><td><a href="report-f95274.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-f95274.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/i18n/islamcal.cpp</td><td class="DESC">handleComputeFields</td><td class="Q">617</td><td class="Q">1</td><td><a href="report-e78f9e.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-e78f9e.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/i18n/islamcal.cpp</td><td class="DESC">handleComputeFields</td><td class="Q">584</td><td class="Q">1</td><td><a href="report-ce12f2.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-ce12f2.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/i18n/dtptngen.cpp</td><td class="DESC">setTokens</td><td class="Q">1775</td><td class="Q">1</td><td><a href="report-3efa88.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-3efa88.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/i18n/filteredbrk.cpp</td><td class="DESC">next</td><td class="Q">226</td><td class="Q">1</td><td><a href="report-5a24bc.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-5a24bc.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/i18n/decNumber.c</td><td class="DESC">decDivideOp</td><td class="Q">4799</td><td class="Q">1</td><td><a href="report-766a8c.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-766a8c.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/i18n/decNumber.c</td><td class="DESC">decDivideOp</td><td class="Q">4639</td><td class="Q">1</td><td><a href="report-c792a0.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-c792a0.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/i18n/decNumber.c</td><td class="DESC">decAddOp</td><td class="Q">3939</td><td class="Q">1</td><td><a href="report-a3ac85.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-a3ac85.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/i18n/decNumber.c</td><td class="DESC">decAddOp</td><td class="Q">3903</td><td class="Q">1</td><td><a href="report-4da853.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-4da853.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/i18n/collationfastlatinbuilder.cpp</td><td class="DESC">encodeUniqueCEs</td><td class="Q">527</td><td class="Q">1</td><td><a href="report-d734cd.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-d734cd.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>third_party/icu/source/i18n/collationfastlatinbuilder.cpp</td><td class="DESC">encodeUniqueCEs</td><td class="Q">526</td><td class="Q">1</td><td><a href="report-356355.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-356355.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>src/x64/disasm-x64.cc</td><td class="DESC">AVXInstruction</td><td class="Q">1157</td><td class="Q">1</td><td><a href="report-38f902.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-38f902.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>src/wasm/ast-decoder.cc</td><td class="DESC">MergeIntoProduction</td><td class="Q">1298</td><td class="Q">1</td><td><a href="report-9dcdd0.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-9dcdd0.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>src/v8threads.cc</td><td class="DESC">Iterate</td><td class="Q">332</td><td class="Q">1</td><td><a href="report-f1794d.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-f1794d.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>src/v8threads.cc</td><td class="DESC">EagerlyArchiveThread</td><td class="Q">298</td><td class="Q">1</td><td><a href="report-096a5d.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-096a5d.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>src/v8threads.cc</td><td class="DESC">RestoreThread</td><td class="Q">140</td><td class="Q">1</td><td><a href="report-183035.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-183035.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>src/snapshot/serialize.cc</td><td class="DESC">ReadData</td><td class="Q">1177</td><td class="Q">1</td><td><a href="report-96cc86.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-96cc86.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>src/objects-debug.cc</td><td class="DESC">IsSortedNoDuplicates</td><td class="Q">1143</td><td class="Q">1</td><td><a href="report-887fab.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-887fab.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>src/elements.cc</td><td class="DESC">TraceTopFrame</td><td class="Q">445</td><td class="Q">1</td><td><a href="report-cff257.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-cff257.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>src/deoptimizer.cc</td><td class="DESC">DoComputeArgumentsAdaptorFrame</td><td class="Q">1415</td><td class="Q">1</td><td><a href="report-de31a9.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-de31a9.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>src/crankshaft/hydrogen-instructions.cc</td><td class="DESC">New</td><td class="Q">4224</td><td class="Q">1</td><td><a href="report-a4eed0.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-a4eed0.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>src/compiler/graph-visualizer.cc</td><td class="DESC">PrintLiveRange</td><td class="Q">551</td><td class="Q">1</td><td><a href="report-cefa57.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-cefa57.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>src/compiler/escape-analysis-reducer.cc</td><td class="DESC">ReduceStateValueInput</td><td class="Q">315</td><td class="Q">1</td><td><a href="report-8a55dc.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-8a55dc.html" -->
+</tr>
+<tr class="bt_dead_store_dead_assignment"><td class="DESC">Dead store</td><td class="DESC">Dead assignment</td><td>src/compiler/escape-analysis-reducer.cc</td><td class="DESC">ReduceStateValueInput</td><td class="Q">314</td><td class="Q">1</td><td><a href="report-2496a1.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-2496a1.html" -->
+</tr>
+<tr class="bt_dead_store_dead_increment"><td class="DESC">Dead store</td><td class="DESC">Dead increment</td><td>third_party/icu/source/common/uloc.cpp</td><td class="DESC">uloc_setKeywordValue_54</td><td class="Q">988</td><td class="Q">1</td><td><a href="report-1e418b.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-1e418b.html" -->
+</tr>
+<tr class="bt_dead_store_dead_increment"><td class="DESC">Dead store</td><td class="DESC">Dead increment</td><td>third_party/icu/source/common/ucnvsel.cpp</td><td class="DESC">ucnvsel_openFromSerialized_54</td><td class="Q">583</td><td class="Q">1</td><td><a href="report-9116c1.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-9116c1.html" -->
+</tr>
+<tr class="bt_dead_store_dead_increment"><td class="DESC">Dead store</td><td class="DESC">Dead increment</td><td>third_party/icu/source/common/ucnvsel.cpp</td><td class="DESC">ucnvsel_swap</td><td class="Q">453</td><td class="Q">1</td><td><a href="report-6b48e6.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-6b48e6.html" -->
+</tr>
+<tr class="bt_dead_store_dead_increment"><td class="DESC">Dead store</td><td class="DESC">Dead increment</td><td>third_party/icu/source/common/ucnvsel.cpp</td><td class="DESC">ucnvsel_serialize_54</td><td class="Q">344</td><td class="Q">1</td><td><a href="report-9af61c.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-9af61c.html" -->
+</tr>
+<tr class="bt_dead_store_dead_increment"><td class="DESC">Dead store</td><td class="DESC">Dead increment</td><td>third_party/icu/source/common/locid.cpp</td><td class="DESC">Locale</td><td class="Q">403</td><td class="Q">1</td><td><a href="report-348f17.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-348f17.html" -->
+</tr>
+<tr class="bt_dead_store_dead_increment"><td class="DESC">Dead store</td><td class="DESC">Dead increment</td><td>third_party/icu/source/i18n/msgfmt.cpp</td><td class="DESC">parse</td><td class="Q">1393</td><td class="Q">1</td><td><a href="report-f29238.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-f29238.html" -->
+</tr>
+<tr class="bt_dead_store_dead_increment"><td class="DESC">Dead store</td><td class="DESC">Dead increment</td><td>src/x64/disasm-x64.cc</td><td class="DESC">InstructionDecode</td><td class="Q">2401</td><td class="Q">1</td><td><a href="report-36a457.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-36a457.html" -->
+</tr>
+<tr class="bt_dead_store_dead_increment"><td class="DESC">Dead store</td><td class="DESC">Dead increment</td><td>src/deoptimizer.cc</td><td class="DESC">DoComputeInterpretedFrame</td><td class="Q">1270</td><td class="Q">1</td><td><a href="report-6bf58d.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-6bf58d.html" -->
+</tr>
+<tr class="bt_dead_store_dead_initialization"><td class="DESC">Dead store</td><td class="DESC">Dead initialization</td><td>test/cctest/test-api.cc</td><td class="DESC">NextThread</td><td class="Q">13636</td><td class="Q">1</td><td><a href="report-9e6789.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-9e6789.html" -->
+</tr>
+<tr class="bt_dead_store_dead_initialization"><td class="DESC">Dead store</td><td class="DESC">Dead initialization</td><td>third_party/icu/source/i18n/regexcmp.cpp</td><td class="DESC">handleCloseParen</td><td class="Q">2138</td><td class="Q">1</td><td><a href="report-658111.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-658111.html" -->
+</tr>
+<tr class="bt_dead_store_dead_initialization"><td class="DESC">Dead store</td><td class="DESC">Dead initialization</td><td>third_party/icu/source/i18n/regexcmp.cpp</td><td class="DESC">doParseActions</td><td class="Q">416</td><td class="Q">1</td><td><a href="report-d0bbdc.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-d0bbdc.html" -->
+</tr>
+<tr class="bt_dead_store_dead_initialization"><td class="DESC">Dead store</td><td class="DESC">Dead initialization</td><td>third_party/icu/source/i18n/nfrule.cpp</td><td class="DESC">extractSubstitution</td><td class="Q">443</td><td class="Q">1</td><td><a href="report-1f1da5.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-1f1da5.html" -->
+</tr>
+<tr class="bt_dead_store_dead_initialization"><td class="DESC">Dead store</td><td class="DESC">Dead initialization</td><td>third_party/icu/source/i18n/collationbuilder.cpp</td><td class="DESC">addReset</td><td class="Q">387</td><td class="Q">1</td><td><a href="report-1bc516.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-1bc516.html" -->
+</tr>
+<tr class="bt_dead_store_dead_initialization"><td class="DESC">Dead store</td><td class="DESC">Dead initialization</td><td>src/compiler/simplified-lowering.cc</td><td class="DESC">SetOutputFromMachineType</td><td class="Q">471</td><td class="Q">1</td><td><a href="report-1f6aec.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-1f6aec.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>testing/gtest/src/gtest.cc</td><td class="DESC">AddTestPartResult</td><td class="Q">4154</td><td class="Q">7</td><td><a href="report-b6ab6a.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-b6ab6a.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>third_party/icu/source/common/uts46.cpp</td><td class="DESC">isASCIIString</td><td class="Q">53</td><td class="Q">12</td><td><a href="report-9b8fc6.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-9b8fc6.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>third_party/icu/source/common/utrie2.cpp</td><td class="DESC">enumEitherTrie</td><td class="Q">679</td><td class="Q">34</td><td><a href="report-9a57e8.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-9a57e8.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>third_party/icu/source/common/ubidiwrt.c</td><td class="DESC">ubidi_writeReordered_54</td><td class="Q">633</td><td class="Q">22</td><td><a href="report-a1d01b.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-a1d01b.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>third_party/icu/source/common/ubidiwrt.c</td><td class="DESC">ubidi_writeReordered_54</td><td class="Q">618</td><td class="Q">26</td><td><a href="report-23da0a.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-23da0a.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>third_party/icu/source/common/ubidiwrt.c</td><td class="DESC">ubidi_writeReordered_54</td><td class="Q">611</td><td class="Q">22</td><td><a href="report-88517a.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-88517a.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>third_party/icu/source/common/ubidiwrt.c</td><td class="DESC">ubidi_writeReordered_54</td><td class="Q">596</td><td class="Q">26</td><td><a href="report-c2dd13.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-c2dd13.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>third_party/icu/source/common/ubidiwrt.c</td><td class="DESC">ubidi_writeReordered_54</td><td class="Q">556</td><td class="Q">41</td><td><a href="report-6f1964.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-6f1964.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>third_party/icu/source/common/ubidiwrt.c</td><td class="DESC">ubidi_writeReordered_54</td><td class="Q">530</td><td class="Q">37</td><td><a href="report-0360e4.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-0360e4.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>third_party/icu/source/common/ubidiwrt.c</td><td class="DESC">ubidi_writeReordered_54</td><td class="Q">512</td><td class="Q">41</td><td><a href="report-c27dd0.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-c27dd0.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>third_party/icu/source/common/ubidiwrt.c</td><td class="DESC">ubidi_writeReordered_54</td><td class="Q">486</td><td class="Q">50</td><td><a href="report-718e51.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-718e51.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>third_party/icu/source/common/simplepatternformatter.cpp</td><td class="DESC">updatePlaceholderOffset</td><td class="Q">236</td><td class="Q">12</td><td><a href="report-fd128c.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-fd128c.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>third_party/icu/source/i18n/uregex.cpp</td><td class="DESC">appendTail</td><td class="Q">1683</td><td class="Q">8</td><td><a href="report-0b7619.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-0b7619.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>third_party/icu/source/i18n/tznames_impl.cpp</td><td class="DESC">createInstance</td><td class="Q">704</td><td class="Q">12</td><td><a href="report-07ed3c.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-07ed3c.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>third_party/icu/source/i18n/ucol_sit.cpp</td><td class="DESC">ucol_sit_dumpSpecs</td><td class="Q">369</td><td class="Q">19</td><td><a href="report-888edb.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-888edb.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>third_party/icu/source/i18n/rulebasedcollator.cpp</td><td class="DESC">writeIdenticalLevel</td><td class="Q">1384</td><td class="Q">23</td><td><a href="report-43d9ec.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-43d9ec.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>third_party/icu/source/i18n/olsontz.cpp</td><td class="DESC">initTransitionRules</td><td class="Q">859</td><td class="Q">27</td><td><a href="report-af4764.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-af4764.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>third_party/icu/source/i18n/olsontz.cpp</td><td class="DESC">initTransitionRules</td><td class="Q">797</td><td class="Q">26</td><td><a href="report-cf2740.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-cf2740.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>third_party/icu/source/i18n/msgfmt.cpp</td><td class="DESC">applyPattern</td><td class="Q">514</td><td class="Q">35</td><td><a href="report-32f103.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-32f103.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>third_party/icu/source/i18n/measfmt.cpp</td><td class="DESC">loadMeasureUnitData</td><td class="Q">236</td><td class="Q">16</td><td><a href="report-4466a5.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-4466a5.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>third_party/icu/source/i18n/alphaindex.cpp</td><td class="DESC">init</td><td class="Q">899</td><td class="Q">7</td><td><a href="report-02bb08.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-02bb08.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>src/wasm/ast-decoder.cc</td><td class="DESC">InitSsaEnv</td><td class="Q">494</td><td class="Q">18</td><td><a href="report-9bd70f.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-9bd70f.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>src/wasm/ast-decoder.cc</td><td class="DESC">InitSsaEnv</td><td class="Q">487</td><td class="Q">17</td><td><a href="report-3ed084.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-3ed084.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>src/wasm/ast-decoder.cc</td><td class="DESC">InitSsaEnv</td><td class="Q">480</td><td class="Q">16</td><td><a href="report-6f6be6.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-6f6be6.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>src/wasm/ast-decoder.cc</td><td class="DESC">InitSsaEnv</td><td class="Q">473</td><td class="Q">15</td><td><a href="report-a90c99.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-a90c99.html" -->
+</tr>
+<tr class="bt_logic_error_dereference_of_null_pointer"><td class="DESC">Logic error</td><td class="DESC">Dereference of null pointer</td><td>src/wasm/ast-decoder.cc</td><td class="DESC">InitSsaEnv</td><td class="Q">467</td><td class="Q">13</td><td><a href="report-cc404c.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-cc404c.html" -->
+</tr>
+<tr class="bt_logic_error_division_by_zero"><td class="DESC">Logic error</td><td class="DESC">Division by zero</td><td>third_party/icu/source/i18n/nfrs.cpp</td><td class="DESC">util_lcm</td><td class="Q">98</td><td class="Q">10</td><td><a href="report-807e89.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-807e89.html" -->
+</tr>
+<tr class="bt_memory_error_memory_leak"><td class="DESC">Memory Error</td><td class="DESC">Memory leak</td><td>src/heap/scavenge-job.cc</td><td class="DESC">ScheduleIdleTask</td><td class="Q">114</td><td class="Q">6</td><td><a href="report-8940a4.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-8940a4.html" -->
+</tr>
+<tr class="bt_memory_error_memory_leak"><td class="DESC">Memory Error</td><td class="DESC">Memory leak</td><td>src/heap/incremental-marking-job.cc</td><td class="DESC">ScheduleIdleTask</td><td class="Q">52</td><td class="Q">5</td><td><a href="report-c7b47e.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-c7b47e.html" -->
+</tr>
+<tr class="bt_logic_error_result_of_operation_is_garbage_or_undefined"><td class="DESC">Logic error</td><td class="DESC">Result of operation is garbage or undefined</td><td>third_party/icu/source/common/unames.cpp</td><td class="DESC">enumAlgNames</td><td class="Q">1027</td><td class="Q">22</td><td><a href="report-80b9db.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-80b9db.html" -->
+</tr>
+<tr class="bt_logic_error_result_of_operation_is_garbage_or_undefined"><td class="DESC">Logic error</td><td class="DESC">Result of operation is garbage or undefined</td><td>third_party/icu/source/common/ubidi.c</td><td class="DESC">resolveExplicitLevels</td><td class="Q">1267</td><td class="Q">34</td><td><a href="report-cb6777.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-cb6777.html" -->
+</tr>
+<tr class="bt_logic_error_result_of_operation_is_garbage_or_undefined"><td class="DESC">Logic error</td><td class="DESC">Result of operation is garbage or undefined</td><td>third_party/icu/source/i18n/tzfmt.cpp</td><td class="DESC">formatOffsetWithAsciiDigits</td><td class="Q">2160</td><td class="Q">11</td><td><a href="report-77e7b9.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-77e7b9.html" -->
+</tr>
+<tr class="bt_logic_error_result_of_operation_is_garbage_or_undefined"><td class="DESC">Logic error</td><td class="DESC">Result of operation is garbage or undefined</td><td>third_party/icu/source/i18n/decNumber.c</td><td class="DESC">decDivideOp</td><td class="Q">4618</td><td class="Q">38</td><td><a href="report-749848.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-749848.html" -->
+</tr>
+<tr class="bt_logic_error_result_of_operation_is_garbage_or_undefined"><td class="DESC">Logic error</td><td class="DESC">Result of operation is garbage or undefined</td><td>src/third_party/fdlibm/fdlibm.cc</td><td class="DESC">rempio2</td><td class="Q">218</td><td class="Q">9</td><td><a href="report-9f08b7.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-9f08b7.html" -->
+</tr>
+<tr class="bt_logic_error_result_of_operation_is_garbage_or_undefined"><td class="DESC">Logic error</td><td class="DESC">Result of operation is garbage or undefined</td><td>src/bignum.cc</td><td class="DESC">AssignPowerUInt16</td><td class="Q">437</td><td class="Q">14</td><td><a href="report-912944.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-912944.html" -->
+</tr>
+<tr class="bt_logic_error_return_of_address_to_stack-allocated_memory"><td class="DESC">Logic error</td><td class="DESC">Return of address to stack-allocated memory</td><td>test/cctest/test-api.cc</td><td class="DESC">ComputeStackLimit</td><td class="Q">17799</td><td class="Q">3</td><td><a href="report-eaa919.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-eaa919.html" -->
+</tr>
+<tr class="bt_logic_error_returning_null_reference"><td class="DESC">Logic error</td><td class="DESC">Returning null reference</td><td>third_party/icu/source/common/usetiter.cpp</td><td class="DESC">getString</td><td class="Q">145</td><td class="Q">3</td><td><a href="report-8864ac.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-8864ac.html" -->
+</tr>
+<tr class="bt_logic_error_returning_null_reference"><td class="DESC">Logic error</td><td class="DESC">Returning null reference</td><td>third_party/icu/source/i18n/translit.cpp</td><td class="DESC">getAvailableID</td><td class="Q">1326</td><td class="Q">3</td><td><a href="report-1a3870.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-1a3870.html" -->
+</tr>
+<tr class="bt_logic_error_uninitialized_argument_value"><td class="DESC">Logic error</td><td class="DESC">Uninitialized argument value</td><td>test/cctest/test-regexp.cc</td><td class="DESC">TestUncanonicalizeEquivalence</td><td class="Q">1620</td><td class="Q">7</td><td><a href="report-51e0e5.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-51e0e5.html" -->
+</tr>
+<tr class="bt_logic_error_uninitialized_argument_value"><td class="DESC">Logic error</td><td class="DESC">Uninitialized argument value</td><td>test/cctest/test-api.cc</td><td class="DESC">RethrowPrimitiveStackTraceHandler</td><td class="Q">17002</td><td class="Q">6</td><td><a href="report-b133ac.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-b133ac.html" -->
+</tr>
+<tr class="bt_logic_error_uninitialized_argument_value"><td class="DESC">Logic error</td><td class="DESC">Uninitialized argument value</td><td>test/cctest/test-api.cc</td><td class="DESC">RethrowStackTraceHandler</td><td class="Q">16958</td><td class="Q">8</td><td><a href="report-5cc638.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-5cc638.html" -->
+</tr>
+<tr class="bt_logic_error_uninitialized_argument_value"><td class="DESC">Logic error</td><td class="DESC">Uninitialized argument value</td><td>third_party/icu/source/common/uresbund.cpp</td><td class="DESC">ures_getUTF8StringByKey_54</td><td class="Q">1943</td><td class="Q">3</td><td><a href="report-f31382.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-f31382.html" -->
+</tr>
+<tr class="bt_logic_error_uninitialized_argument_value"><td class="DESC">Logic error</td><td class="DESC">Uninitialized argument value</td><td>third_party/icu/source/common/uresbund.cpp</td><td class="DESC">ures_getUTF8StringByIndex_54</td><td class="Q">1566</td><td class="Q">3</td><td><a href="report-f73431.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-f73431.html" -->
+</tr>
+<tr class="bt_logic_error_uninitialized_argument_value"><td class="DESC">Logic error</td><td class="DESC">Uninitialized argument value</td><td>third_party/icu/source/common/uresbund.cpp</td><td class="DESC">ures_getUTF8String_54</td><td class="Q">1244</td><td class="Q">3</td><td><a href="report-7551eb.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-7551eb.html" -->
+</tr>
+<tr class="bt_logic_error_uninitialized_argument_value"><td class="DESC">Logic error</td><td class="DESC">Uninitialized argument value</td><td>third_party/icu/source/i18n/collationdatabuilder.cpp</td><td class="DESC">buildContext</td><td class="Q">1427</td><td class="Q">14</td><td><a href="report-19bf18.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-19bf18.html" -->
+</tr>
+<tr class="bt_logic_error_uninitialized_argument_value"><td class="DESC">Logic error</td><td class="DESC">Uninitialized argument value</td><td>src/utils.cc</td><td class="DESC">ReadFile</td><td class="Q">280</td><td class="Q">6</td><td><a href="report-fe8f05.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-fe8f05.html" -->
+</tr>
+<tr class="bt_logic_error_uninitialized_argument_value"><td class="DESC">Logic error</td><td class="DESC">Uninitialized argument value</td><td>src/regexp/jsregexp.cc</td><td class="DESC">EmitUseLookupTable</td><td class="Q">1869</td><td class="Q">10</td><td><a href="report-da812d.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-da812d.html" -->
+</tr>
+<tr class="bt_memory_error_use_of_zero_allocated"><td class="DESC">Memory Error</td><td class="DESC">Use of zero allocated</td><td>src/d8.cc</td><td class="DESC">OnExit</td><td class="Q">1332</td><td class="Q">18</td><td><a href="report-09b233.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-09b233.html" -->
+</tr>
+<tr class="bt_memory_error_use_of_zero_allocated"><td class="DESC">Memory Error</td><td class="DESC">Use of zero allocated</td><td>src/heap/mark-compact.cc</td><td class="DESC">StartParallelCompaction</td><td class="Q">3379</td><td class="Q">9</td><td><a href="report-d59d7e.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-d59d7e.html" -->
+</tr>
+</tbody>
+</table>
+
+<h2>Analyzer Failures</h2>
+<p>The analyzer had problems processing the following files:</p>
+<table>
+<thead><tr><td>Problem</td><td>Source File</td><td>Preprocessed File</td><td>STDERR Output</td></tr></thead>
+<tr><td>Crash</td><td>src/objects-printer.cc</td><td><a href="failures/clang_crash_WTiHbl.ii">clang_crash_WTiHbl.ii</a></td><td><a href="failures/clang_crash_WTiHbl.ii.stderr.txt">clang_crash_WTiHbl.ii.stderr.txt</a></td></tr>
+  <!-- REPORTPROBLEM src="src/objects-printer.cc" file="failures/clang_crash_WTiHbl.ii" clangfile="failures/clang_crash_WTiHbl.clang.ii" stderr="failures/clang_crash_WTiHbl.ii.stderr.txt" info="failures/clang_crash_WTiHbl.ii.info.txt" -->
+<tr><td>Crash</td><td>src/extensions/externalize-string-extension.cc</td><td><a href="failures/clang_crash_vLKGNA.ii">clang_crash_vLKGNA.ii</a></td><td><a href="failures/clang_crash_vLKGNA.ii.stderr.txt">clang_crash_vLKGNA.ii.stderr.txt</a></td></tr>
+  <!-- REPORTPROBLEM src="src/extensions/externalize-string-extension.cc" file="failures/clang_crash_vLKGNA.ii" clangfile="failures/clang_crash_vLKGNA.clang.ii" stderr="failures/clang_crash_vLKGNA.ii.stderr.txt" info="failures/clang_crash_vLKGNA.ii.info.txt" -->
+</table>
+<p>Please consider submitting preprocessed files as <a href="http://clang-analyzer.llvm.org/filing_bugs.html">bug reports</a>. <!-- REPORTCRASHES --> </p>
+</body></html>

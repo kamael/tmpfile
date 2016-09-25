@@ -1,0 +1,565 @@
+<!doctype html>
+<html>
+<head>
+<title>../third_party/icu/source/i18n/collationdatareader.cpp</title>
+<style type="text/css">
+ body { color:#000000; background-color:#ffffff }
+ body { font-family:Helvetica, sans-serif; font-size:10pt }
+ h1 { font-size:14pt }
+ .code { border-collapse:collapse; width:100%; }
+ .code { font-family: "Monospace", monospace; font-size:10pt }
+ .code { line-height: 1.2em }
+ .comment { color: green; font-style: oblique }
+ .keyword { color: blue }
+ .string_literal { color: red }
+ .directive { color: darkmagenta }
+ .expansion { display: none; }
+ .macro:hover .expansion { display: block; border: 2px solid #FF0000; padding: 2px; background-color:#FFF0F0; font-weight: normal;   -webkit-border-radius:5px;  -webkit-box-shadow:1px 1px 7px #000;   border-radius:5px;  box-shadow:1px 1px 7px #000; position: absolute; top: -1em; left:10em; z-index: 1 } 
+ .macro { color: darkmagenta; background-color:LemonChiffon; position: relative }
+ .num { width:2.5em; padding-right:2ex; background-color:#eeeeee }
+ .num { text-align:right; font-size:8pt }
+ .num { color:#444444 }
+ .line { padding-left: 1ex; border-left: 3px solid #ccc }
+ .line { white-space: pre }
+ .msg { -webkit-box-shadow:1px 1px 7px #000 }
+ .msg { box-shadow:1px 1px 7px #000 }
+ .msg { -webkit-border-radius:5px }
+ .msg { border-radius:5px }
+ .msg { font-family:Helvetica, sans-serif; font-size:8pt }
+ .msg { float:left }
+ .msg { padding:0.25em 1ex 0.25em 1ex }
+ .msg { margin-top:10px; margin-bottom:10px }
+ .msg { font-weight:bold }
+ .msg { max-width:60em; word-wrap: break-word; white-space: pre-wrap }
+ .msgT { padding:0x; spacing:0x }
+ .msgEvent { background-color:#fff8b4; color:#000000 }
+ .msgControl { background-color:#bbbbbb; color:#000000 }
+ .mrange { background-color:#dfddf3 }
+ .mrange { border-bottom:1px solid #6F9DBE }
+ .PathIndex { font-weight: bold; padding:0px 5px; margin-right:5px; }
+ .PathIndex { -webkit-border-radius:8px }
+ .PathIndex { border-radius:8px }
+ .PathIndexEvent { background-color:#bfba87 }
+ .PathIndexControl { background-color:#8c8c8c }
+ .PathNav a { text-decoration:none; font-size: larger }
+ .CodeInsertionHint { font-weight: bold; background-color: #10dd10 }
+ .CodeRemovalHint { background-color:#de1010 }
+ .CodeRemovalHint { border-bottom:1px solid #6F9DBE }
+ table.simpletable {
+   padding: 5px;
+   font-size:12pt;
+   margin:20px;
+   border-collapse: collapse; border-spacing: 0px;
+ }
+ td.rowname {
+   text-align:right; font-weight:bold; color:#444444;
+   padding-right:2ex; }
+</style>
+</head>
+<body>
+<!-- BUGDESC Null pointer passed as an argument to a 'nonnull' parameter -->
+
+<!-- BUGTYPE Argument with 'nonnull' attribute passed null -->
+
+<!-- BUGCATEGORY API -->
+
+<!-- BUGFILE /home/haha/code/v8_5_0/v8/out/../third_party/icu/source/i18n/collationdatareader.cpp -->
+
+<!-- FILENAME collationdatareader.cpp -->
+
+<!-- FUNCTIONNAME read -->
+
+<!-- ISSUEHASHCONTENTOFLINEINCONTEXT 264ea8f858c186f5039e808bc25e544b -->
+
+<!-- BUGLINE 374 -->
+
+<!-- BUGCOLUMN 13 -->
+
+<!-- BUGPATHLENGTH 33 -->
+
+<!-- BUGMETAEND -->
+<!-- REPORTHEADER -->
+<h3>Bug Summary</h3>
+<table class="simpletable">
+<tr><td class="rowname">File:</td><td>out/../third_party/icu/source/i18n/collationdatareader.cpp</td></tr>
+<tr><td class="rowname">Location:</td><td><a href="#EndPath">line 374, column 13</a></td></tr>
+<tr><td class="rowname">Description:</td><td>Null pointer passed as an argument to a 'nonnull' parameter</td></tr>
+</table>
+<!-- REPORTSUMMARYEXTRA -->
+<h3>Annotated Source Code</h3>
+<table class="code">
+<tr><td class="num" id="LN1">1</td><td class="line"><span class='comment'>/*</span></td></tr>
+<tr><td class="num" id="LN2">2</td><td class="line"><span class='comment'>*******************************************************************************</span></td></tr>
+<tr><td class="num" id="LN3">3</td><td class="line"><span class='comment'>* Copyright (C) 2013-2014, International Business Machines</span></td></tr>
+<tr><td class="num" id="LN4">4</td><td class="line"><span class='comment'>* Corporation and others.  All Rights Reserved.</span></td></tr>
+<tr><td class="num" id="LN5">5</td><td class="line"><span class='comment'>*******************************************************************************</span></td></tr>
+<tr><td class="num" id="LN6">6</td><td class="line"><span class='comment'>* collationdatareader.cpp</span></td></tr>
+<tr><td class="num" id="LN7">7</td><td class="line"><span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN8">8</td><td class="line"><span class='comment'>* created on: 2013feb07</span></td></tr>
+<tr><td class="num" id="LN9">9</td><td class="line"><span class='comment'>* created by: Markus W. Scherer</span></td></tr>
+<tr><td class="num" id="LN10">10</td><td class="line"><span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN11">11</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN12">12</td><td class="line"><span class='directive'>#include "unicode/utypes.h"</span></td></tr>
+<tr><td class="num" id="LN13">13</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN14">14</td><td class="line"><span class='directive'>#if !<span class='macro'>UCONFIG_NO_COLLATION<span class='expansion'>0</span></span></span></td></tr>
+<tr><td class="num" id="LN15">15</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN16">16</td><td class="line"><span class='directive'>#include "unicode/ucol.h"</span></td></tr>
+<tr><td class="num" id="LN17">17</td><td class="line"><span class='directive'>#include "unicode/udata.h"</span></td></tr>
+<tr><td class="num" id="LN18">18</td><td class="line"><span class='directive'>#include "unicode/uscript.h"</span></td></tr>
+<tr><td class="num" id="LN19">19</td><td class="line"><span class='directive'>#include "cmemory.h"</span></td></tr>
+<tr><td class="num" id="LN20">20</td><td class="line"><span class='directive'>#include "collation.h"</span></td></tr>
+<tr><td class="num" id="LN21">21</td><td class="line"><span class='directive'>#include "collationdata.h"</span></td></tr>
+<tr><td class="num" id="LN22">22</td><td class="line"><span class='directive'>#include "collationdatareader.h"</span></td></tr>
+<tr><td class="num" id="LN23">23</td><td class="line"><span class='directive'>#include "collationfastlatin.h"</span></td></tr>
+<tr><td class="num" id="LN24">24</td><td class="line"><span class='directive'>#include "collationkeys.h"</span></td></tr>
+<tr><td class="num" id="LN25">25</td><td class="line"><span class='directive'>#include "collationrootelements.h"</span></td></tr>
+<tr><td class="num" id="LN26">26</td><td class="line"><span class='directive'>#include "collationsettings.h"</span></td></tr>
+<tr><td class="num" id="LN27">27</td><td class="line"><span class='directive'>#include "collationtailoring.h"</span></td></tr>
+<tr><td class="num" id="LN28">28</td><td class="line"><span class='directive'>#include "normalizer2impl.h"</span></td></tr>
+<tr><td class="num" id="LN29">29</td><td class="line"><span class='directive'>#include "uassert.h"</span></td></tr>
+<tr><td class="num" id="LN30">30</td><td class="line"><span class='directive'>#include "ucmndata.h"</span></td></tr>
+<tr><td class="num" id="LN31">31</td><td class="line"><span class='directive'>#include "utrie2.h"</span></td></tr>
+<tr><td class="num" id="LN32">32</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN33">33</td><td class="line"><span class='macro'>U_NAMESPACE_BEGIN<span class='expansion'>extern "C++" { namespace icu_54 {</span></span></td></tr>
+<tr><td class="num" id="LN34">34</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN35">35</td><td class="line"><span class='keyword'>namespace</span> {</td></tr>
+<tr><td class="num" id="LN36">36</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN37">37</td><td class="line">int32_t getIndex(<span class='keyword'>const</span> int32_t *indexes, int32_t length, int32_t i) {</td></tr>
+<tr><td class="num" id="LN38">38</td><td class="line">    <span class='keyword'>return</span> (i &lt; length) ? indexes[i] : -1;</td></tr>
+<tr><td class="num" id="LN39">39</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN40">40</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN41">41</td><td class="line">}  <span class='comment'>// namespace</span></td></tr>
+<tr><td class="num" id="LN42">42</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN43">43</td><td class="line"><span class='keyword'>void</span></td></tr>
+<tr><td class="num" id="LN44">44</td><td class="line">CollationDataReader::read(<span class='keyword'>const</span> CollationTailoring *base, <span class='keyword'>const</span> uint8_t *inBytes, int32_t inLength,</td></tr>
+<tr><td class="num" id="LN45">45</td><td class="line">                          CollationTailoring &amp;tailoring, UErrorCode &amp;errorCode) {</td></tr>
+<tr><td class="num" id="LN46">46</td><td class="line">    <span class='keyword'>if</span>(U_FAILURE(errorCode)) { <span class='keyword'>return</span>; }</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path1" class="msg msgControl" style="margin-left:5ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">1</div></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path2" title="Next event (2)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN47">47</td><td class="line">    <span class='keyword'>if</span>(base != <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path2" class="msg msgControl" style="margin-left:5ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">2</div></td><td><div class="PathNav"><a href="#Path1" title="Previous event (1)">&#x2190;</a></div></td></td><td>Taking true branch</td><td><div class="PathNav"><a href="#Path3" title="Next event (3)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN48">48</td><td class="line">        <span class='keyword'>if</span>(inBytes == <span class='macro'>NULL<span class='expansion'>__null</span></span> || (<span class="mrange">0 &lt;= inLength</span> &amp;&amp; inLength &lt; 24)) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path3" class="msg msgEvent" style="margin-left:32ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexEvent">3</div></td><td><div class="PathNav"><a href="#Path2" title="Previous event (2)">&#x2190;</a></div></td></td><td>Assuming 'inLength' is &lt; 0</td><td><div class="PathNav"><a href="#Path4" title="Next event (4)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN49">49</td><td class="line">            errorCode = U_ILLEGAL_ARGUMENT_ERROR;</td></tr>
+<tr><td class="num" id="LN50">50</td><td class="line">            <span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN51">51</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN52">52</td><td class="line">        <span class='keyword'>const</span> DataHeader *header = <span class='keyword'>reinterpret_cast</span>&lt;<span class='keyword'>const</span> DataHeader *&gt;(inBytes);</td></tr>
+<tr><td class="num" id="LN53">53</td><td class="line">        <span class='keyword'>if</span>(!(header-&gt;dataHeader.magic1 == 0xda &amp;&amp; header-&gt;dataHeader.magic2 == 0x27 &amp;&amp;</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path4" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">4</div></td><td><div class="PathNav"><a href="#Path3" title="Previous event (3)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path5" title="Next event (5)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN54">54</td><td class="line">                isAcceptable(tailoring.version, <span class='macro'>NULL<span class='expansion'>__null</span></span>, <span class='macro'>NULL<span class='expansion'>__null</span></span>, &amp;header-&gt;info))) {</td></tr>
+<tr><td class="num" id="LN55">55</td><td class="line">            errorCode = U_INVALID_FORMAT_ERROR;</td></tr>
+<tr><td class="num" id="LN56">56</td><td class="line">            <span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN57">57</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN58">58</td><td class="line">        <span class='keyword'>if</span>(base-&gt;getUCAVersion() != tailoring.getUCAVersion()) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path5" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">5</div></td><td><div class="PathNav"><a href="#Path4" title="Previous event (4)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path6" title="Next event (6)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN59">59</td><td class="line">            errorCode = U_COLLATOR_VERSION_MISMATCH;</td></tr>
+<tr><td class="num" id="LN60">60</td><td class="line">            <span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN61">61</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN62">62</td><td class="line">        int32_t headerLength = header-&gt;dataHeader.headerSize;</td></tr>
+<tr><td class="num" id="LN63">63</td><td class="line">        inBytes += headerLength;</td></tr>
+<tr><td class="num" id="LN64">64</td><td class="line">        <span class='keyword'>if</span>(inLength &gt;= 0) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path6" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">6</div></td><td><div class="PathNav"><a href="#Path5" title="Previous event (5)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path7" title="Next event (7)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN65">65</td><td class="line">            inLength -= headerLength;</td></tr>
+<tr><td class="num" id="LN66">66</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN67">67</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN68">68</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN69">69</td><td class="line">    <span class='keyword'>if</span>(inBytes == <span class='macro'>NULL<span class='expansion'>__null</span></span> || (0 &lt;= inLength &amp;&amp; inLength &lt; 8)) {</td></tr>
+<tr><td class="num" id="LN70">70</td><td class="line">        errorCode = U_ILLEGAL_ARGUMENT_ERROR;</td></tr>
+<tr><td class="num" id="LN71">71</td><td class="line">        <span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN72">72</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN73">73</td><td class="line">    <span class='keyword'>const</span> int32_t *inIndexes = <span class='keyword'>reinterpret_cast</span>&lt;<span class='keyword'>const</span> int32_t *&gt;(inBytes);</td></tr>
+<tr><td class="num" id="LN74">74</td><td class="line">    int32_t indexesLength = inIndexes[IX_INDEXES_LENGTH];</td></tr>
+<tr><td class="num" id="LN75">75</td><td class="line">    <span class='keyword'>if</span>(<span class="mrange">indexesLength &lt; 2</span> || (0 &lt;= inLength &amp;&amp; inLength &lt; indexesLength * 4)) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path7" class="msg msgEvent" style="margin-left:8ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexEvent">7</div></td><td><div class="PathNav"><a href="#Path6" title="Previous event (6)">&#x2190;</a></div></td></td><td>Assuming 'indexesLength' is &gt;= 2</td><td><div class="PathNav"><a href="#Path8" title="Next event (8)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN76">76</td><td class="line">        errorCode = U_INVALID_FORMAT_ERROR;  <span class='comment'>// Not enough indexes.</span></td></tr>
+<tr><td class="num" id="LN77">77</td><td class="line">        <span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN78">78</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN79">79</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN80">80</td><td class="line">    <span class='comment'>// Assume that the tailoring data is in initial state,</span></td></tr>
+<tr><td class="num" id="LN81">81</td><td class="line">    <span class='comment'>// with NULL pointers and 0 lengths.</span></td></tr>
+<tr><td class="num" id="LN82">82</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN83">83</td><td class="line">    <span class='comment'>// Set pointers to non-empty data parts.</span></td></tr>
+<tr><td class="num" id="LN84">84</td><td class="line">    <span class='comment'>// Do this in order of their byte offsets. (Should help porting to Java.)</span></td></tr>
+<tr><td class="num" id="LN85">85</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN86">86</td><td class="line">    int32_t index;  <span class='comment'>// one of the indexes[] slots</span></td></tr>
+<tr><td class="num" id="LN87">87</td><td class="line">    int32_t offset;  <span class='comment'>// byte offset for the index part</span></td></tr>
+<tr><td class="num" id="LN88">88</td><td class="line">    int32_t length;  <span class='comment'>// number of bytes in the index part</span></td></tr>
+<tr><td class="num" id="LN89">89</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN90">90</td><td class="line">    <span class='keyword'>if</span>(<span class="mrange">indexesLength &gt; IX_TOTAL_SIZE</span>) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path8" class="msg msgEvent" style="margin-left:8ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexEvent">8</div></td><td><div class="PathNav"><a href="#Path7" title="Previous event (7)">&#x2190;</a></div></td></td><td>Assuming 'indexesLength' is &lt;= IX_TOTAL_SIZE</td><td><div class="PathNav"><a href="#Path9" title="Next event (9)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path9" class="msg msgControl" style="margin-left:5ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">9</div></td><td><div class="PathNav"><a href="#Path8" title="Previous event (8)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path10" title="Next event (10)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN91">91</td><td class="line">        length = inIndexes[IX_TOTAL_SIZE];</td></tr>
+<tr><td class="num" id="LN92">92</td><td class="line">    } <span class='keyword'>else</span> <span class='keyword'>if</span>(<span class="mrange">indexesLength &gt; IX_REORDER_CODES_OFFSET</span>) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path10" class="msg msgEvent" style="margin-left:15ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexEvent">10</div></td><td><div class="PathNav"><a href="#Path9" title="Previous event (9)">&#x2190;</a></div></td></td><td>Assuming 'indexesLength' is &lt;= IX_REORDER_CODES_OFFSET</td><td><div class="PathNav"><a href="#Path11" title="Next event (11)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path11" class="msg msgControl" style="margin-left:12ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">11</div></td><td><div class="PathNav"><a href="#Path10" title="Previous event (10)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path12" title="Next event (12)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN93">93</td><td class="line">        length = inIndexes[indexesLength - 1];</td></tr>
+<tr><td class="num" id="LN94">94</td><td class="line">    } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN95">95</td><td class="line">        length = 0;  <span class='comment'>// only indexes, and inLength was already checked for them</span></td></tr>
+<tr><td class="num" id="LN96">96</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN97">97</td><td class="line">    <span class='keyword'>if</span>(0 &lt;= inLength &amp;&amp; inLength &lt; length) {</td></tr>
+<tr><td class="num" id="LN98">98</td><td class="line">        errorCode = U_INVALID_FORMAT_ERROR;</td></tr>
+<tr><td class="num" id="LN99">99</td><td class="line">        <span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN100">100</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN101">101</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN102">102</td><td class="line">    <span class='keyword'>const</span> CollationData *baseData = base == <span class='macro'>NULL<span class='expansion'>__null</span></span> ? <span class='macro'>NULL<span class='expansion'>__null</span></span> : base-&gt;data;</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path12" class="msg msgControl" style="margin-left:37ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">12</div></td><td><div class="PathNav"><a href="#Path11" title="Previous event (11)">&#x2190;</a></div></td></td><td>'?' condition is false</td><td><div class="PathNav"><a href="#Path13" title="Next event (13)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN103">103</td><td class="line">    <span class="mrange"><span class='keyword'>const</span> int32_t *reorderCodes</span> = <span class='macro'>NULL<span class='expansion'>__null</span></span>;</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path13" class="msg msgEvent" style="margin-left:5ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexEvent">13</div></td><td><div class="PathNav"><a href="#Path12" title="Previous event (12)">&#x2190;</a></div></td></td><td>'reorderCodes' initialized to a null pointer value</td><td><div class="PathNav"><a href="#Path14" title="Next event (14)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN104">104</td><td class="line">    int32_t reorderCodesLength = 0;</td></tr>
+<tr><td class="num" id="LN105">105</td><td class="line">    index = IX_REORDER_CODES_OFFSET;</td></tr>
+<tr><td class="num" id="LN106">106</td><td class="line">    offset = getIndex(inIndexes, indexesLength, index);</td></tr>
+<tr><td class="num" id="LN107">107</td><td class="line">    length = getIndex(inIndexes, indexesLength, index + 1) - offset;</td></tr>
+<tr><td class="num" id="LN108">108</td><td class="line">    <span class='keyword'>if</span>(length &gt;= 4) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path14" class="msg msgControl" style="margin-left:5ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">14</div></td><td><div class="PathNav"><a href="#Path13" title="Previous event (13)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path15" title="Next event (15)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN109">109</td><td class="line">        <span class='keyword'>if</span>(baseData == <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num" id="LN110">110</td><td class="line">            <span class='comment'>// We assume for collation settings that</span></td></tr>
+<tr><td class="num" id="LN111">111</td><td class="line">            <span class='comment'>// the base data does not have a reordering.</span></td></tr>
+<tr><td class="num" id="LN112">112</td><td class="line">            errorCode = U_INVALID_FORMAT_ERROR;</td></tr>
+<tr><td class="num" id="LN113">113</td><td class="line">            <span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN114">114</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN115">115</td><td class="line">        reorderCodes = <span class='keyword'>reinterpret_cast</span>&lt;<span class='keyword'>const</span> int32_t *&gt;(inBytes + offset);</td></tr>
+<tr><td class="num" id="LN116">116</td><td class="line">        reorderCodesLength = length / 4;</td></tr>
+<tr><td class="num" id="LN117">117</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN118">118</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN119">119</td><td class="line">    <span class='comment'>// There should be a reorder table only if there are reorder codes.</span></td></tr>
+<tr><td class="num" id="LN120">120</td><td class="line">    <span class='comment'>// However, when there are reorder codes the reorder table may be omitted to reduce</span></td></tr>
+<tr><td class="num" id="LN121">121</td><td class="line">    <span class='comment'>// the data size.</span></td></tr>
+<tr><td class="num" id="LN122">122</td><td class="line">    <span class='keyword'>const</span> uint8_t *reorderTable = <span class='macro'>NULL<span class='expansion'>__null</span></span>;</td></tr>
+<tr><td class="num" id="LN123">123</td><td class="line">    index = IX_REORDER_TABLE_OFFSET;</td></tr>
+<tr><td class="num" id="LN124">124</td><td class="line">    offset = getIndex(inIndexes, indexesLength, index);</td></tr>
+<tr><td class="num" id="LN125">125</td><td class="line">    length = getIndex(inIndexes, indexesLength, index + 1) - offset;</td></tr>
+<tr><td class="num" id="LN126">126</td><td class="line">    <span class='keyword'>if</span>(length &gt;= 256) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path15" class="msg msgControl" style="margin-left:5ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">15</div></td><td><div class="PathNav"><a href="#Path14" title="Previous event (14)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path16" title="Next event (16)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN127">127</td><td class="line">        <span class='keyword'>if</span>(reorderCodesLength == 0) {</td></tr>
+<tr><td class="num" id="LN128">128</td><td class="line">            errorCode = U_INVALID_FORMAT_ERROR;  <span class='comment'>// Reordering table without reordering codes.</span></td></tr>
+<tr><td class="num" id="LN129">129</td><td class="line">            <span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN130">130</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN131">131</td><td class="line">        reorderTable = inBytes + offset;</td></tr>
+<tr><td class="num" id="LN132">132</td><td class="line">    } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN133">133</td><td class="line">        <span class='comment'>// If we have reorder codes, then build the reorderTable at the end,</span></td></tr>
+<tr><td class="num" id="LN134">134</td><td class="line">        <span class='comment'>// when the CollationData is otherwise complete.</span></td></tr>
+<tr><td class="num" id="LN135">135</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN136">136</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN137">137</td><td class="line">    <span class='keyword'>if</span>(baseData != <span class='macro'>NULL<span class='expansion'>__null</span></span> &amp;&amp; baseData-&gt;numericPrimary != (inIndexes[IX_OPTIONS] &amp; 0xff000000)) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path16" class="msg msgControl" style="margin-left:5ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">16</div></td><td><div class="PathNav"><a href="#Path15" title="Previous event (15)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path17" title="Next event (17)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN138">138</td><td class="line">        errorCode = U_INVALID_FORMAT_ERROR;</td></tr>
+<tr><td class="num" id="LN139">139</td><td class="line">        <span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN140">140</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN141">141</td><td class="line">    CollationData *data = <span class='macro'>NULL<span class='expansion'>__null</span></span>;  <span class='comment'>// Remains NULL if there are no mappings.</span></td></tr>
+<tr><td class="num" id="LN142">142</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN143">143</td><td class="line">    index = IX_TRIE_OFFSET;</td></tr>
+<tr><td class="num" id="LN144">144</td><td class="line">    offset = getIndex(inIndexes, indexesLength, index);</td></tr>
+<tr><td class="num" id="LN145">145</td><td class="line">    length = getIndex(inIndexes, indexesLength, index + 1) - offset;</td></tr>
+<tr><td class="num" id="LN146">146</td><td class="line">    <span class='keyword'>if</span>(length &gt;= 8) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path17" class="msg msgControl" style="margin-left:5ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">17</div></td><td><div class="PathNav"><a href="#Path16" title="Previous event (16)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path18" title="Next event (18)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN147">147</td><td class="line">        <span class='keyword'>if</span>(!tailoring.ensureOwnedData(errorCode)) { <span class='keyword'>return</span>; }</td></tr>
+<tr><td class="num" id="LN148">148</td><td class="line">        data = tailoring.ownedData;</td></tr>
+<tr><td class="num" id="LN149">149</td><td class="line">        data-&gt;base = baseData;</td></tr>
+<tr><td class="num" id="LN150">150</td><td class="line">        data-&gt;numericPrimary = inIndexes[IX_OPTIONS] &amp; 0xff000000;</td></tr>
+<tr><td class="num" id="LN151">151</td><td class="line">        data-&gt;trie = tailoring.trie = <span class='macro'>utrie2_openFromSerialized<span class='expansion'>utrie2_openFromSerialized_54</span></span>(</td></tr>
+<tr><td class="num" id="LN152">152</td><td class="line">            UTRIE2_32_VALUE_BITS, inBytes + offset, length, <span class='macro'>NULL<span class='expansion'>__null</span></span>,</td></tr>
+<tr><td class="num" id="LN153">153</td><td class="line">            &amp;errorCode);</td></tr>
+<tr><td class="num" id="LN154">154</td><td class="line">        <span class='keyword'>if</span>(U_FAILURE(errorCode)) { <span class='keyword'>return</span>; }</td></tr>
+<tr><td class="num" id="LN155">155</td><td class="line">    } <span class='keyword'>else</span> <span class='keyword'>if</span>(baseData != <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path18" class="msg msgControl" style="margin-left:12ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">18</div></td><td><div class="PathNav"><a href="#Path17" title="Previous event (17)">&#x2190;</a></div></td></td><td>Taking true branch</td><td><div class="PathNav"><a href="#Path19" title="Next event (19)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN156">156</td><td class="line">        <span class='comment'>// Use the base data. Only the settings are tailored.</span></td></tr>
+<tr><td class="num" id="LN157">157</td><td class="line">        tailoring.data = baseData;</td></tr>
+<tr><td class="num" id="LN158">158</td><td class="line">    } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN159">159</td><td class="line">        errorCode = U_INVALID_FORMAT_ERROR;  <span class='comment'>// No mappings.</span></td></tr>
+<tr><td class="num" id="LN160">160</td><td class="line">        <span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN161">161</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN162">162</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN163">163</td><td class="line">    index = IX_CES_OFFSET;</td></tr>
+<tr><td class="num" id="LN164">164</td><td class="line">    offset = getIndex(inIndexes, indexesLength, index);</td></tr>
+<tr><td class="num" id="LN165">165</td><td class="line">    length = getIndex(inIndexes, indexesLength, index + 1) - offset;</td></tr>
+<tr><td class="num" id="LN166">166</td><td class="line">    <span class='keyword'>if</span>(length &gt;= 8) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path19" class="msg msgControl" style="margin-left:5ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">19</div></td><td><div class="PathNav"><a href="#Path18" title="Previous event (18)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path20" title="Next event (20)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN167">167</td><td class="line">        <span class='keyword'>if</span>(data == <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num" id="LN168">168</td><td class="line">            errorCode = U_INVALID_FORMAT_ERROR;  <span class='comment'>// Tailored ces without tailored trie.</span></td></tr>
+<tr><td class="num" id="LN169">169</td><td class="line">            <span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN170">170</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN171">171</td><td class="line">        data-&gt;ces = <span class='keyword'>reinterpret_cast</span>&lt;<span class='keyword'>const</span> int64_t *&gt;(inBytes + offset);</td></tr>
+<tr><td class="num" id="LN172">172</td><td class="line">        data-&gt;cesLength = length / 8;</td></tr>
+<tr><td class="num" id="LN173">173</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN174">174</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN175">175</td><td class="line">    index = IX_CE32S_OFFSET;</td></tr>
+<tr><td class="num" id="LN176">176</td><td class="line">    offset = getIndex(inIndexes, indexesLength, index);</td></tr>
+<tr><td class="num" id="LN177">177</td><td class="line">    length = getIndex(inIndexes, indexesLength, index + 1) - offset;</td></tr>
+<tr><td class="num" id="LN178">178</td><td class="line">    <span class='keyword'>if</span>(length &gt;= 4) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path20" class="msg msgControl" style="margin-left:5ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">20</div></td><td><div class="PathNav"><a href="#Path19" title="Previous event (19)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path21" title="Next event (21)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN179">179</td><td class="line">        <span class='keyword'>if</span>(data == <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num" id="LN180">180</td><td class="line">            errorCode = U_INVALID_FORMAT_ERROR;  <span class='comment'>// Tailored ce32s without tailored trie.</span></td></tr>
+<tr><td class="num" id="LN181">181</td><td class="line">            <span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN182">182</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN183">183</td><td class="line">        data-&gt;ce32s = <span class='keyword'>reinterpret_cast</span>&lt;<span class='keyword'>const</span> uint32_t *&gt;(inBytes + offset);</td></tr>
+<tr><td class="num" id="LN184">184</td><td class="line">        data-&gt;ce32sLength = length / 4;</td></tr>
+<tr><td class="num" id="LN185">185</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN186">186</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN187">187</td><td class="line">    int32_t jamoCE32sStart = getIndex(inIndexes, indexesLength, IX_JAMO_CE32S_START);</td></tr>
+<tr><td class="num" id="LN188">188</td><td class="line">    <span class='keyword'>if</span>(<span class="mrange">jamoCE32sStart &gt;= 0</span>) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path21" class="msg msgEvent" style="margin-left:8ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexEvent">21</div></td><td><div class="PathNav"><a href="#Path20" title="Previous event (20)">&#x2190;</a></div></td></td><td>Assuming 'jamoCE32sStart' is &lt; 0</td><td><div class="PathNav"><a href="#Path22" title="Next event (22)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path22" class="msg msgControl" style="margin-left:5ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">22</div></td><td><div class="PathNav"><a href="#Path21" title="Previous event (21)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path23" title="Next event (23)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN189">189</td><td class="line">        <span class='keyword'>if</span>(data == <span class='macro'>NULL<span class='expansion'>__null</span></span> || data-&gt;ce32s == <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num" id="LN190">190</td><td class="line">            errorCode = U_INVALID_FORMAT_ERROR;  <span class='comment'>// Index into non-existent ce32s[].</span></td></tr>
+<tr><td class="num" id="LN191">191</td><td class="line">            <span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN192">192</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN193">193</td><td class="line">        data-&gt;jamoCE32s = data-&gt;ce32s + jamoCE32sStart;</td></tr>
+<tr><td class="num" id="LN194">194</td><td class="line">    } <span class='keyword'>else</span> <span class='keyword'>if</span>(data == <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path23" class="msg msgControl" style="margin-left:12ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">23</div></td><td><div class="PathNav"><a href="#Path22" title="Previous event (22)">&#x2190;</a></div></td></td><td>Taking true branch</td><td><div class="PathNav"><a href="#Path24" title="Next event (24)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN195">195</td><td class="line">        <span class='comment'>// Nothing to do.</span></td></tr>
+<tr><td class="num" id="LN196">196</td><td class="line">    } <span class='keyword'>else</span> <span class='keyword'>if</span>(baseData != <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num" id="LN197">197</td><td class="line">        data-&gt;jamoCE32s = baseData-&gt;jamoCE32s;</td></tr>
+<tr><td class="num" id="LN198">198</td><td class="line">    } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN199">199</td><td class="line">        errorCode = U_INVALID_FORMAT_ERROR;  <span class='comment'>// No Jamo CE32s for Hangul processing.</span></td></tr>
+<tr><td class="num" id="LN200">200</td><td class="line">        <span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN201">201</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN202">202</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN203">203</td><td class="line">    index = IX_ROOT_ELEMENTS_OFFSET;</td></tr>
+<tr><td class="num" id="LN204">204</td><td class="line">    offset = getIndex(inIndexes, indexesLength, index);</td></tr>
+<tr><td class="num" id="LN205">205</td><td class="line">    length = getIndex(inIndexes, indexesLength, index + 1) - offset;</td></tr>
+<tr><td class="num" id="LN206">206</td><td class="line">    <span class='keyword'>if</span>(length &gt;= 4) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path24" class="msg msgControl" style="margin-left:5ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">24</div></td><td><div class="PathNav"><a href="#Path23" title="Previous event (23)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path25" title="Next event (25)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN207">207</td><td class="line">        length /= 4;</td></tr>
+<tr><td class="num" id="LN208">208</td><td class="line">        <span class='keyword'>if</span>(data == <span class='macro'>NULL<span class='expansion'>__null</span></span> || length &lt;= CollationRootElements::IX_SEC_TER_BOUNDARIES) {</td></tr>
+<tr><td class="num" id="LN209">209</td><td class="line">            errorCode = U_INVALID_FORMAT_ERROR;</td></tr>
+<tr><td class="num" id="LN210">210</td><td class="line">            <span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN211">211</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN212">212</td><td class="line">        data-&gt;rootElements = <span class='keyword'>reinterpret_cast</span>&lt;<span class='keyword'>const</span> uint32_t *&gt;(inBytes + offset);</td></tr>
+<tr><td class="num" id="LN213">213</td><td class="line">        data-&gt;rootElementsLength = length;</td></tr>
+<tr><td class="num" id="LN214">214</td><td class="line">        uint32_t commonSecTer = data-&gt;rootElements[CollationRootElements::IX_COMMON_SEC_AND_TER_CE];</td></tr>
+<tr><td class="num" id="LN215">215</td><td class="line">        <span class='keyword'>if</span>(commonSecTer != Collation::COMMON_SEC_AND_TER_CE) {</td></tr>
+<tr><td class="num" id="LN216">216</td><td class="line">            errorCode = U_INVALID_FORMAT_ERROR;</td></tr>
+<tr><td class="num" id="LN217">217</td><td class="line">            <span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN218">218</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN219">219</td><td class="line">        uint32_t secTerBoundaries = data-&gt;rootElements[CollationRootElements::IX_SEC_TER_BOUNDARIES];</td></tr>
+<tr><td class="num" id="LN220">220</td><td class="line">        <span class='keyword'>if</span>((secTerBoundaries &gt;&gt; 24) &lt; CollationKeys::SEC_COMMON_HIGH) {</td></tr>
+<tr><td class="num" id="LN221">221</td><td class="line">            <span class='comment'>// [fixed last secondary common byte] is too low,</span></td></tr>
+<tr><td class="num" id="LN222">222</td><td class="line">            <span class='comment'>// and secondary weights would collide with compressed common secondaries.</span></td></tr>
+<tr><td class="num" id="LN223">223</td><td class="line">            errorCode = U_INVALID_FORMAT_ERROR;</td></tr>
+<tr><td class="num" id="LN224">224</td><td class="line">            <span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN225">225</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN226">226</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN227">227</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN228">228</td><td class="line">    index = IX_CONTEXTS_OFFSET;</td></tr>
+<tr><td class="num" id="LN229">229</td><td class="line">    offset = getIndex(inIndexes, indexesLength, index);</td></tr>
+<tr><td class="num" id="LN230">230</td><td class="line">    length = getIndex(inIndexes, indexesLength, index + 1) - offset;</td></tr>
+<tr><td class="num" id="LN231">231</td><td class="line">    <span class='keyword'>if</span>(length &gt;= 2) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path25" class="msg msgControl" style="margin-left:5ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">25</div></td><td><div class="PathNav"><a href="#Path24" title="Previous event (24)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path26" title="Next event (26)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN232">232</td><td class="line">        <span class='keyword'>if</span>(data == <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num" id="LN233">233</td><td class="line">            errorCode = U_INVALID_FORMAT_ERROR;  <span class='comment'>// Tailored contexts without tailored trie.</span></td></tr>
+<tr><td class="num" id="LN234">234</td><td class="line">            <span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN235">235</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN236">236</td><td class="line">        data-&gt;contexts = <span class='keyword'>reinterpret_cast</span>&lt;<span class='keyword'>const</span> UChar *&gt;(inBytes + offset);</td></tr>
+<tr><td class="num" id="LN237">237</td><td class="line">        data-&gt;contextsLength = length / 2;</td></tr>
+<tr><td class="num" id="LN238">238</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN239">239</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN240">240</td><td class="line">    index = IX_UNSAFE_BWD_OFFSET;</td></tr>
+<tr><td class="num" id="LN241">241</td><td class="line">    offset = getIndex(inIndexes, indexesLength, index);</td></tr>
+<tr><td class="num" id="LN242">242</td><td class="line">    length = getIndex(inIndexes, indexesLength, index + 1) - offset;</td></tr>
+<tr><td class="num" id="LN243">243</td><td class="line">    <span class='keyword'>if</span>(length &gt;= 2) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path26" class="msg msgControl" style="margin-left:5ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">26</div></td><td><div class="PathNav"><a href="#Path25" title="Previous event (25)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path27" title="Next event (27)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN244">244</td><td class="line">        <span class='keyword'>if</span>(data == <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num" id="LN245">245</td><td class="line">            errorCode = U_INVALID_FORMAT_ERROR;</td></tr>
+<tr><td class="num" id="LN246">246</td><td class="line">            <span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN247">247</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN248">248</td><td class="line">        <span class='keyword'>if</span>(baseData == <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num" id="LN249">249</td><td class="line">            <span class='comment'>// Create the unsafe-backward set for the root collator.</span></td></tr>
+<tr><td class="num" id="LN250">250</td><td class="line">            <span class='comment'>// Include all non-zero combining marks and trail surrogates.</span></td></tr>
+<tr><td class="num" id="LN251">251</td><td class="line">            <span class='comment'>// We do this at load time, rather than at build time,</span></td></tr>
+<tr><td class="num" id="LN252">252</td><td class="line">            <span class='comment'>// to simplify Unicode version bootstrapping:</span></td></tr>
+<tr><td class="num" id="LN253">253</td><td class="line">            <span class='comment'>// The root data builder only needs the new FractionalUCA.txt data,</span></td></tr>
+<tr><td class="num" id="LN254">254</td><td class="line">            <span class='comment'>// but it need not be built with a version of ICU already updated to</span></td></tr>
+<tr><td class="num" id="LN255">255</td><td class="line">            <span class='comment'>// the corresponding new Unicode Character Database.</span></td></tr>
+<tr><td class="num" id="LN256">256</td><td class="line">            <span class='comment'>//</span></td></tr>
+<tr><td class="num" id="LN257">257</td><td class="line">            <span class='comment'>// The following is an optimized version of</span></td></tr>
+<tr><td class="num" id="LN258">258</td><td class="line">            <span class='comment'>// new UnicodeSet("[[:^lccc=0:][\\udc00-\\udfff]]").</span></td></tr>
+<tr><td class="num" id="LN259">259</td><td class="line">            <span class='comment'>// It is faster and requires fewer code dependencies.</span></td></tr>
+<tr><td class="num" id="LN260">260</td><td class="line">            tailoring.unsafeBackwardSet = <span class='keyword'>new</span> UnicodeSet(0xdc00, 0xdfff);  <span class='comment'>// trail surrogates</span></td></tr>
+<tr><td class="num" id="LN261">261</td><td class="line">            <span class='keyword'>if</span>(tailoring.unsafeBackwardSet == <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num" id="LN262">262</td><td class="line">                errorCode = U_MEMORY_ALLOCATION_ERROR;</td></tr>
+<tr><td class="num" id="LN263">263</td><td class="line">                <span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN264">264</td><td class="line">            }</td></tr>
+<tr><td class="num" id="LN265">265</td><td class="line">            data-&gt;nfcImpl.addLcccChars(*tailoring.unsafeBackwardSet);</td></tr>
+<tr><td class="num" id="LN266">266</td><td class="line">        } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN267">267</td><td class="line">            <span class='comment'>// Clone the root collator's set contents.</span></td></tr>
+<tr><td class="num" id="LN268">268</td><td class="line">            tailoring.unsafeBackwardSet = <span class='keyword'>static_cast</span>&lt;UnicodeSet *&gt;(</td></tr>
+<tr><td class="num" id="LN269">269</td><td class="line">                baseData-&gt;unsafeBackwardSet-&gt;cloneAsThawed());</td></tr>
+<tr><td class="num" id="LN270">270</td><td class="line">            <span class='keyword'>if</span>(tailoring.unsafeBackwardSet == <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num" id="LN271">271</td><td class="line">                errorCode = U_MEMORY_ALLOCATION_ERROR;</td></tr>
+<tr><td class="num" id="LN272">272</td><td class="line">                <span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN273">273</td><td class="line">            }</td></tr>
+<tr><td class="num" id="LN274">274</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN275">275</td><td class="line">        <span class='comment'>// Add the ranges from the data file to the unsafe-backward set.</span></td></tr>
+<tr><td class="num" id="LN276">276</td><td class="line">        USerializedSet sset;</td></tr>
+<tr><td class="num" id="LN277">277</td><td class="line">        <span class='keyword'>const</span> uint16_t *unsafeData = <span class='keyword'>reinterpret_cast</span>&lt;<span class='keyword'>const</span> uint16_t *&gt;(inBytes + offset);</td></tr>
+<tr><td class="num" id="LN278">278</td><td class="line">        <span class='keyword'>if</span>(!<span class='macro'>uset_getSerializedSet<span class='expansion'>uset_getSerializedSet_54</span></span>(&amp;sset, unsafeData, length / 2)) {</td></tr>
+<tr><td class="num" id="LN279">279</td><td class="line">            errorCode = U_INVALID_FORMAT_ERROR;</td></tr>
+<tr><td class="num" id="LN280">280</td><td class="line">            <span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN281">281</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN282">282</td><td class="line">        int32_t count = <span class='macro'>uset_getSerializedRangeCount<span class='expansion'>uset_getSerializedRangeCount_54</span></span>(&amp;sset);</td></tr>
+<tr><td class="num" id="LN283">283</td><td class="line">        <span class='keyword'>for</span>(int32_t i = 0; i &lt; count; ++i) {</td></tr>
+<tr><td class="num" id="LN284">284</td><td class="line">            UChar32 start, end;</td></tr>
+<tr><td class="num" id="LN285">285</td><td class="line">            <span class='macro'>uset_getSerializedRange<span class='expansion'>uset_getSerializedRange_54</span></span>(&amp;sset, i, &amp;start, &amp;end);</td></tr>
+<tr><td class="num" id="LN286">286</td><td class="line">            tailoring.unsafeBackwardSet-&gt;add(start, end);</td></tr>
+<tr><td class="num" id="LN287">287</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN288">288</td><td class="line">        <span class='comment'>// Mark each lead surrogate as "unsafe"</span></td></tr>
+<tr><td class="num" id="LN289">289</td><td class="line">        <span class='comment'>// if any of its 1024 associated supplementary code points is "unsafe".</span></td></tr>
+<tr><td class="num" id="LN290">290</td><td class="line">        UChar32 c = 0x10000;</td></tr>
+<tr><td class="num" id="LN291">291</td><td class="line">        <span class='keyword'>for</span>(UChar lead = 0xd800; lead &lt; 0xdc00; ++lead, c += 0x400) {</td></tr>
+<tr><td class="num" id="LN292">292</td><td class="line">            <span class='keyword'>if</span>(!tailoring.unsafeBackwardSet-&gt;containsNone(c, c + 0x3ff)) {</td></tr>
+<tr><td class="num" id="LN293">293</td><td class="line">                tailoring.unsafeBackwardSet-&gt;add(lead);</td></tr>
+<tr><td class="num" id="LN294">294</td><td class="line">            }</td></tr>
+<tr><td class="num" id="LN295">295</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN296">296</td><td class="line">        tailoring.unsafeBackwardSet-&gt;freeze();</td></tr>
+<tr><td class="num" id="LN297">297</td><td class="line">        data-&gt;unsafeBackwardSet = tailoring.unsafeBackwardSet;</td></tr>
+<tr><td class="num" id="LN298">298</td><td class="line">    } <span class='keyword'>else</span> <span class='keyword'>if</span>(data == <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path27" class="msg msgControl" style="margin-left:12ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">27</div></td><td><div class="PathNav"><a href="#Path26" title="Previous event (26)">&#x2190;</a></div></td></td><td>Taking true branch</td><td><div class="PathNav"><a href="#Path28" title="Next event (28)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN299">299</td><td class="line">        <span class='comment'>// Nothing to do.</span></td></tr>
+<tr><td class="num" id="LN300">300</td><td class="line">    } <span class='keyword'>else</span> <span class='keyword'>if</span>(baseData != <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num" id="LN301">301</td><td class="line">        <span class='comment'>// No tailoring-specific data: Alias the root collator's set.</span></td></tr>
+<tr><td class="num" id="LN302">302</td><td class="line">        data-&gt;unsafeBackwardSet = baseData-&gt;unsafeBackwardSet;</td></tr>
+<tr><td class="num" id="LN303">303</td><td class="line">    } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN304">304</td><td class="line">        errorCode = U_INVALID_FORMAT_ERROR;  <span class='comment'>// No unsafeBackwardSet.</span></td></tr>
+<tr><td class="num" id="LN305">305</td><td class="line">        <span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN306">306</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN307">307</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN308">308</td><td class="line">    <span class='comment'>// If the fast Latin format version is different,</span></td></tr>
+<tr><td class="num" id="LN309">309</td><td class="line">    <span class='comment'>// or the version is set to 0 for "no fast Latin table",</span></td></tr>
+<tr><td class="num" id="LN310">310</td><td class="line">    <span class='comment'>// then just always use the normal string comparison path.</span></td></tr>
+<tr><td class="num" id="LN311">311</td><td class="line">    <span class='keyword'>if</span>(data != <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path28" class="msg msgControl" style="margin-left:5ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">28</div></td><td><div class="PathNav"><a href="#Path27" title="Previous event (27)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path29" title="Next event (29)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN312">312</td><td class="line">        data-&gt;fastLatinTable = <span class='macro'>NULL<span class='expansion'>__null</span></span>;</td></tr>
+<tr><td class="num" id="LN313">313</td><td class="line">        data-&gt;fastLatinTableLength = 0;</td></tr>
+<tr><td class="num" id="LN314">314</td><td class="line">        <span class='keyword'>if</span>(((inIndexes[IX_OPTIONS] &gt;&gt; 16) &amp; 0xff) == CollationFastLatin::VERSION) {</td></tr>
+<tr><td class="num" id="LN315">315</td><td class="line">            index = IX_FAST_LATIN_TABLE_OFFSET;</td></tr>
+<tr><td class="num" id="LN316">316</td><td class="line">            offset = getIndex(inIndexes, indexesLength, index);</td></tr>
+<tr><td class="num" id="LN317">317</td><td class="line">            length = getIndex(inIndexes, indexesLength, index + 1) - offset;</td></tr>
+<tr><td class="num" id="LN318">318</td><td class="line">            <span class='keyword'>if</span>(length &gt;= 2) {</td></tr>
+<tr><td class="num" id="LN319">319</td><td class="line">                data-&gt;fastLatinTable = <span class='keyword'>reinterpret_cast</span>&lt;<span class='keyword'>const</span> uint16_t *&gt;(inBytes + offset);</td></tr>
+<tr><td class="num" id="LN320">320</td><td class="line">                data-&gt;fastLatinTableLength = length / 2;</td></tr>
+<tr><td class="num" id="LN321">321</td><td class="line">                <span class='keyword'>if</span>((*data-&gt;fastLatinTable &gt;&gt; 8) != CollationFastLatin::VERSION) {</td></tr>
+<tr><td class="num" id="LN322">322</td><td class="line">                    errorCode = U_INVALID_FORMAT_ERROR;  <span class='comment'>// header vs. table version mismatch</span></td></tr>
+<tr><td class="num" id="LN323">323</td><td class="line">                    <span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN324">324</td><td class="line">                }</td></tr>
+<tr><td class="num" id="LN325">325</td><td class="line">            } <span class='keyword'>else</span> <span class='keyword'>if</span>(baseData != <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num" id="LN326">326</td><td class="line">                data-&gt;fastLatinTable = baseData-&gt;fastLatinTable;</td></tr>
+<tr><td class="num" id="LN327">327</td><td class="line">                data-&gt;fastLatinTableLength = baseData-&gt;fastLatinTableLength;</td></tr>
+<tr><td class="num" id="LN328">328</td><td class="line">            }</td></tr>
+<tr><td class="num" id="LN329">329</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN330">330</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN331">331</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN332">332</td><td class="line">    index = IX_SCRIPTS_OFFSET;</td></tr>
+<tr><td class="num" id="LN333">333</td><td class="line">    offset = getIndex(inIndexes, indexesLength, index);</td></tr>
+<tr><td class="num" id="LN334">334</td><td class="line">    length = getIndex(inIndexes, indexesLength, index + 1) - offset;</td></tr>
+<tr><td class="num" id="LN335">335</td><td class="line">    <span class='keyword'>if</span>(length &gt;= 2) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path29" class="msg msgControl" style="margin-left:5ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">29</div></td><td><div class="PathNav"><a href="#Path28" title="Previous event (28)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path30" title="Next event (30)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN336">336</td><td class="line">        <span class='keyword'>if</span>(data == <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num" id="LN337">337</td><td class="line">            errorCode = U_INVALID_FORMAT_ERROR;</td></tr>
+<tr><td class="num" id="LN338">338</td><td class="line">            <span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN339">339</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN340">340</td><td class="line">        data-&gt;scripts = <span class='keyword'>reinterpret_cast</span>&lt;<span class='keyword'>const</span> uint16_t *&gt;(inBytes + offset);</td></tr>
+<tr><td class="num" id="LN341">341</td><td class="line">        data-&gt;scriptsLength = length / 2;</td></tr>
+<tr><td class="num" id="LN342">342</td><td class="line">    } <span class='keyword'>else</span> <span class='keyword'>if</span>(data == <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path30" class="msg msgControl" style="margin-left:12ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">30</div></td><td><div class="PathNav"><a href="#Path29" title="Previous event (29)">&#x2190;</a></div></td></td><td>Taking true branch</td><td><div class="PathNav"><a href="#Path31" title="Next event (31)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN343">343</td><td class="line">        <span class='comment'>// Nothing to do.</span></td></tr>
+<tr><td class="num" id="LN344">344</td><td class="line">    } <span class='keyword'>else</span> <span class='keyword'>if</span>(baseData != <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num" id="LN345">345</td><td class="line">        data-&gt;scripts = baseData-&gt;scripts;</td></tr>
+<tr><td class="num" id="LN346">346</td><td class="line">        data-&gt;scriptsLength = baseData-&gt;scriptsLength;</td></tr>
+<tr><td class="num" id="LN347">347</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN348">348</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN349">349</td><td class="line">    index = IX_COMPRESSIBLE_BYTES_OFFSET;</td></tr>
+<tr><td class="num" id="LN350">350</td><td class="line">    offset = getIndex(inIndexes, indexesLength, index);</td></tr>
+<tr><td class="num" id="LN351">351</td><td class="line">    length = getIndex(inIndexes, indexesLength, index + 1) - offset;</td></tr>
+<tr><td class="num" id="LN352">352</td><td class="line">    <span class='keyword'>if</span>(length &gt;= 256) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path31" class="msg msgControl" style="margin-left:5ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">31</div></td><td><div class="PathNav"><a href="#Path30" title="Previous event (30)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path32" title="Next event (32)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN353">353</td><td class="line">        <span class='keyword'>if</span>(data == <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num" id="LN354">354</td><td class="line">            errorCode = U_INVALID_FORMAT_ERROR;</td></tr>
+<tr><td class="num" id="LN355">355</td><td class="line">            <span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN356">356</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN357">357</td><td class="line">        data-&gt;compressibleBytes = <span class='keyword'>reinterpret_cast</span>&lt;<span class='keyword'>const</span> UBool *&gt;(inBytes + offset);</td></tr>
+<tr><td class="num" id="LN358">358</td><td class="line">    } <span class='keyword'>else</span> <span class='keyword'>if</span>(data == <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path32" class="msg msgControl" style="margin-left:12ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">32</div></td><td><div class="PathNav"><a href="#Path31" title="Previous event (31)">&#x2190;</a></div></td></td><td>Taking true branch</td><td><div class="PathNav"><a href="#EndPath" title="Next event (33)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN359">359</td><td class="line">        <span class='comment'>// Nothing to do.</span></td></tr>
+<tr><td class="num" id="LN360">360</td><td class="line">    } <span class='keyword'>else</span> <span class='keyword'>if</span>(baseData != <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num" id="LN361">361</td><td class="line">        data-&gt;compressibleBytes = baseData-&gt;compressibleBytes;</td></tr>
+<tr><td class="num" id="LN362">362</td><td class="line">    } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN363">363</td><td class="line">        errorCode = U_INVALID_FORMAT_ERROR;  <span class='comment'>// No compressibleBytes[].</span></td></tr>
+<tr><td class="num" id="LN364">364</td><td class="line">        <span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN365">365</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN366">366</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN367">367</td><td class="line">    <span class='keyword'>const</span> CollationSettings &amp;ts = *tailoring.settings;</td></tr>
+<tr><td class="num" id="LN368">368</td><td class="line">    int32_t options = inIndexes[IX_OPTIONS] &amp; 0xffff;</td></tr>
+<tr><td class="num" id="LN369">369</td><td class="line">    uint16_t fastLatinPrimaries[CollationFastLatin::LATIN_LIMIT];</td></tr>
+<tr><td class="num" id="LN370">370</td><td class="line">    int32_t fastLatinOptions = CollationFastLatin::getOptions(</td></tr>
+<tr><td class="num" id="LN371">371</td><td class="line">            tailoring.data, ts, fastLatinPrimaries, <span class='macro'>UPRV_LENGTHOF(fastLatinPrimaries)<span class='expansion'>(int32_t)(sizeof(fastLatinPrimaries)/sizeof((fastLatinPrimaries<br>)[0]))</span></span>);</td></tr>
+<tr><td class="num" id="LN372">372</td><td class="line">    <span class='keyword'>if</span>(options == ts.options &amp;&amp; ts.variableTop != 0 &amp;&amp;</td></tr>
+<tr><td class="num" id="LN373">373</td><td class="line">            reorderCodesLength == ts.reorderCodesLength &amp;&amp;</td></tr>
+<tr><td class="num" id="LN374">374</td><td class="line">            <span class='macro'>uprv_memcmp(reorderCodes, ts.reorderCodes, reorderCodesLength * 4)<span class='expansion'>:: memcmp(reorderCodes, ts.reorderCodes,reorderCodesLength * 4<br>)</span></span> == 0 &amp;&amp;</td></tr>
+<tr><td class="num"></td><td class="line"><div id="EndPath" class="msg msgControl" style="margin-left:13ex; max-width:100em"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">33</div></td><td><div class="PathNav"><a href="#Path32" title="Previous event (32)">&#x2190;</a></div></td></td><td>Within the expansion of the macro 'uprv_memcmp':
+</td></tr></table><div class="msg msgEvent" style="width:94%; margin-left:5px"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexEvent">a</div></td><td valign="top">Null pointer passed as an argument to a 'nonnull' parameter</td></tr></table></div>
+</div></td></tr>
+<tr><td class="num" id="LN375">375</td><td class="line">            fastLatinOptions == ts.fastLatinOptions &amp;&amp;</td></tr>
+<tr><td class="num" id="LN376">376</td><td class="line">            (fastLatinOptions &lt; 0 ||</td></tr>
+<tr><td class="num" id="LN377">377</td><td class="line">                <span class='macro'>uprv_memcmp(fastLatinPrimaries, ts.fastLatinPrimaries,<span class='expansion'>:: memcmp(fastLatinPrimaries, ts.fastLatinPrimaries,sizeof(fastLatinPrimaries<br>))</span></span></td></tr>
+<tr><td class="num" id="LN378">378</td><td class="line">                            <span class='keyword'><span class='macro'>sizeof</span>(fastLatinPrimaries))<span class='expansion'>:: memcmp(fastLatinPrimaries, ts.fastLatinPrimaries,sizeof(fastLatinPrimaries<br>))</span></span> == 0)) {</td></tr>
+<tr><td class="num" id="LN379">379</td><td class="line">        <span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN380">380</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN381">381</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN382">382</td><td class="line">    CollationSettings *settings = SharedObject::copyOnWrite(tailoring.settings);</td></tr>
+<tr><td class="num" id="LN383">383</td><td class="line">    <span class='keyword'>if</span>(settings == <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num" id="LN384">384</td><td class="line">        errorCode = U_MEMORY_ALLOCATION_ERROR;</td></tr>
+<tr><td class="num" id="LN385">385</td><td class="line">        <span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN386">386</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN387">387</td><td class="line">    settings-&gt;options = options;</td></tr>
+<tr><td class="num" id="LN388">388</td><td class="line">    <span class='comment'>// Set variableTop from options and scripts data.</span></td></tr>
+<tr><td class="num" id="LN389">389</td><td class="line">    settings-&gt;variableTop = tailoring.data-&gt;getLastPrimaryForGroup(</td></tr>
+<tr><td class="num" id="LN390">390</td><td class="line">            UCOL_REORDER_CODE_FIRST + settings-&gt;getMaxVariable());</td></tr>
+<tr><td class="num" id="LN391">391</td><td class="line">    <span class='keyword'>if</span>(settings-&gt;variableTop == 0) {</td></tr>
+<tr><td class="num" id="LN392">392</td><td class="line">        errorCode = U_INVALID_FORMAT_ERROR;</td></tr>
+<tr><td class="num" id="LN393">393</td><td class="line">        <span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN394">394</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN395">395</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN396">396</td><td class="line">    <span class='keyword'>if</span>(reorderCodesLength == 0 || reorderTable != <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num" id="LN397">397</td><td class="line">        settings-&gt;aliasReordering(reorderCodes, reorderCodesLength, reorderTable);</td></tr>
+<tr><td class="num" id="LN398">398</td><td class="line">    } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN399">399</td><td class="line">        uint8_t table[256];</td></tr>
+<tr><td class="num" id="LN400">400</td><td class="line">        baseData-&gt;makeReorderTable(reorderCodes, reorderCodesLength, table, errorCode);</td></tr>
+<tr><td class="num" id="LN401">401</td><td class="line">        <span class='keyword'>if</span>(U_FAILURE(errorCode)) { <span class='keyword'>return</span>; }</td></tr>
+<tr><td class="num" id="LN402">402</td><td class="line">        <span class='keyword'>if</span>(!settings-&gt;setReordering(reorderCodes, reorderCodesLength,table)) {</td></tr>
+<tr><td class="num" id="LN403">403</td><td class="line">            errorCode = U_MEMORY_ALLOCATION_ERROR;</td></tr>
+<tr><td class="num" id="LN404">404</td><td class="line">            <span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN405">405</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN406">406</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN407">407</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN408">408</td><td class="line">    settings-&gt;fastLatinOptions = CollationFastLatin::getOptions(</td></tr>
+<tr><td class="num" id="LN409">409</td><td class="line">        tailoring.data, *settings,</td></tr>
+<tr><td class="num" id="LN410">410</td><td class="line">        settings-&gt;fastLatinPrimaries, <span class='macro'>UPRV_LENGTHOF(settings-&gt;fastLatinPrimaries)<span class='expansion'>(int32_t)(sizeof(settings-&gt;fastLatinPrimaries)/sizeof((settings<br>-&gt;fastLatinPrimaries)[0]))</span></span>);</td></tr>
+<tr><td class="num" id="LN411">411</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN412">412</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN413">413</td><td class="line">UBool U_CALLCONV</td></tr>
+<tr><td class="num" id="LN414">414</td><td class="line">CollationDataReader::isAcceptable(<span class='keyword'>void</span> *context,</td></tr>
+<tr><td class="num" id="LN415">415</td><td class="line">                                  <span class='keyword'>const</span> <span class='keyword'>char</span> * <span class='comment'>/* type */</span>, <span class='keyword'>const</span> <span class='keyword'>char</span> * <span class='comment'>/*name*/</span>,</td></tr>
+<tr><td class="num" id="LN416">416</td><td class="line">                                  <span class='keyword'>const</span> UDataInfo *pInfo) {</td></tr>
+<tr><td class="num" id="LN417">417</td><td class="line">    <span class='keyword'>if</span>(</td></tr>
+<tr><td class="num" id="LN418">418</td><td class="line">        pInfo-&gt;size &gt;= 20 &amp;&amp;</td></tr>
+<tr><td class="num" id="LN419">419</td><td class="line">        pInfo-&gt;isBigEndian == <span class='macro'>U_IS_BIG_ENDIAN<span class='expansion'>(1234 == 4321)</span></span> &amp;&amp;</td></tr>
+<tr><td class="num" id="LN420">420</td><td class="line">        pInfo-&gt;charsetFamily == <span class='macro'>U_CHARSET_FAMILY<span class='expansion'>0</span></span> &amp;&amp;</td></tr>
+<tr><td class="num" id="LN421">421</td><td class="line">        pInfo-&gt;dataFormat[0] == 0x55 &amp;&amp;  <span class='comment'>// dataFormat="UCol"</span></td></tr>
+<tr><td class="num" id="LN422">422</td><td class="line">        pInfo-&gt;dataFormat[1] == 0x43 &amp;&amp;</td></tr>
+<tr><td class="num" id="LN423">423</td><td class="line">        pInfo-&gt;dataFormat[2] == 0x6f &amp;&amp;</td></tr>
+<tr><td class="num" id="LN424">424</td><td class="line">        pInfo-&gt;dataFormat[3] == 0x6c &amp;&amp;</td></tr>
+<tr><td class="num" id="LN425">425</td><td class="line">        pInfo-&gt;formatVersion[0] == 4</td></tr>
+<tr><td class="num" id="LN426">426</td><td class="line">    ) {</td></tr>
+<tr><td class="num" id="LN427">427</td><td class="line">        UVersionInfo *version = <span class='keyword'>static_cast</span>&lt;UVersionInfo *&gt;(context);</td></tr>
+<tr><td class="num" id="LN428">428</td><td class="line">        <span class='keyword'>if</span>(version != <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num" id="LN429">429</td><td class="line">            <span class='macro'>uprv_memcpy(version, pInfo-&gt;dataVersion, 4)<span class='expansion'>:: memcpy(version, pInfo-&gt;dataVersion, 4)</span></span>;</td></tr>
+<tr><td class="num" id="LN430">430</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN431">431</td><td class="line">        <span class='keyword'>return</span> <span class='macro'>TRUE<span class='expansion'>1</span></span>;</td></tr>
+<tr><td class="num" id="LN432">432</td><td class="line">    } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN433">433</td><td class="line">        <span class='keyword'>return</span> <span class='macro'>FALSE<span class='expansion'>0</span></span>;</td></tr>
+<tr><td class="num" id="LN434">434</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN435">435</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN436">436</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN437">437</td><td class="line"><span class='macro'>U_NAMESPACE_END<span class='expansion'>} }</span></span></td></tr>
+<tr><td class="num" id="LN438">438</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN439">439</td><td class="line"><span class='directive'>#endif  // !UCONFIG_NO_COLLATION</span></td></tr>
+</table></body></html>

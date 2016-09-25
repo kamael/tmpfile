@@ -1,0 +1,209 @@
+<!doctype html>
+<html>
+<head>
+<title>../third_party/icu/source/i18n/rbt_data.cpp</title>
+<style type="text/css">
+ body { color:#000000; background-color:#ffffff }
+ body { font-family:Helvetica, sans-serif; font-size:10pt }
+ h1 { font-size:14pt }
+ .code { border-collapse:collapse; width:100%; }
+ .code { font-family: "Monospace", monospace; font-size:10pt }
+ .code { line-height: 1.2em }
+ .comment { color: green; font-style: oblique }
+ .keyword { color: blue }
+ .string_literal { color: red }
+ .directive { color: darkmagenta }
+ .expansion { display: none; }
+ .macro:hover .expansion { display: block; border: 2px solid #FF0000; padding: 2px; background-color:#FFF0F0; font-weight: normal;   -webkit-border-radius:5px;  -webkit-box-shadow:1px 1px 7px #000;   border-radius:5px;  box-shadow:1px 1px 7px #000; position: absolute; top: -1em; left:10em; z-index: 1 } 
+ .macro { color: darkmagenta; background-color:LemonChiffon; position: relative }
+ .num { width:2.5em; padding-right:2ex; background-color:#eeeeee }
+ .num { text-align:right; font-size:8pt }
+ .num { color:#444444 }
+ .line { padding-left: 1ex; border-left: 3px solid #ccc }
+ .line { white-space: pre }
+ .msg { -webkit-box-shadow:1px 1px 7px #000 }
+ .msg { box-shadow:1px 1px 7px #000 }
+ .msg { -webkit-border-radius:5px }
+ .msg { border-radius:5px }
+ .msg { font-family:Helvetica, sans-serif; font-size:8pt }
+ .msg { float:left }
+ .msg { padding:0.25em 1ex 0.25em 1ex }
+ .msg { margin-top:10px; margin-bottom:10px }
+ .msg { font-weight:bold }
+ .msg { max-width:60em; word-wrap: break-word; white-space: pre-wrap }
+ .msgT { padding:0x; spacing:0x }
+ .msgEvent { background-color:#fff8b4; color:#000000 }
+ .msgControl { background-color:#bbbbbb; color:#000000 }
+ .mrange { background-color:#dfddf3 }
+ .mrange { border-bottom:1px solid #6F9DBE }
+ .PathIndex { font-weight: bold; padding:0px 5px; margin-right:5px; }
+ .PathIndex { -webkit-border-radius:8px }
+ .PathIndex { border-radius:8px }
+ .PathIndexEvent { background-color:#bfba87 }
+ .PathIndexControl { background-color:#8c8c8c }
+ .PathNav a { text-decoration:none; font-size: larger }
+ .CodeInsertionHint { font-weight: bold; background-color: #10dd10 }
+ .CodeRemovalHint { background-color:#de1010 }
+ .CodeRemovalHint { border-bottom:1px solid #6F9DBE }
+ table.simpletable {
+   padding: 5px;
+   font-size:12pt;
+   margin:20px;
+   border-collapse: collapse; border-spacing: 0px;
+ }
+ td.rowname {
+   text-align:right; font-weight:bold; color:#444444;
+   padding-right:2ex; }
+</style>
+</head>
+<body>
+<!-- BUGDESC Value stored to 'status' is never read -->
+
+<!-- BUGTYPE Dead assignment -->
+
+<!-- BUGCATEGORY Dead store -->
+
+<!-- BUGFILE /home/haha/code/v8_5_0/v8/out/../third_party/icu/source/i18n/rbt_data.cpp -->
+
+<!-- FILENAME rbt_data.cpp -->
+
+<!-- FUNCTIONNAME TransliterationRuleData -->
+
+<!-- ISSUEHASHCONTENTOFLINEINCONTEXT 1f8eb6a37366acf0ff2d79f4f62c4ba1 -->
+
+<!-- BUGLINE 62 -->
+
+<!-- BUGCOLUMN 13 -->
+
+<!-- BUGPATHLENGTH 1 -->
+
+<!-- BUGMETAEND -->
+<!-- REPORTHEADER -->
+<h3>Bug Summary</h3>
+<table class="simpletable">
+<tr><td class="rowname">File:</td><td>out/../third_party/icu/source/i18n/rbt_data.cpp</td></tr>
+<tr><td class="rowname">Location:</td><td><a href="#EndPath">line 62, column 13</a></td></tr>
+<tr><td class="rowname">Description:</td><td>Value stored to 'status' is never read</td></tr>
+</table>
+<!-- REPORTSUMMARYEXTRA -->
+<h3>Annotated Source Code</h3>
+<table class="code">
+<tr><td class="num" id="LN1">1</td><td class="line"><span class='comment'>/*</span></td></tr>
+<tr><td class="num" id="LN2">2</td><td class="line"><span class='comment'>**********************************************************************</span></td></tr>
+<tr><td class="num" id="LN3">3</td><td class="line"><span class='comment'>*   Copyright (C) 1999-2014, International Business Machines</span></td></tr>
+<tr><td class="num" id="LN4">4</td><td class="line"><span class='comment'>*   Corporation and others.  All Rights Reserved.</span></td></tr>
+<tr><td class="num" id="LN5">5</td><td class="line"><span class='comment'>**********************************************************************</span></td></tr>
+<tr><td class="num" id="LN6">6</td><td class="line"><span class='comment'>*   Date        Name        Description</span></td></tr>
+<tr><td class="num" id="LN7">7</td><td class="line"><span class='comment'>*   11/17/99    aliu        Creation.</span></td></tr>
+<tr><td class="num" id="LN8">8</td><td class="line"><span class='comment'>**********************************************************************</span></td></tr>
+<tr><td class="num" id="LN9">9</td><td class="line"><span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN10">10</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN11">11</td><td class="line"><span class='directive'>#include "unicode/utypes.h"</span></td></tr>
+<tr><td class="num" id="LN12">12</td><td class="line"><span class='directive'>#include "umutex.h"</span></td></tr>
+<tr><td class="num" id="LN13">13</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN14">14</td><td class="line"><span class='directive'>#if !<span class='macro'>UCONFIG_NO_TRANSLITERATION<span class='expansion'>0</span></span></span></td></tr>
+<tr><td class="num" id="LN15">15</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN16">16</td><td class="line"><span class='directive'>#include "unicode/unistr.h"</span></td></tr>
+<tr><td class="num" id="LN17">17</td><td class="line"><span class='directive'>#include "unicode/uniset.h"</span></td></tr>
+<tr><td class="num" id="LN18">18</td><td class="line"><span class='directive'>#include "rbt_data.h"</span></td></tr>
+<tr><td class="num" id="LN19">19</td><td class="line"><span class='directive'>#include "hash.h"</span></td></tr>
+<tr><td class="num" id="LN20">20</td><td class="line"><span class='directive'>#include "cmemory.h"</span></td></tr>
+<tr><td class="num" id="LN21">21</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN22">22</td><td class="line"><span class='macro'>U_NAMESPACE_BEGIN<span class='expansion'>extern "C++" { namespace icu_54 {</span></span></td></tr>
+<tr><td class="num" id="LN23">23</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN24">24</td><td class="line">TransliterationRuleData::TransliterationRuleData(UErrorCode&amp; status)</td></tr>
+<tr><td class="num" id="LN25">25</td><td class="line"> : UMemory(), ruleSet(status), variableNames(status),</td></tr>
+<tr><td class="num" id="LN26">26</td><td class="line">    variables(0), variablesAreOwned(<span class='macro'>TRUE<span class='expansion'>1</span></span>)</td></tr>
+<tr><td class="num" id="LN27">27</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN28">28</td><td class="line">    <span class='keyword'>if</span> (U_FAILURE(status)) {</td></tr>
+<tr><td class="num" id="LN29">29</td><td class="line">        <span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN30">30</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN31">31</td><td class="line">    variableNames.setValueDeleter(<span class='macro'>uprv_deleteUObject<span class='expansion'>uprv_deleteUObject_54</span></span>);</td></tr>
+<tr><td class="num" id="LN32">32</td><td class="line">    variables = 0;</td></tr>
+<tr><td class="num" id="LN33">33</td><td class="line">    variablesLength = 0;</td></tr>
+<tr><td class="num" id="LN34">34</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN35">35</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN36">36</td><td class="line">TransliterationRuleData::TransliterationRuleData(<span class='keyword'>const</span> TransliterationRuleData&amp; other) :</td></tr>
+<tr><td class="num" id="LN37">37</td><td class="line">    UMemory(other), ruleSet(other.ruleSet),</td></tr>
+<tr><td class="num" id="LN38">38</td><td class="line">    variablesAreOwned(<span class='macro'>TRUE<span class='expansion'>1</span></span>),</td></tr>
+<tr><td class="num" id="LN39">39</td><td class="line">    variablesBase(other.variablesBase),</td></tr>
+<tr><td class="num" id="LN40">40</td><td class="line">    variablesLength(other.variablesLength)</td></tr>
+<tr><td class="num" id="LN41">41</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN42">42</td><td class="line">    UErrorCode status = U_ZERO_ERROR;</td></tr>
+<tr><td class="num" id="LN43">43</td><td class="line">    int32_t i = 0;</td></tr>
+<tr><td class="num" id="LN44">44</td><td class="line">    variableNames.setValueDeleter(<span class='macro'>uprv_deleteUObject<span class='expansion'>uprv_deleteUObject_54</span></span>);</td></tr>
+<tr><td class="num" id="LN45">45</td><td class="line">    int32_t pos = -1;</td></tr>
+<tr><td class="num" id="LN46">46</td><td class="line">    <span class='keyword'>const</span> UHashElement *e;</td></tr>
+<tr><td class="num" id="LN47">47</td><td class="line">    <span class='keyword'>while</span> ((e = other.variableNames.nextElement(pos)) != 0) {</td></tr>
+<tr><td class="num" id="LN48">48</td><td class="line">        UnicodeString* value =</td></tr>
+<tr><td class="num" id="LN49">49</td><td class="line">            <span class='keyword'>new</span> UnicodeString(*(<span class='keyword'>const</span> UnicodeString*)e-&gt;value.pointer);</td></tr>
+<tr><td class="num" id="LN50">50</td><td class="line">        <span class='comment'>// Exit out if value could not be created.</span></td></tr>
+<tr><td class="num" id="LN51">51</td><td class="line">        <span class='keyword'>if</span> (value == <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num" id="LN52">52</td><td class="line">        	<span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN53">53</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN54">54</td><td class="line">        variableNames.put(*(UnicodeString*)e-&gt;key.pointer, value, status);</td></tr>
+<tr><td class="num" id="LN55">55</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN56">56</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN57">57</td><td class="line">    variables = 0;</td></tr>
+<tr><td class="num" id="LN58">58</td><td class="line">    <span class='keyword'>if</span> (other.variables != 0) {</td></tr>
+<tr><td class="num" id="LN59">59</td><td class="line">        variables = (UnicodeFunctor **)<span class='macro'>uprv_malloc<span class='expansion'>uprv_malloc_54</span></span>(variablesLength * <span class='keyword'>sizeof</span>(UnicodeFunctor *));</td></tr>
+<tr><td class="num" id="LN60">60</td><td class="line">        <span class='comment'>/* test for NULL */</span></td></tr>
+<tr><td class="num" id="LN61">61</td><td class="line">        <span class='keyword'>if</span> (variables == 0) {</td></tr>
+<tr><td class="num" id="LN62">62</td><td class="line">            status = <span class="mrange">U_MEMORY_ALLOCATION_ERROR</span>;</td></tr>
+<tr><td class="num"></td><td class="line"><div id="EndPath" class="msg msgEvent" style="margin-left:13ex">Value stored to 'status' is never read</div></td></tr>
+<tr><td class="num" id="LN63">63</td><td class="line">            <span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN64">64</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN65">65</td><td class="line">        <span class='keyword'>for</span> (i=0; i&lt;variablesLength; ++i) {</td></tr>
+<tr><td class="num" id="LN66">66</td><td class="line">            variables[i] = other.variables[i]-&gt;clone();</td></tr>
+<tr><td class="num" id="LN67">67</td><td class="line">            <span class='keyword'>if</span> (variables[i] == <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num" id="LN68">68</td><td class="line">                status = U_MEMORY_ALLOCATION_ERROR;</td></tr>
+<tr><td class="num" id="LN69">69</td><td class="line">                <span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN70">70</td><td class="line">            }</td></tr>
+<tr><td class="num" id="LN71">71</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN72">72</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN73">73</td><td class="line">    <span class='comment'>// Remove the array and exit if memory allocation error occured.</span></td></tr>
+<tr><td class="num" id="LN74">74</td><td class="line">    <span class='keyword'>if</span> (U_FAILURE(status)) {</td></tr>
+<tr><td class="num" id="LN75">75</td><td class="line">        <span class='keyword'>for</span> (int32_t n = i-1; n &gt;= 0; n--) {</td></tr>
+<tr><td class="num" id="LN76">76</td><td class="line">            <span class='keyword'>delete</span> variables[n];</td></tr>
+<tr><td class="num" id="LN77">77</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN78">78</td><td class="line">        <span class='macro'>uprv_free<span class='expansion'>uprv_free_54</span></span>(variables);</td></tr>
+<tr><td class="num" id="LN79">79</td><td class="line">        variables = <span class='macro'>NULL<span class='expansion'>__null</span></span>;</td></tr>
+<tr><td class="num" id="LN80">80</td><td class="line">        <span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN81">81</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN82">82</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN83">83</td><td class="line">    <span class='comment'>// Do this last, _after_ setting up variables[].</span></td></tr>
+<tr><td class="num" id="LN84">84</td><td class="line">    ruleSet.setData(<span class='keyword'>this</span>); <span class='comment'>// ruleSet must already be frozen</span></td></tr>
+<tr><td class="num" id="LN85">85</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN86">86</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN87">87</td><td class="line">TransliterationRuleData::~TransliterationRuleData() {</td></tr>
+<tr><td class="num" id="LN88">88</td><td class="line">    <span class='keyword'>if</span> (variablesAreOwned &amp;&amp; variables != 0) {</td></tr>
+<tr><td class="num" id="LN89">89</td><td class="line">        <span class='keyword'>for</span> (int32_t i=0; i&lt;variablesLength; ++i) {</td></tr>
+<tr><td class="num" id="LN90">90</td><td class="line">            <span class='keyword'>delete</span> variables[i];</td></tr>
+<tr><td class="num" id="LN91">91</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN92">92</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN93">93</td><td class="line">    <span class='macro'>uprv_free<span class='expansion'>uprv_free_54</span></span>(variables);</td></tr>
+<tr><td class="num" id="LN94">94</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN95">95</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN96">96</td><td class="line">UnicodeFunctor*</td></tr>
+<tr><td class="num" id="LN97">97</td><td class="line">TransliterationRuleData::lookup(UChar32 standIn) <span class='keyword'>const</span> {</td></tr>
+<tr><td class="num" id="LN98">98</td><td class="line">    int32_t i = standIn - variablesBase;</td></tr>
+<tr><td class="num" id="LN99">99</td><td class="line">    <span class='keyword'>return</span> (i &gt;= 0 &amp;&amp; i &lt; variablesLength) ? variables[i] : 0;</td></tr>
+<tr><td class="num" id="LN100">100</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN101">101</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN102">102</td><td class="line">UnicodeMatcher*</td></tr>
+<tr><td class="num" id="LN103">103</td><td class="line">TransliterationRuleData::lookupMatcher(UChar32 standIn) <span class='keyword'>const</span> {</td></tr>
+<tr><td class="num" id="LN104">104</td><td class="line">    UnicodeFunctor *f = lookup(standIn);</td></tr>
+<tr><td class="num" id="LN105">105</td><td class="line">    <span class='keyword'>return</span> (f != 0) ? f-&gt;toMatcher() : 0;</td></tr>
+<tr><td class="num" id="LN106">106</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN107">107</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN108">108</td><td class="line">UnicodeReplacer*</td></tr>
+<tr><td class="num" id="LN109">109</td><td class="line">TransliterationRuleData::lookupReplacer(UChar32 standIn) <span class='keyword'>const</span> {</td></tr>
+<tr><td class="num" id="LN110">110</td><td class="line">    UnicodeFunctor *f = lookup(standIn);</td></tr>
+<tr><td class="num" id="LN111">111</td><td class="line">    <span class='keyword'>return</span> (f != 0) ? f-&gt;toReplacer() : 0;</td></tr>
+<tr><td class="num" id="LN112">112</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN113">113</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN114">114</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN115">115</td><td class="line"><span class='macro'>U_NAMESPACE_END<span class='expansion'>} }</span></span></td></tr>
+<tr><td class="num" id="LN116">116</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN117">117</td><td class="line"><span class='directive'>#endif /* #if !UCONFIG_NO_TRANSLITERATION */</span></td></tr>
+</table></body></html>

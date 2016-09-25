@@ -1,0 +1,459 @@
+<!doctype html>
+<html>
+<head>
+<title>../src/compiler/escape-analysis-reducer.cc</title>
+<style type="text/css">
+ body { color:#000000; background-color:#ffffff }
+ body { font-family:Helvetica, sans-serif; font-size:10pt }
+ h1 { font-size:14pt }
+ .code { border-collapse:collapse; width:100%; }
+ .code { font-family: "Monospace", monospace; font-size:10pt }
+ .code { line-height: 1.2em }
+ .comment { color: green; font-style: oblique }
+ .keyword { color: blue }
+ .string_literal { color: red }
+ .directive { color: darkmagenta }
+ .expansion { display: none; }
+ .macro:hover .expansion { display: block; border: 2px solid #FF0000; padding: 2px; background-color:#FFF0F0; font-weight: normal;   -webkit-border-radius:5px;  -webkit-box-shadow:1px 1px 7px #000;   border-radius:5px;  box-shadow:1px 1px 7px #000; position: absolute; top: -1em; left:10em; z-index: 1 } 
+ .macro { color: darkmagenta; background-color:LemonChiffon; position: relative }
+ .num { width:2.5em; padding-right:2ex; background-color:#eeeeee }
+ .num { text-align:right; font-size:8pt }
+ .num { color:#444444 }
+ .line { padding-left: 1ex; border-left: 3px solid #ccc }
+ .line { white-space: pre }
+ .msg { -webkit-box-shadow:1px 1px 7px #000 }
+ .msg { box-shadow:1px 1px 7px #000 }
+ .msg { -webkit-border-radius:5px }
+ .msg { border-radius:5px }
+ .msg { font-family:Helvetica, sans-serif; font-size:8pt }
+ .msg { float:left }
+ .msg { padding:0.25em 1ex 0.25em 1ex }
+ .msg { margin-top:10px; margin-bottom:10px }
+ .msg { font-weight:bold }
+ .msg { max-width:60em; word-wrap: break-word; white-space: pre-wrap }
+ .msgT { padding:0x; spacing:0x }
+ .msgEvent { background-color:#fff8b4; color:#000000 }
+ .msgControl { background-color:#bbbbbb; color:#000000 }
+ .mrange { background-color:#dfddf3 }
+ .mrange { border-bottom:1px solid #6F9DBE }
+ .PathIndex { font-weight: bold; padding:0px 5px; margin-right:5px; }
+ .PathIndex { -webkit-border-radius:8px }
+ .PathIndex { border-radius:8px }
+ .PathIndexEvent { background-color:#bfba87 }
+ .PathIndexControl { background-color:#8c8c8c }
+ .PathNav a { text-decoration:none; font-size: larger }
+ .CodeInsertionHint { font-weight: bold; background-color: #10dd10 }
+ .CodeRemovalHint { background-color:#de1010 }
+ .CodeRemovalHint { border-bottom:1px solid #6F9DBE }
+ table.simpletable {
+   padding: 5px;
+   font-size:12pt;
+   margin:20px;
+   border-collapse: collapse; border-spacing: 0px;
+ }
+ td.rowname {
+   text-align:right; font-weight:bold; color:#444444;
+   padding-right:2ex; }
+</style>
+</head>
+<body>
+<!-- BUGDESC Value stored to 'already_cloned' is never read -->
+
+<!-- BUGTYPE Dead assignment -->
+
+<!-- BUGCATEGORY Dead store -->
+
+<!-- BUGFILE /home/haha/code/v8_5_0/v8/out/../src/compiler/escape-analysis-reducer.cc -->
+
+<!-- FILENAME escape-analysis-reducer.cc -->
+
+<!-- FUNCTIONNAME ReduceStateValueInput -->
+
+<!-- ISSUEHASHCONTENTOFLINEINCONTEXT 8f771403f3b609bf305a67d9b4817ec1 -->
+
+<!-- BUGLINE 315 -->
+
+<!-- BUGCOLUMN 11 -->
+
+<!-- BUGPATHLENGTH 1 -->
+
+<!-- BUGMETAEND -->
+<!-- REPORTHEADER -->
+<h3>Bug Summary</h3>
+<table class="simpletable">
+<tr><td class="rowname">File:</td><td>out/../src/compiler/escape-analysis-reducer.cc</td></tr>
+<tr><td class="rowname">Location:</td><td><a href="#EndPath">line 315, column 11</a></td></tr>
+<tr><td class="rowname">Description:</td><td>Value stored to 'already_cloned' is never read</td></tr>
+</table>
+<!-- REPORTSUMMARYEXTRA -->
+<h3>Annotated Source Code</h3>
+<table class="code">
+<tr><td class="num" id="LN1">1</td><td class="line"><span class='comment'>// Copyright 2015 the V8 project authors. All rights reserved.</span></td></tr>
+<tr><td class="num" id="LN2">2</td><td class="line"><span class='comment'>// Use of this source code is governed by a BSD-style license that can be</span></td></tr>
+<tr><td class="num" id="LN3">3</td><td class="line"><span class='comment'>// found in the LICENSE file.</span></td></tr>
+<tr><td class="num" id="LN4">4</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN5">5</td><td class="line"><span class='directive'>#include "src/compiler/escape-analysis-reducer.h"</span></td></tr>
+<tr><td class="num" id="LN6">6</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN7">7</td><td class="line"><span class='directive'>#include "src/compiler/js-graph.h"</span></td></tr>
+<tr><td class="num" id="LN8">8</td><td class="line"><span class='directive'>#include "src/counters.h"</span></td></tr>
+<tr><td class="num" id="LN9">9</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN10">10</td><td class="line"><span class='keyword'>namespace</span> v8 {</td></tr>
+<tr><td class="num" id="LN11">11</td><td class="line"><span class='keyword'>namespace</span> internal {</td></tr>
+<tr><td class="num" id="LN12">12</td><td class="line"><span class='keyword'>namespace</span> compiler {</td></tr>
+<tr><td class="num" id="LN13">13</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN14">14</td><td class="line"><span class='directive'>#ifdef <span class='macro'>DEBUG<span class='expansion'>1</span></span></span></td></tr>
+<tr><td class="num" id="LN15">15</td><td class="line"><span class='directive'>#define <span class='macro'>TRACE(...)<span class='expansion'>do { if (FLAG_trace_turbo_escape) PrintF(...); } while (false<br>)</span></span>                                    \</span></td></tr>
+<tr><td class="num" id="LN16">16</td><td class="line">  <span class='directive'>do {                                                \</span></td></tr>
+<tr><td class="num" id="LN17">17</td><td class="line">    <span class='directive'>if (FLAG_trace_turbo_escape) PrintF(__VA_ARGS__); \</span></td></tr>
+<tr><td class="num" id="LN18">18</td><td class="line">  <span class='directive'>} while (false)</span></td></tr>
+<tr><td class="num" id="LN19">19</td><td class="line"><span class='directive'>#else</span></td></tr>
+<tr><td class="num" id="LN20">20</td><td class="line"><span class='directive'>#define <span class='macro'>TRACE(...)<span class='expansion'>do { if (FLAG_trace_turbo_escape) PrintF(...); } while (false<br>)</span></span></span></td></tr>
+<tr><td class="num" id="LN21">21</td><td class="line"><span class='directive'>#endif  // DEBUG</span></td></tr>
+<tr><td class="num" id="LN22">22</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN23">23</td><td class="line">EscapeAnalysisReducer::EscapeAnalysisReducer(Editor* editor, JSGraph* jsgraph,</td></tr>
+<tr><td class="num" id="LN24">24</td><td class="line">                                             EscapeAnalysis* escape_analysis,</td></tr>
+<tr><td class="num" id="LN25">25</td><td class="line">                                             Zone* zone)</td></tr>
+<tr><td class="num" id="LN26">26</td><td class="line">    : AdvancedReducer(editor),</td></tr>
+<tr><td class="num" id="LN27">27</td><td class="line">      jsgraph_(jsgraph),</td></tr>
+<tr><td class="num" id="LN28">28</td><td class="line">      escape_analysis_(escape_analysis),</td></tr>
+<tr><td class="num" id="LN29">29</td><td class="line">      zone_(zone),</td></tr>
+<tr><td class="num" id="LN30">30</td><td class="line">      fully_reduced_(<span class='keyword'>static_cast</span>&lt;<span class='keyword'>int</span>&gt;(jsgraph-&gt;graph()-&gt;NodeCount() * 2), zone),</td></tr>
+<tr><td class="num" id="LN31">31</td><td class="line">      exists_virtual_allocate_(<span class='keyword'>true</span>) {}</td></tr>
+<tr><td class="num" id="LN32">32</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN33">33</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN34">34</td><td class="line">Reduction EscapeAnalysisReducer::Reduce(Node* node) {</td></tr>
+<tr><td class="num" id="LN35">35</td><td class="line">  <span class='keyword'>if</span> (node-&gt;id() &lt; <span class='keyword'>static_cast</span>&lt;NodeId&gt;(fully_reduced_.length()) &amp;&amp;</td></tr>
+<tr><td class="num" id="LN36">36</td><td class="line">      fully_reduced_.Contains(node-&gt;id())) {</td></tr>
+<tr><td class="num" id="LN37">37</td><td class="line">    <span class='keyword'>return</span> NoChange();</td></tr>
+<tr><td class="num" id="LN38">38</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN39">39</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN40">40</td><td class="line">  <span class='keyword'>switch</span> (node-&gt;opcode()) {</td></tr>
+<tr><td class="num" id="LN41">41</td><td class="line">    <span class='keyword'>case</span> IrOpcode::kLoadField:</td></tr>
+<tr><td class="num" id="LN42">42</td><td class="line">    <span class='keyword'>case</span> IrOpcode::kLoadElement:</td></tr>
+<tr><td class="num" id="LN43">43</td><td class="line">      <span class='keyword'>return</span> ReduceLoad(node);</td></tr>
+<tr><td class="num" id="LN44">44</td><td class="line">    <span class='keyword'>case</span> IrOpcode::kStoreField:</td></tr>
+<tr><td class="num" id="LN45">45</td><td class="line">    <span class='keyword'>case</span> IrOpcode::kStoreElement:</td></tr>
+<tr><td class="num" id="LN46">46</td><td class="line">      <span class='keyword'>return</span> ReduceStore(node);</td></tr>
+<tr><td class="num" id="LN47">47</td><td class="line">    <span class='keyword'>case</span> IrOpcode::kAllocate:</td></tr>
+<tr><td class="num" id="LN48">48</td><td class="line">      <span class='keyword'>return</span> ReduceAllocate(node);</td></tr>
+<tr><td class="num" id="LN49">49</td><td class="line">    <span class='keyword'>case</span> IrOpcode::kFinishRegion:</td></tr>
+<tr><td class="num" id="LN50">50</td><td class="line">      <span class='keyword'>return</span> ReduceFinishRegion(node);</td></tr>
+<tr><td class="num" id="LN51">51</td><td class="line">    <span class='keyword'>case</span> IrOpcode::kReferenceEqual:</td></tr>
+<tr><td class="num" id="LN52">52</td><td class="line">      <span class='keyword'>return</span> ReduceReferenceEqual(node);</td></tr>
+<tr><td class="num" id="LN53">53</td><td class="line">    <span class='keyword'>case</span> IrOpcode::kObjectIsSmi:</td></tr>
+<tr><td class="num" id="LN54">54</td><td class="line">      <span class='keyword'>return</span> ReduceObjectIsSmi(node);</td></tr>
+<tr><td class="num" id="LN55">55</td><td class="line">    <span class='comment'>// FrameStates and Value nodes are preprocessed here,</span></td></tr>
+<tr><td class="num" id="LN56">56</td><td class="line">    <span class='comment'>// and visited via ReduceFrameStateUses from their user nodes.</span></td></tr>
+<tr><td class="num" id="LN57">57</td><td class="line">    <span class='keyword'>case</span> IrOpcode::kFrameState:</td></tr>
+<tr><td class="num" id="LN58">58</td><td class="line">    <span class='keyword'>case</span> IrOpcode::kStateValues: {</td></tr>
+<tr><td class="num" id="LN59">59</td><td class="line">      <span class='keyword'>if</span> (node-&gt;id() &gt;= <span class='keyword'>static_cast</span>&lt;NodeId&gt;(fully_reduced_.length()) ||</td></tr>
+<tr><td class="num" id="LN60">60</td><td class="line">          fully_reduced_.Contains(node-&gt;id())) {</td></tr>
+<tr><td class="num" id="LN61">61</td><td class="line">        <span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN62">62</td><td class="line">      }</td></tr>
+<tr><td class="num" id="LN63">63</td><td class="line">      <span class='keyword'>bool</span> depends_on_object_state = <span class='keyword'>false</span>;</td></tr>
+<tr><td class="num" id="LN64">64</td><td class="line">      <span class='keyword'>for</span> (<span class='keyword'>int</span> i = 0; i &lt; node-&gt;InputCount(); i++) {</td></tr>
+<tr><td class="num" id="LN65">65</td><td class="line">        Node* input = node-&gt;InputAt(i);</td></tr>
+<tr><td class="num" id="LN66">66</td><td class="line">        <span class='keyword'>switch</span> (input-&gt;opcode()) {</td></tr>
+<tr><td class="num" id="LN67">67</td><td class="line">          <span class='keyword'>case</span> IrOpcode::kAllocate:</td></tr>
+<tr><td class="num" id="LN68">68</td><td class="line">          <span class='keyword'>case</span> IrOpcode::kFinishRegion:</td></tr>
+<tr><td class="num" id="LN69">69</td><td class="line">            depends_on_object_state =</td></tr>
+<tr><td class="num" id="LN70">70</td><td class="line">                depends_on_object_state || escape_analysis()-&gt;IsVirtual(input);</td></tr>
+<tr><td class="num" id="LN71">71</td><td class="line">            <span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN72">72</td><td class="line">          <span class='keyword'>case</span> IrOpcode::kFrameState:</td></tr>
+<tr><td class="num" id="LN73">73</td><td class="line">          <span class='keyword'>case</span> IrOpcode::kStateValues:</td></tr>
+<tr><td class="num" id="LN74">74</td><td class="line">            depends_on_object_state =</td></tr>
+<tr><td class="num" id="LN75">75</td><td class="line">                depends_on_object_state ||</td></tr>
+<tr><td class="num" id="LN76">76</td><td class="line">                input-&gt;id() &gt;= <span class='keyword'>static_cast</span>&lt;NodeId&gt;(fully_reduced_.length()) ||</td></tr>
+<tr><td class="num" id="LN77">77</td><td class="line">                !fully_reduced_.Contains(input-&gt;id());</td></tr>
+<tr><td class="num" id="LN78">78</td><td class="line">            <span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN79">79</td><td class="line">          <span class='keyword'>default</span>:</td></tr>
+<tr><td class="num" id="LN80">80</td><td class="line">            <span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN81">81</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN82">82</td><td class="line">      }</td></tr>
+<tr><td class="num" id="LN83">83</td><td class="line">      <span class='keyword'>if</span> (!depends_on_object_state) {</td></tr>
+<tr><td class="num" id="LN84">84</td><td class="line">        fully_reduced_.Add(node-&gt;id());</td></tr>
+<tr><td class="num" id="LN85">85</td><td class="line">      }</td></tr>
+<tr><td class="num" id="LN86">86</td><td class="line">      <span class='keyword'>return</span> NoChange();</td></tr>
+<tr><td class="num" id="LN87">87</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN88">88</td><td class="line">    <span class='keyword'>default</span>:</td></tr>
+<tr><td class="num" id="LN89">89</td><td class="line">      <span class='comment'>// TODO(sigurds): Change this to GetFrameStateInputCount once</span></td></tr>
+<tr><td class="num" id="LN90">90</td><td class="line">      <span class='comment'>// it is working. For now we use EffectInputCount &gt; 0 to determine</span></td></tr>
+<tr><td class="num" id="LN91">91</td><td class="line">      <span class='comment'>// whether a node might have a frame state input.</span></td></tr>
+<tr><td class="num" id="LN92">92</td><td class="line">      <span class='keyword'>if</span> (exists_virtual_allocate_ &amp;&amp; node-&gt;op()-&gt;EffectInputCount() &gt; 0) {</td></tr>
+<tr><td class="num" id="LN93">93</td><td class="line">        <span class='keyword'>return</span> ReduceFrameStateUses(node);</td></tr>
+<tr><td class="num" id="LN94">94</td><td class="line">      }</td></tr>
+<tr><td class="num" id="LN95">95</td><td class="line">      <span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN96">96</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN97">97</td><td class="line">  <span class='keyword'>return</span> NoChange();</td></tr>
+<tr><td class="num" id="LN98">98</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN99">99</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN100">100</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN101">101</td><td class="line">Reduction EscapeAnalysisReducer::ReduceLoad(Node* node) {</td></tr>
+<tr><td class="num" id="LN102">102</td><td class="line">  <span class='macro'>DCHECK(node-&gt;opcode() == IrOpcode::kLoadField ||<span class='expansion'>do { if ((__builtin_expect(!!(!(node-&gt;opcode() == IrOpcode<br>::kLoadField || node-&gt;opcode() == IrOpcode::kLoadElement))<br>, 0))) { V8_Fatal("../src/compiler/escape-analysis-reducer.cc"<br>, 103, "Check failed: %s.", "node-&gt;opcode() == IrOpcode::kLoadField || node-&gt;opcode() == IrOpcode::kLoadElement"<br>); } } while (0)</span></span></td></tr>
+<tr><td class="num" id="LN103">103</td><td class="line">         <span class='macro'>node-&gt;opcode() == IrOpcode::kLoadElement)<span class='expansion'>do { if ((__builtin_expect(!!(!(node-&gt;opcode() == IrOpcode<br>::kLoadField || node-&gt;opcode() == IrOpcode::kLoadElement))<br>, 0))) { V8_Fatal("../src/compiler/escape-analysis-reducer.cc"<br>, 103, "Check failed: %s.", "node-&gt;opcode() == IrOpcode::kLoadField || node-&gt;opcode() == IrOpcode::kLoadElement"<br>); } } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN104">104</td><td class="line">  <span class='keyword'>if</span> (node-&gt;id() &lt; <span class='keyword'>static_cast</span>&lt;NodeId&gt;(fully_reduced_.length())) {</td></tr>
+<tr><td class="num" id="LN105">105</td><td class="line">    fully_reduced_.Add(node-&gt;id());</td></tr>
+<tr><td class="num" id="LN106">106</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN107">107</td><td class="line">  <span class='keyword'>if</span> (Node* rep = escape_analysis()-&gt;GetReplacement(node)) {</td></tr>
+<tr><td class="num" id="LN108">108</td><td class="line">    counters()-&gt;turbo_escape_loads_replaced()-&gt;Increment();</td></tr>
+<tr><td class="num" id="LN109">109</td><td class="line">    <span class='macro'>TRACE(<span class='string_literal'>"Replaced #%d (%s) with #%d (%s)\n"</span>, node-&gt;id(),<span class='expansion'>do { if (FLAG_trace_turbo_escape) PrintF("Replaced #%d (%s) with #%d (%s)\n"<br>, node-&gt;id(), node-&gt;op()-&gt;mnemonic(), rep-&gt;id(), rep<br>-&gt;op()-&gt;mnemonic()); } while (false)</span></span></td></tr>
+<tr><td class="num" id="LN110">110</td><td class="line">          <span class='macro'>node-&gt;op()-&gt;mnemonic(), rep-&gt;id(), rep-&gt;op()-&gt;mnemonic())<span class='expansion'>do { if (FLAG_trace_turbo_escape) PrintF("Replaced #%d (%s) with #%d (%s)\n"<br>, node-&gt;id(), node-&gt;op()-&gt;mnemonic(), rep-&gt;id(), rep<br>-&gt;op()-&gt;mnemonic()); } while (false)</span></span>;</td></tr>
+<tr><td class="num" id="LN111">111</td><td class="line">    ReplaceWithValue(node, rep);</td></tr>
+<tr><td class="num" id="LN112">112</td><td class="line">    <span class='keyword'>return</span> Replace(rep);</td></tr>
+<tr><td class="num" id="LN113">113</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN114">114</td><td class="line">  <span class='keyword'>return</span> NoChange();</td></tr>
+<tr><td class="num" id="LN115">115</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN116">116</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN117">117</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN118">118</td><td class="line">Reduction EscapeAnalysisReducer::ReduceStore(Node* node) {</td></tr>
+<tr><td class="num" id="LN119">119</td><td class="line">  <span class='macro'>DCHECK(node-&gt;opcode() == IrOpcode::kStoreField ||<span class='expansion'>do { if ((__builtin_expect(!!(!(node-&gt;opcode() == IrOpcode<br>::kStoreField || node-&gt;opcode() == IrOpcode::kStoreElement<br>)), 0))) { V8_Fatal("../src/compiler/escape-analysis-reducer.cc"<br>, 120, "Check failed: %s.", "node-&gt;opcode() == IrOpcode::kStoreField || node-&gt;opcode() == IrOpcode::kStoreElement"<br>); } } while (0)</span></span></td></tr>
+<tr><td class="num" id="LN120">120</td><td class="line">         <span class='macro'>node-&gt;opcode() == IrOpcode::kStoreElement)<span class='expansion'>do { if ((__builtin_expect(!!(!(node-&gt;opcode() == IrOpcode<br>::kStoreField || node-&gt;opcode() == IrOpcode::kStoreElement<br>)), 0))) { V8_Fatal("../src/compiler/escape-analysis-reducer.cc"<br>, 120, "Check failed: %s.", "node-&gt;opcode() == IrOpcode::kStoreField || node-&gt;opcode() == IrOpcode::kStoreElement"<br>); } } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN121">121</td><td class="line">  <span class='keyword'>if</span> (node-&gt;id() &lt; <span class='keyword'>static_cast</span>&lt;NodeId&gt;(fully_reduced_.length())) {</td></tr>
+<tr><td class="num" id="LN122">122</td><td class="line">    fully_reduced_.Add(node-&gt;id());</td></tr>
+<tr><td class="num" id="LN123">123</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN124">124</td><td class="line">  <span class='keyword'>if</span> (escape_analysis()-&gt;IsVirtual(NodeProperties::GetValueInput(node, 0))) {</td></tr>
+<tr><td class="num" id="LN125">125</td><td class="line">    <span class='macro'>TRACE(<span class='string_literal'>"Removed #%d (%s) from effect chain\n"</span>, node-&gt;id(),<span class='expansion'>do { if (FLAG_trace_turbo_escape) PrintF("Removed #%d (%s) from effect chain\n"<br>, node-&gt;id(), node-&gt;op()-&gt;mnemonic()); } while (false<br>)</span></span></td></tr>
+<tr><td class="num" id="LN126">126</td><td class="line">          <span class='macro'>node-&gt;op()-&gt;mnemonic())<span class='expansion'>do { if (FLAG_trace_turbo_escape) PrintF("Removed #%d (%s) from effect chain\n"<br>, node-&gt;id(), node-&gt;op()-&gt;mnemonic()); } while (false<br>)</span></span>;</td></tr>
+<tr><td class="num" id="LN127">127</td><td class="line">    RelaxEffectsAndControls(node);</td></tr>
+<tr><td class="num" id="LN128">128</td><td class="line">    <span class='keyword'>return</span> Changed(node);</td></tr>
+<tr><td class="num" id="LN129">129</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN130">130</td><td class="line">  <span class='keyword'>return</span> NoChange();</td></tr>
+<tr><td class="num" id="LN131">131</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN132">132</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN133">133</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN134">134</td><td class="line">Reduction EscapeAnalysisReducer::ReduceAllocate(Node* node) {</td></tr>
+<tr><td class="num" id="LN135">135</td><td class="line">  <span class='macro'>DCHECK_EQ(node-&gt;opcode(), IrOpcode::kAllocate)<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (node-&gt;<br>opcode()), (IrOpcode::kAllocate), "node-&gt;opcode()" " " "=="<br> " " "IrOpcode::kAllocate")) { V8_Fatal("../src/compiler/escape-analysis-reducer.cc"<br>, 135, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN136">136</td><td class="line">  <span class='keyword'>if</span> (node-&gt;id() &lt; <span class='keyword'>static_cast</span>&lt;NodeId&gt;(fully_reduced_.length())) {</td></tr>
+<tr><td class="num" id="LN137">137</td><td class="line">    fully_reduced_.Add(node-&gt;id());</td></tr>
+<tr><td class="num" id="LN138">138</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN139">139</td><td class="line">  <span class='keyword'>if</span> (escape_analysis()-&gt;IsVirtual(node)) {</td></tr>
+<tr><td class="num" id="LN140">140</td><td class="line">    RelaxEffectsAndControls(node);</td></tr>
+<tr><td class="num" id="LN141">141</td><td class="line">    counters()-&gt;turbo_escape_allocs_replaced()-&gt;Increment();</td></tr>
+<tr><td class="num" id="LN142">142</td><td class="line">    <span class='macro'>TRACE(<span class='string_literal'>"Removed allocate #%d from effect chain\n"</span>, node-&gt;id())<span class='expansion'>do { if (FLAG_trace_turbo_escape) PrintF("Removed allocate #%d from effect chain\n"<br>, node-&gt;id()); } while (false)</span></span>;</td></tr>
+<tr><td class="num" id="LN143">143</td><td class="line">    <span class='keyword'>return</span> Changed(node);</td></tr>
+<tr><td class="num" id="LN144">144</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN145">145</td><td class="line">  <span class='keyword'>return</span> NoChange();</td></tr>
+<tr><td class="num" id="LN146">146</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN147">147</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN148">148</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN149">149</td><td class="line">Reduction EscapeAnalysisReducer::ReduceFinishRegion(Node* node) {</td></tr>
+<tr><td class="num" id="LN150">150</td><td class="line">  <span class='macro'>DCHECK_EQ(node-&gt;opcode(), IrOpcode::kFinishRegion)<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (node-&gt;<br>opcode()), (IrOpcode::kFinishRegion), "node-&gt;opcode()" " "<br> "==" " " "IrOpcode::kFinishRegion")) { V8_Fatal("../src/compiler/escape-analysis-reducer.cc"<br>, 150, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN151">151</td><td class="line">  Node* effect = NodeProperties::GetEffectInput(node, 0);</td></tr>
+<tr><td class="num" id="LN152">152</td><td class="line">  <span class='keyword'>if</span> (effect-&gt;opcode() == IrOpcode::kBeginRegion) {</td></tr>
+<tr><td class="num" id="LN153">153</td><td class="line">    <span class='comment'>// We only add it now to remove empty Begin/Finish region pairs</span></td></tr>
+<tr><td class="num" id="LN154">154</td><td class="line">    <span class='comment'>// in the process.</span></td></tr>
+<tr><td class="num" id="LN155">155</td><td class="line">    <span class='keyword'>if</span> (node-&gt;id() &lt; <span class='keyword'>static_cast</span>&lt;NodeId&gt;(fully_reduced_.length())) {</td></tr>
+<tr><td class="num" id="LN156">156</td><td class="line">      fully_reduced_.Add(node-&gt;id());</td></tr>
+<tr><td class="num" id="LN157">157</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN158">158</td><td class="line">    RelaxEffectsAndControls(effect);</td></tr>
+<tr><td class="num" id="LN159">159</td><td class="line">    RelaxEffectsAndControls(node);</td></tr>
+<tr><td class="num" id="LN160">160</td><td class="line"><span class='directive'>#ifdef <span class='macro'>DEBUG<span class='expansion'>1</span></span></span></td></tr>
+<tr><td class="num" id="LN161">161</td><td class="line">    <span class='keyword'>if</span> (FLAG_trace_turbo_escape) {</td></tr>
+<tr><td class="num" id="LN162">162</td><td class="line">      PrintF(<span class='string_literal'>"Removed region #%d / #%d from effect chain,"</span>, effect-&gt;id(),</td></tr>
+<tr><td class="num" id="LN163">163</td><td class="line">             node-&gt;id());</td></tr>
+<tr><td class="num" id="LN164">164</td><td class="line">      PrintF(<span class='string_literal'>" %d user(s) of #%d remain(s):"</span>, node-&gt;UseCount(), node-&gt;id());</td></tr>
+<tr><td class="num" id="LN165">165</td><td class="line">      <span class='keyword'>for</span> (Edge edge : node-&gt;use_edges()) {</td></tr>
+<tr><td class="num" id="LN166">166</td><td class="line">        PrintF(<span class='string_literal'>" #%d"</span>, edge.from()-&gt;id());</td></tr>
+<tr><td class="num" id="LN167">167</td><td class="line">      }</td></tr>
+<tr><td class="num" id="LN168">168</td><td class="line">      PrintF(<span class='string_literal'>"\n"</span>);</td></tr>
+<tr><td class="num" id="LN169">169</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN170">170</td><td class="line"><span class='directive'>#endif  // DEBUG</span></td></tr>
+<tr><td class="num" id="LN171">171</td><td class="line">    <span class='keyword'>return</span> Changed(node);</td></tr>
+<tr><td class="num" id="LN172">172</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN173">173</td><td class="line">  <span class='keyword'>return</span> NoChange();</td></tr>
+<tr><td class="num" id="LN174">174</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN175">175</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN176">176</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN177">177</td><td class="line">Reduction EscapeAnalysisReducer::ReduceReferenceEqual(Node* node) {</td></tr>
+<tr><td class="num" id="LN178">178</td><td class="line">  <span class='macro'>DCHECK_EQ(node-&gt;opcode(), IrOpcode::kReferenceEqual)<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (node-&gt;<br>opcode()), (IrOpcode::kReferenceEqual), "node-&gt;opcode()" " "<br> "==" " " "IrOpcode::kReferenceEqual")) { V8_Fatal("../src/compiler/escape-analysis-reducer.cc"<br>, 178, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN179">179</td><td class="line">  Node* left = NodeProperties::GetValueInput(node, 0);</td></tr>
+<tr><td class="num" id="LN180">180</td><td class="line">  Node* right = NodeProperties::GetValueInput(node, 1);</td></tr>
+<tr><td class="num" id="LN181">181</td><td class="line">  <span class='keyword'>if</span> (escape_analysis()-&gt;IsVirtual(left)) {</td></tr>
+<tr><td class="num" id="LN182">182</td><td class="line">    <span class='keyword'>if</span> (escape_analysis()-&gt;IsVirtual(right) &amp;&amp;</td></tr>
+<tr><td class="num" id="LN183">183</td><td class="line">        escape_analysis()-&gt;CompareVirtualObjects(left, right)) {</td></tr>
+<tr><td class="num" id="LN184">184</td><td class="line">      ReplaceWithValue(node, jsgraph()-&gt;TrueConstant());</td></tr>
+<tr><td class="num" id="LN185">185</td><td class="line">      <span class='macro'>TRACE(<span class='string_literal'>"Replaced ref eq #%d with true\n"</span>, node-&gt;id())<span class='expansion'>do { if (FLAG_trace_turbo_escape) PrintF("Replaced ref eq #%d with true\n"<br>, node-&gt;id()); } while (false)</span></span>;</td></tr>
+<tr><td class="num" id="LN186">186</td><td class="line">      Replace(jsgraph()-&gt;TrueConstant());</td></tr>
+<tr><td class="num" id="LN187">187</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN188">188</td><td class="line">    <span class='comment'>// Right-hand side is not a virtual object, or a different one.</span></td></tr>
+<tr><td class="num" id="LN189">189</td><td class="line">    ReplaceWithValue(node, jsgraph()-&gt;FalseConstant());</td></tr>
+<tr><td class="num" id="LN190">190</td><td class="line">    <span class='macro'>TRACE(<span class='string_literal'>"Replaced ref eq #%d with false\n"</span>, node-&gt;id())<span class='expansion'>do { if (FLAG_trace_turbo_escape) PrintF("Replaced ref eq #%d with false\n"<br>, node-&gt;id()); } while (false)</span></span>;</td></tr>
+<tr><td class="num" id="LN191">191</td><td class="line">    <span class='keyword'>return</span> Replace(jsgraph()-&gt;FalseConstant());</td></tr>
+<tr><td class="num" id="LN192">192</td><td class="line">  } <span class='keyword'>else</span> <span class='keyword'>if</span> (escape_analysis()-&gt;IsVirtual(right)) {</td></tr>
+<tr><td class="num" id="LN193">193</td><td class="line">    <span class='comment'>// Left-hand side is not a virtual object.</span></td></tr>
+<tr><td class="num" id="LN194">194</td><td class="line">    ReplaceWithValue(node, jsgraph()-&gt;FalseConstant());</td></tr>
+<tr><td class="num" id="LN195">195</td><td class="line">    <span class='macro'>TRACE(<span class='string_literal'>"Replaced ref eq #%d with false\n"</span>, node-&gt;id())<span class='expansion'>do { if (FLAG_trace_turbo_escape) PrintF("Replaced ref eq #%d with false\n"<br>, node-&gt;id()); } while (false)</span></span>;</td></tr>
+<tr><td class="num" id="LN196">196</td><td class="line">    <span class='keyword'>return</span> Replace(jsgraph()-&gt;FalseConstant());</td></tr>
+<tr><td class="num" id="LN197">197</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN198">198</td><td class="line">  <span class='keyword'>return</span> NoChange();</td></tr>
+<tr><td class="num" id="LN199">199</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN200">200</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN201">201</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN202">202</td><td class="line">Reduction EscapeAnalysisReducer::ReduceObjectIsSmi(Node* node) {</td></tr>
+<tr><td class="num" id="LN203">203</td><td class="line">  <span class='macro'>DCHECK_EQ(node-&gt;opcode(), IrOpcode::kObjectIsSmi)<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckEQImpl( (node-&gt;<br>opcode()), (IrOpcode::kObjectIsSmi), "node-&gt;opcode()" " " "=="<br> " " "IrOpcode::kObjectIsSmi")) { V8_Fatal("../src/compiler/escape-analysis-reducer.cc"<br>, 203, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN204">204</td><td class="line">  Node* input = NodeProperties::GetValueInput(node, 0);</td></tr>
+<tr><td class="num" id="LN205">205</td><td class="line">  <span class='keyword'>if</span> (escape_analysis()-&gt;IsVirtual(input)) {</td></tr>
+<tr><td class="num" id="LN206">206</td><td class="line">    ReplaceWithValue(node, jsgraph()-&gt;FalseConstant());</td></tr>
+<tr><td class="num" id="LN207">207</td><td class="line">    <span class='macro'>TRACE(<span class='string_literal'>"Replaced ObjectIsSmi #%d with false\n"</span>, node-&gt;id())<span class='expansion'>do { if (FLAG_trace_turbo_escape) PrintF("Replaced ObjectIsSmi #%d with false\n"<br>, node-&gt;id()); } while (false)</span></span>;</td></tr>
+<tr><td class="num" id="LN208">208</td><td class="line">    <span class='keyword'>return</span> Replace(jsgraph()-&gt;FalseConstant());</td></tr>
+<tr><td class="num" id="LN209">209</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN210">210</td><td class="line">  <span class='keyword'>return</span> NoChange();</td></tr>
+<tr><td class="num" id="LN211">211</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN212">212</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN213">213</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN214">214</td><td class="line">Reduction EscapeAnalysisReducer::ReduceFrameStateUses(Node* node) {</td></tr>
+<tr><td class="num" id="LN215">215</td><td class="line">  <span class='macro'>DCHECK_GE(node-&gt;op()-&gt;EffectInputCount(), 1)<span class='expansion'>do { if (std::string* _msg = ::v8::base::CheckGEImpl( (node-&gt;<br>op()-&gt;EffectInputCount()), (1), "node-&gt;op()-&gt;EffectInputCount()"<br> " " "&gt;=" " " "1")) { V8_Fatal("../src/compiler/escape-analysis-reducer.cc"<br>, 215, "Check failed: %s.", _msg-&gt;c_str()); delete _msg; }<br> } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN216">216</td><td class="line">  <span class='keyword'>if</span> (node-&gt;id() &lt; <span class='keyword'>static_cast</span>&lt;NodeId&gt;(fully_reduced_.length())) {</td></tr>
+<tr><td class="num" id="LN217">217</td><td class="line">    fully_reduced_.Add(node-&gt;id());</td></tr>
+<tr><td class="num" id="LN218">218</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN219">219</td><td class="line">  <span class='keyword'>bool</span> changed = <span class='keyword'>false</span>;</td></tr>
+<tr><td class="num" id="LN220">220</td><td class="line">  <span class='keyword'>for</span> (<span class='keyword'>int</span> i = 0; i &lt; node-&gt;InputCount(); ++i) {</td></tr>
+<tr><td class="num" id="LN221">221</td><td class="line">    Node* input = node-&gt;InputAt(i);</td></tr>
+<tr><td class="num" id="LN222">222</td><td class="line">    <span class='keyword'>if</span> (input-&gt;opcode() == IrOpcode::kFrameState) {</td></tr>
+<tr><td class="num" id="LN223">223</td><td class="line">      <span class='keyword'>if</span> (Node* ret = ReduceDeoptState(input, node, <span class='keyword'>false</span>)) {</td></tr>
+<tr><td class="num" id="LN224">224</td><td class="line">        node-&gt;ReplaceInput(i, ret);</td></tr>
+<tr><td class="num" id="LN225">225</td><td class="line">        changed = <span class='keyword'>true</span>;</td></tr>
+<tr><td class="num" id="LN226">226</td><td class="line">      }</td></tr>
+<tr><td class="num" id="LN227">227</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN228">228</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN229">229</td><td class="line">  <span class='keyword'>if</span> (changed) {</td></tr>
+<tr><td class="num" id="LN230">230</td><td class="line">    <span class='keyword'>return</span> Changed(node);</td></tr>
+<tr><td class="num" id="LN231">231</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN232">232</td><td class="line">  <span class='keyword'>return</span> NoChange();</td></tr>
+<tr><td class="num" id="LN233">233</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN234">234</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN235">235</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN236">236</td><td class="line"><span class='comment'>// Returns the clone if it duplicated the node, and null otherwise.</span></td></tr>
+<tr><td class="num" id="LN237">237</td><td class="line">Node* EscapeAnalysisReducer::ReduceDeoptState(Node* node, Node* effect,</td></tr>
+<tr><td class="num" id="LN238">238</td><td class="line">                                              <span class='keyword'>bool</span> multiple_users) {</td></tr>
+<tr><td class="num" id="LN239">239</td><td class="line">  <span class='macro'>DCHECK(node-&gt;opcode() == IrOpcode::kFrameState ||<span class='expansion'>do { if ((__builtin_expect(!!(!(node-&gt;opcode() == IrOpcode<br>::kFrameState || node-&gt;opcode() == IrOpcode::kStateValues)<br>), 0))) { V8_Fatal("../src/compiler/escape-analysis-reducer.cc"<br>, 240, "Check failed: %s.", "node-&gt;opcode() == IrOpcode::kFrameState || node-&gt;opcode() == IrOpcode::kStateValues"<br>); } } while (0)</span></span></td></tr>
+<tr><td class="num" id="LN240">240</td><td class="line">         <span class='macro'>node-&gt;opcode() == IrOpcode::kStateValues)<span class='expansion'>do { if ((__builtin_expect(!!(!(node-&gt;opcode() == IrOpcode<br>::kFrameState || node-&gt;opcode() == IrOpcode::kStateValues)<br>), 0))) { V8_Fatal("../src/compiler/escape-analysis-reducer.cc"<br>, 240, "Check failed: %s.", "node-&gt;opcode() == IrOpcode::kFrameState || node-&gt;opcode() == IrOpcode::kStateValues"<br>); } } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN241">241</td><td class="line">  <span class='keyword'>if</span> (node-&gt;id() &lt; <span class='keyword'>static_cast</span>&lt;NodeId&gt;(fully_reduced_.length()) &amp;&amp;</td></tr>
+<tr><td class="num" id="LN242">242</td><td class="line">      fully_reduced_.Contains(node-&gt;id())) {</td></tr>
+<tr><td class="num" id="LN243">243</td><td class="line">    <span class='keyword'>return</span> <span class='keyword'>nullptr</span>;</td></tr>
+<tr><td class="num" id="LN244">244</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN245">245</td><td class="line">  <span class='macro'>TRACE(<span class='string_literal'>"Reducing %s %d\n"</span>, node-&gt;op()-&gt;mnemonic(), node-&gt;id())<span class='expansion'>do { if (FLAG_trace_turbo_escape) PrintF("Reducing %s %d\n", node<br>-&gt;op()-&gt;mnemonic(), node-&gt;id()); } while (false)</span></span>;</td></tr>
+<tr><td class="num" id="LN246">246</td><td class="line">  Node* clone = <span class='keyword'>nullptr</span>;</td></tr>
+<tr><td class="num" id="LN247">247</td><td class="line">  <span class='keyword'>bool</span> node_multiused = node-&gt;UseCount() &gt; 1;</td></tr>
+<tr><td class="num" id="LN248">248</td><td class="line">  <span class='keyword'>bool</span> multiple_users_rec = multiple_users || node_multiused;</td></tr>
+<tr><td class="num" id="LN249">249</td><td class="line">  <span class='keyword'>for</span> (<span class='keyword'>int</span> i = 0; i &lt; node-&gt;op()-&gt;ValueInputCount(); ++i) {</td></tr>
+<tr><td class="num" id="LN250">250</td><td class="line">    Node* input = NodeProperties::GetValueInput(node, i);</td></tr>
+<tr><td class="num" id="LN251">251</td><td class="line">    <span class='keyword'>if</span> (input-&gt;opcode() == IrOpcode::kStateValues) {</td></tr>
+<tr><td class="num" id="LN252">252</td><td class="line">      <span class='keyword'>if</span> (Node* ret = ReduceDeoptState(input, effect, multiple_users_rec)) {</td></tr>
+<tr><td class="num" id="LN253">253</td><td class="line">        <span class='keyword'>if</span> (node_multiused || (multiple_users &amp;&amp; !clone)) {</td></tr>
+<tr><td class="num" id="LN254">254</td><td class="line">          <span class='macro'>TRACE(<span class='string_literal'>"  Cloning #%d"</span>, node-&gt;id())<span class='expansion'>do { if (FLAG_trace_turbo_escape) PrintF("  Cloning #%d", node<br>-&gt;id()); } while (false)</span></span>;</td></tr>
+<tr><td class="num" id="LN255">255</td><td class="line">          node = clone = jsgraph()-&gt;graph()-&gt;CloneNode(node);</td></tr>
+<tr><td class="num" id="LN256">256</td><td class="line">          <span class='macro'>TRACE(<span class='string_literal'>" to #%d\n"</span>, node-&gt;id())<span class='expansion'>do { if (FLAG_trace_turbo_escape) PrintF(" to #%d\n", node-&gt;<br>id()); } while (false)</span></span>;</td></tr>
+<tr><td class="num" id="LN257">257</td><td class="line">          node_multiused = <span class='keyword'>false</span>;</td></tr>
+<tr><td class="num" id="LN258">258</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN259">259</td><td class="line">        NodeProperties::ReplaceValueInput(node, ret, i);</td></tr>
+<tr><td class="num" id="LN260">260</td><td class="line">      }</td></tr>
+<tr><td class="num" id="LN261">261</td><td class="line">    } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN262">262</td><td class="line">      <span class='keyword'>if</span> (Node* ret = ReduceStateValueInput(node, i, effect, node_multiused,</td></tr>
+<tr><td class="num" id="LN263">263</td><td class="line">                                            clone, multiple_users)) {</td></tr>
+<tr><td class="num" id="LN264">264</td><td class="line">        <span class='macro'>DCHECK_NULL(clone)<span class='expansion'>do { if ((__builtin_expect(!!(!((clone) == nullptr)), 0))) { V8_Fatal<br>("../src/compiler/escape-analysis-reducer.cc", 264, "Check failed: %s."<br>, "(clone) == nullptr"); } } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN265">265</td><td class="line">        node_multiused = <span class='keyword'>false</span>;  <span class='comment'>// Don't clone anymore.</span></td></tr>
+<tr><td class="num" id="LN266">266</td><td class="line">        node = clone = ret;</td></tr>
+<tr><td class="num" id="LN267">267</td><td class="line">      }</td></tr>
+<tr><td class="num" id="LN268">268</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN269">269</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN270">270</td><td class="line">  <span class='keyword'>if</span> (node-&gt;opcode() == IrOpcode::kFrameState) {</td></tr>
+<tr><td class="num" id="LN271">271</td><td class="line">    Node* outer_frame_state = NodeProperties::GetFrameStateInput(node, 0);</td></tr>
+<tr><td class="num" id="LN272">272</td><td class="line">    <span class='keyword'>if</span> (outer_frame_state-&gt;opcode() == IrOpcode::kFrameState) {</td></tr>
+<tr><td class="num" id="LN273">273</td><td class="line">      <span class='keyword'>if</span> (Node* ret =</td></tr>
+<tr><td class="num" id="LN274">274</td><td class="line">              ReduceDeoptState(outer_frame_state, effect, multiple_users_rec)) {</td></tr>
+<tr><td class="num" id="LN275">275</td><td class="line">        <span class='keyword'>if</span> (node_multiused || (multiple_users &amp;&amp; !clone)) {</td></tr>
+<tr><td class="num" id="LN276">276</td><td class="line">          <span class='macro'>TRACE(<span class='string_literal'>"    Cloning #%d"</span>, node-&gt;id())<span class='expansion'>do { if (FLAG_trace_turbo_escape) PrintF("    Cloning #%d", node<br>-&gt;id()); } while (false)</span></span>;</td></tr>
+<tr><td class="num" id="LN277">277</td><td class="line">          node = clone = jsgraph()-&gt;graph()-&gt;CloneNode(node);</td></tr>
+<tr><td class="num" id="LN278">278</td><td class="line">          <span class='macro'>TRACE(<span class='string_literal'>" to #%d\n"</span>, node-&gt;id())<span class='expansion'>do { if (FLAG_trace_turbo_escape) PrintF(" to #%d\n", node-&gt;<br>id()); } while (false)</span></span>;</td></tr>
+<tr><td class="num" id="LN279">279</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN280">280</td><td class="line">        NodeProperties::ReplaceFrameStateInput(node, 0, ret);</td></tr>
+<tr><td class="num" id="LN281">281</td><td class="line">      }</td></tr>
+<tr><td class="num" id="LN282">282</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN283">283</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN284">284</td><td class="line">  <span class='keyword'>if</span> (node-&gt;id() &lt; <span class='keyword'>static_cast</span>&lt;NodeId&gt;(fully_reduced_.length())) {</td></tr>
+<tr><td class="num" id="LN285">285</td><td class="line">    fully_reduced_.Add(node-&gt;id());</td></tr>
+<tr><td class="num" id="LN286">286</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN287">287</td><td class="line">  <span class='keyword'>return</span> clone;</td></tr>
+<tr><td class="num" id="LN288">288</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN289">289</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN290">290</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN291">291</td><td class="line"><span class='comment'>// Returns the clone if it duplicated the node, and null otherwise.</span></td></tr>
+<tr><td class="num" id="LN292">292</td><td class="line">Node* EscapeAnalysisReducer::ReduceStateValueInput(Node* node, <span class='keyword'>int</span> node_index,</td></tr>
+<tr><td class="num" id="LN293">293</td><td class="line">                                                   Node* effect,</td></tr>
+<tr><td class="num" id="LN294">294</td><td class="line">                                                   <span class='keyword'>bool</span> node_multiused,</td></tr>
+<tr><td class="num" id="LN295">295</td><td class="line">                                                   <span class='keyword'>bool</span> already_cloned,</td></tr>
+<tr><td class="num" id="LN296">296</td><td class="line">                                                   <span class='keyword'>bool</span> multiple_users) {</td></tr>
+<tr><td class="num" id="LN297">297</td><td class="line">  Node* input = NodeProperties::GetValueInput(node, node_index);</td></tr>
+<tr><td class="num" id="LN298">298</td><td class="line">  <span class='keyword'>if</span> (node-&gt;id() &lt; <span class='keyword'>static_cast</span>&lt;NodeId&gt;(fully_reduced_.length()) &amp;&amp;</td></tr>
+<tr><td class="num" id="LN299">299</td><td class="line">      fully_reduced_.Contains(node-&gt;id())) {</td></tr>
+<tr><td class="num" id="LN300">300</td><td class="line">    <span class='keyword'>return</span> <span class='keyword'>nullptr</span>;</td></tr>
+<tr><td class="num" id="LN301">301</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN302">302</td><td class="line">  <span class='macro'>TRACE(<span class='string_literal'>"Reducing State Input #%d (%s)\n"</span>, input-&gt;id(),<span class='expansion'>do { if (FLAG_trace_turbo_escape) PrintF("Reducing State Input #%d (%s)\n"<br>, input-&gt;id(), input-&gt;op()-&gt;mnemonic()); } while (false<br>)</span></span></td></tr>
+<tr><td class="num" id="LN303">303</td><td class="line">        <span class='macro'>input-&gt;op()-&gt;mnemonic())<span class='expansion'>do { if (FLAG_trace_turbo_escape) PrintF("Reducing State Input #%d (%s)\n"<br>, input-&gt;id(), input-&gt;op()-&gt;mnemonic()); } while (false<br>)</span></span>;</td></tr>
+<tr><td class="num" id="LN304">304</td><td class="line">  Node* clone = <span class='keyword'>nullptr</span>;</td></tr>
+<tr><td class="num" id="LN305">305</td><td class="line">  <span class='keyword'>if</span> (input-&gt;opcode() == IrOpcode::kFinishRegion ||</td></tr>
+<tr><td class="num" id="LN306">306</td><td class="line">      input-&gt;opcode() == IrOpcode::kAllocate) {</td></tr>
+<tr><td class="num" id="LN307">307</td><td class="line">    <span class='keyword'>if</span> (escape_analysis()-&gt;IsVirtual(input)) {</td></tr>
+<tr><td class="num" id="LN308">308</td><td class="line">      <span class='keyword'>if</span> (Node* object_state =</td></tr>
+<tr><td class="num" id="LN309">309</td><td class="line">              escape_analysis()-&gt;GetOrCreateObjectState(effect, input)) {</td></tr>
+<tr><td class="num" id="LN310">310</td><td class="line">        <span class='keyword'>if</span> (node_multiused || (multiple_users &amp;&amp; !already_cloned)) {</td></tr>
+<tr><td class="num" id="LN311">311</td><td class="line">          <span class='macro'>TRACE(<span class='string_literal'>"Cloning #%d"</span>, node-&gt;id())<span class='expansion'>do { if (FLAG_trace_turbo_escape) PrintF("Cloning #%d", node-&gt;<br>id()); } while (false)</span></span>;</td></tr>
+<tr><td class="num" id="LN312">312</td><td class="line">          node = clone = jsgraph()-&gt;graph()-&gt;CloneNode(node);</td></tr>
+<tr><td class="num" id="LN313">313</td><td class="line">          <span class='macro'>TRACE(<span class='string_literal'>" to #%d\n"</span>, node-&gt;id())<span class='expansion'>do { if (FLAG_trace_turbo_escape) PrintF(" to #%d\n", node-&gt;<br>id()); } while (false)</span></span>;</td></tr>
+<tr><td class="num" id="LN314">314</td><td class="line">          node_multiused = <span class='keyword'>false</span>;</td></tr>
+<tr><td class="num" id="LN315">315</td><td class="line">          already_cloned = <span class="mrange"><span class='keyword'>true</span></span>;</td></tr>
+<tr><td class="num"></td><td class="line"><div id="EndPath" class="msg msgEvent" style="margin-left:11ex">Value stored to 'already_cloned' is never read</div></td></tr>
+<tr><td class="num" id="LN316">316</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN317">317</td><td class="line">        NodeProperties::ReplaceValueInput(node, object_state, node_index);</td></tr>
+<tr><td class="num" id="LN318">318</td><td class="line">        <span class='macro'>TRACE(<span class='string_literal'>"Replaced state #%d input #%d with object state #%d\n"</span>,<span class='expansion'>do { if (FLAG_trace_turbo_escape) PrintF("Replaced state #%d input #%d with object state #%d\n"<br>, node-&gt;id(), input-&gt;id(), object_state-&gt;id()); } while<br> (false)</span></span></td></tr>
+<tr><td class="num" id="LN319">319</td><td class="line">              <span class='macro'>node-&gt;id(), input-&gt;id(), object_state-&gt;id())<span class='expansion'>do { if (FLAG_trace_turbo_escape) PrintF("Replaced state #%d input #%d with object state #%d\n"<br>, node-&gt;id(), input-&gt;id(), object_state-&gt;id()); } while<br> (false)</span></span>;</td></tr>
+<tr><td class="num" id="LN320">320</td><td class="line">      } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN321">321</td><td class="line">        <span class='macro'>TRACE(<span class='string_literal'>"No object state replacement for #%d at effect #%d available.\n"</span>,<span class='expansion'>do { if (FLAG_trace_turbo_escape) PrintF("No object state replacement for #%d at effect #%d available.\n"<br>, input-&gt;id(), effect-&gt;id()); } while (false)</span></span></td></tr>
+<tr><td class="num" id="LN322">322</td><td class="line">              <span class='macro'>input-&gt;id(), effect-&gt;id())<span class='expansion'>do { if (FLAG_trace_turbo_escape) PrintF("No object state replacement for #%d at effect #%d available.\n"<br>, input-&gt;id(), effect-&gt;id()); } while (false)</span></span>;</td></tr>
+<tr><td class="num" id="LN323">323</td><td class="line">        <span class='macro'>UNREACHABLE()<span class='expansion'>V8_Fatal("../src/compiler/escape-analysis-reducer.cc", 323, "unreachable code"<br>)</span></span>;</td></tr>
+<tr><td class="num" id="LN324">324</td><td class="line">      }</td></tr>
+<tr><td class="num" id="LN325">325</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN326">326</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN327">327</td><td class="line">  <span class='keyword'>return</span> clone;</td></tr>
+<tr><td class="num" id="LN328">328</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN329">329</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN330">330</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN331">331</td><td class="line">Counters* EscapeAnalysisReducer::counters() <span class='keyword'>const</span> {</td></tr>
+<tr><td class="num" id="LN332">332</td><td class="line">  <span class='keyword'>return</span> jsgraph_-&gt;isolate()-&gt;counters();</td></tr>
+<tr><td class="num" id="LN333">333</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN334">334</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN335">335</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN336">336</td><td class="line"><span class='keyword'>class</span> EscapeAnalysisVerifier final : <span class='keyword'>public</span> AdvancedReducer {</td></tr>
+<tr><td class="num" id="LN337">337</td><td class="line"> <span class='keyword'>public</span>:</td></tr>
+<tr><td class="num" id="LN338">338</td><td class="line">  EscapeAnalysisVerifier(Editor* editor, EscapeAnalysis* escape_analysis)</td></tr>
+<tr><td class="num" id="LN339">339</td><td class="line">      : AdvancedReducer(editor), escape_analysis_(escape_analysis) {}</td></tr>
+<tr><td class="num" id="LN340">340</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN341">341</td><td class="line">  Reduction Reduce(Node* node) final {</td></tr>
+<tr><td class="num" id="LN342">342</td><td class="line">    <span class='keyword'>switch</span> (node-&gt;opcode()) {</td></tr>
+<tr><td class="num" id="LN343">343</td><td class="line">      <span class='keyword'>case</span> IrOpcode::kAllocate:</td></tr>
+<tr><td class="num" id="LN344">344</td><td class="line">        <span class='macro'>CHECK(!escape_analysis_-&gt;IsVirtual(node))<span class='expansion'>do { if ((__builtin_expect(!!(!(!escape_analysis_-&gt;IsVirtual<br>(node))), 0))) { V8_Fatal("../src/compiler/escape-analysis-reducer.cc"<br>, 344, "Check failed: %s.", "!escape_analysis_-&gt;IsVirtual(node)"<br>); } } while (0)</span></span>;</td></tr>
+<tr><td class="num" id="LN345">345</td><td class="line">        <span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN346">346</td><td class="line">      <span class='keyword'>default</span>:</td></tr>
+<tr><td class="num" id="LN347">347</td><td class="line">        <span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN348">348</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN349">349</td><td class="line">    <span class='keyword'>return</span> NoChange();</td></tr>
+<tr><td class="num" id="LN350">350</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN351">351</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN352">352</td><td class="line"> <span class='keyword'>private</span>:</td></tr>
+<tr><td class="num" id="LN353">353</td><td class="line">  EscapeAnalysis* escape_analysis_;</td></tr>
+<tr><td class="num" id="LN354">354</td><td class="line">};</td></tr>
+<tr><td class="num" id="LN355">355</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN356">356</td><td class="line"><span class='keyword'>void</span> EscapeAnalysisReducer::VerifyReplacement() <span class='keyword'>const</span> {</td></tr>
+<tr><td class="num" id="LN357">357</td><td class="line"><span class='directive'>#ifdef <span class='macro'>DEBUG<span class='expansion'>1</span></span></span></td></tr>
+<tr><td class="num" id="LN358">358</td><td class="line">  GraphReducer graph_reducer(zone(), jsgraph()-&gt;graph());</td></tr>
+<tr><td class="num" id="LN359">359</td><td class="line">  EscapeAnalysisVerifier verifier(&amp;graph_reducer, escape_analysis());</td></tr>
+<tr><td class="num" id="LN360">360</td><td class="line">  graph_reducer.AddReducer(&amp;verifier);</td></tr>
+<tr><td class="num" id="LN361">361</td><td class="line">  graph_reducer.ReduceGraph();</td></tr>
+<tr><td class="num" id="LN362">362</td><td class="line"><span class='directive'>#endif  // DEBUG</span></td></tr>
+<tr><td class="num" id="LN363">363</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN364">364</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN365">365</td><td class="line">}  <span class='comment'>// namespace compiler</span></td></tr>
+<tr><td class="num" id="LN366">366</td><td class="line">}  <span class='comment'>// namespace internal</span></td></tr>
+<tr><td class="num" id="LN367">367</td><td class="line">}  <span class='comment'>// namespace v8</span></td></tr>
+</table></body></html>

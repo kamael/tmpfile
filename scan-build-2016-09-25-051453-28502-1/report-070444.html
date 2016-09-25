@@ -1,0 +1,1139 @@
+<!doctype html>
+<html>
+<head>
+<title>../third_party/icu/source/common/locid.cpp</title>
+<style type="text/css">
+ body { color:#000000; background-color:#ffffff }
+ body { font-family:Helvetica, sans-serif; font-size:10pt }
+ h1 { font-size:14pt }
+ .code { border-collapse:collapse; width:100%; }
+ .code { font-family: "Monospace", monospace; font-size:10pt }
+ .code { line-height: 1.2em }
+ .comment { color: green; font-style: oblique }
+ .keyword { color: blue }
+ .string_literal { color: red }
+ .directive { color: darkmagenta }
+ .expansion { display: none; }
+ .macro:hover .expansion { display: block; border: 2px solid #FF0000; padding: 2px; background-color:#FFF0F0; font-weight: normal;   -webkit-border-radius:5px;  -webkit-box-shadow:1px 1px 7px #000;   border-radius:5px;  box-shadow:1px 1px 7px #000; position: absolute; top: -1em; left:10em; z-index: 1 } 
+ .macro { color: darkmagenta; background-color:LemonChiffon; position: relative }
+ .num { width:2.5em; padding-right:2ex; background-color:#eeeeee }
+ .num { text-align:right; font-size:8pt }
+ .num { color:#444444 }
+ .line { padding-left: 1ex; border-left: 3px solid #ccc }
+ .line { white-space: pre }
+ .msg { -webkit-box-shadow:1px 1px 7px #000 }
+ .msg { box-shadow:1px 1px 7px #000 }
+ .msg { -webkit-border-radius:5px }
+ .msg { border-radius:5px }
+ .msg { font-family:Helvetica, sans-serif; font-size:8pt }
+ .msg { float:left }
+ .msg { padding:0.25em 1ex 0.25em 1ex }
+ .msg { margin-top:10px; margin-bottom:10px }
+ .msg { font-weight:bold }
+ .msg { max-width:60em; word-wrap: break-word; white-space: pre-wrap }
+ .msgT { padding:0x; spacing:0x }
+ .msgEvent { background-color:#fff8b4; color:#000000 }
+ .msgControl { background-color:#bbbbbb; color:#000000 }
+ .mrange { background-color:#dfddf3 }
+ .mrange { border-bottom:1px solid #6F9DBE }
+ .PathIndex { font-weight: bold; padding:0px 5px; margin-right:5px; }
+ .PathIndex { -webkit-border-radius:8px }
+ .PathIndex { border-radius:8px }
+ .PathIndexEvent { background-color:#bfba87 }
+ .PathIndexControl { background-color:#8c8c8c }
+ .PathNav a { text-decoration:none; font-size: larger }
+ .CodeInsertionHint { font-weight: bold; background-color: #10dd10 }
+ .CodeRemovalHint { background-color:#de1010 }
+ .CodeRemovalHint { border-bottom:1px solid #6F9DBE }
+ table.simpletable {
+   padding: 5px;
+   font-size:12pt;
+   margin:20px;
+   border-collapse: collapse; border-spacing: 0px;
+ }
+ td.rowname {
+   text-align:right; font-weight:bold; color:#444444;
+   padding-right:2ex; }
+</style>
+</head>
+<body>
+<!-- BUGDESC Value stored to 'separator' is never read -->
+
+<!-- BUGTYPE Dead assignment -->
+
+<!-- BUGCATEGORY Dead store -->
+
+<!-- BUGFILE /home/haha/code/v8_5_0/v8/out/../third_party/icu/source/common/locid.cpp -->
+
+<!-- FILENAME locid.cpp -->
+
+<!-- FUNCTIONNAME init -->
+
+<!-- ISSUEHASHCONTENTOFLINEINCONTEXT 5fa639c5c7b3efe157f377b04f122b58 -->
+
+<!-- BUGLINE 537 -->
+
+<!-- BUGCOLUMN 9 -->
+
+<!-- BUGPATHLENGTH 1 -->
+
+<!-- BUGMETAEND -->
+<!-- REPORTHEADER -->
+<h3>Bug Summary</h3>
+<table class="simpletable">
+<tr><td class="rowname">File:</td><td>out/../third_party/icu/source/common/locid.cpp</td></tr>
+<tr><td class="rowname">Location:</td><td><a href="#EndPath">line 537, column 9</a></td></tr>
+<tr><td class="rowname">Description:</td><td>Value stored to 'separator' is never read</td></tr>
+</table>
+<!-- REPORTSUMMARYEXTRA -->
+<h3>Annotated Source Code</h3>
+<table class="code">
+<tr><td class="num" id="LN1">1</td><td class="line"><span class='comment'>/*</span></td></tr>
+<tr><td class="num" id="LN2">2</td><td class="line"> <span class='comment'>**********************************************************************</span></td></tr>
+<tr><td class="num" id="LN3">3</td><td class="line"> <span class='comment'>*   Copyright (C) 1997-2014, International Business Machines</span></td></tr>
+<tr><td class="num" id="LN4">4</td><td class="line"> <span class='comment'>*   Corporation and others.  All Rights Reserved.</span></td></tr>
+<tr><td class="num" id="LN5">5</td><td class="line"> <span class='comment'>**********************************************************************</span></td></tr>
+<tr><td class="num" id="LN6">6</td><td class="line"><span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN7">7</td><td class="line"><span class='comment'>* File locid.cpp</span></td></tr>
+<tr><td class="num" id="LN8">8</td><td class="line"><span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN9">9</td><td class="line"><span class='comment'>* Created by: Richard Gillam</span></td></tr>
+<tr><td class="num" id="LN10">10</td><td class="line"><span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN11">11</td><td class="line"><span class='comment'>* Modification History:</span></td></tr>
+<tr><td class="num" id="LN12">12</td><td class="line"><span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN13">13</td><td class="line"><span class='comment'>*   Date        Name        Description</span></td></tr>
+<tr><td class="num" id="LN14">14</td><td class="line"><span class='comment'>*   02/11/97    aliu        Changed gLocPath to fgDataDirectory and added</span></td></tr>
+<tr><td class="num" id="LN15">15</td><td class="line"><span class='comment'>*                           methods to get and set it.</span></td></tr>
+<tr><td class="num" id="LN16">16</td><td class="line"><span class='comment'>*   04/02/97    aliu        Made operator!= inline; fixed return value</span></td></tr>
+<tr><td class="num" id="LN17">17</td><td class="line"><span class='comment'>*                           of getName().</span></td></tr>
+<tr><td class="num" id="LN18">18</td><td class="line"><span class='comment'>*   04/15/97    aliu        Cleanup for AIX/Win32.</span></td></tr>
+<tr><td class="num" id="LN19">19</td><td class="line"><span class='comment'>*   04/24/97    aliu        Numerous changes per code review.</span></td></tr>
+<tr><td class="num" id="LN20">20</td><td class="line"><span class='comment'>*   08/18/98    stephen     Changed getDisplayName()</span></td></tr>
+<tr><td class="num" id="LN21">21</td><td class="line"><span class='comment'>*                           Added SIMPLIFIED_CHINESE, TRADITIONAL_CHINESE</span></td></tr>
+<tr><td class="num" id="LN22">22</td><td class="line"><span class='comment'>*                           Added getISOCountries(), getISOLanguages(),</span></td></tr>
+<tr><td class="num" id="LN23">23</td><td class="line"><span class='comment'>*                           getLanguagesForCountry()</span></td></tr>
+<tr><td class="num" id="LN24">24</td><td class="line"><span class='comment'>*   03/16/99    bertrand    rehaul.</span></td></tr>
+<tr><td class="num" id="LN25">25</td><td class="line"><span class='comment'>*   07/21/99    stephen     Added U_CFUNC setDefault</span></td></tr>
+<tr><td class="num" id="LN26">26</td><td class="line"><span class='comment'>*   11/09/99    weiv        Added const char * getName() const;</span></td></tr>
+<tr><td class="num" id="LN27">27</td><td class="line"><span class='comment'>*   04/12/00    srl         removing unicodestring api's and cached hash code</span></td></tr>
+<tr><td class="num" id="LN28">28</td><td class="line"><span class='comment'>*   08/10/01    grhoten     Change the static Locales to accessor functions</span></td></tr>
+<tr><td class="num" id="LN29">29</td><td class="line"><span class='comment'>******************************************************************************</span></td></tr>
+<tr><td class="num" id="LN30">30</td><td class="line"><span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN31">31</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN32">32</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN33">33</td><td class="line"><span class='directive'>#include "unicode/locid.h"</span></td></tr>
+<tr><td class="num" id="LN34">34</td><td class="line"><span class='directive'>#include "unicode/uloc.h"</span></td></tr>
+<tr><td class="num" id="LN35">35</td><td class="line"><span class='directive'>#include "putilimp.h"</span></td></tr>
+<tr><td class="num" id="LN36">36</td><td class="line"><span class='directive'>#include "mutex.h"</span></td></tr>
+<tr><td class="num" id="LN37">37</td><td class="line"><span class='directive'>#include "umutex.h"</span></td></tr>
+<tr><td class="num" id="LN38">38</td><td class="line"><span class='directive'>#include "uassert.h"</span></td></tr>
+<tr><td class="num" id="LN39">39</td><td class="line"><span class='directive'>#include "cmemory.h"</span></td></tr>
+<tr><td class="num" id="LN40">40</td><td class="line"><span class='directive'>#include "cstring.h"</span></td></tr>
+<tr><td class="num" id="LN41">41</td><td class="line"><span class='directive'>#include "uassert.h"</span></td></tr>
+<tr><td class="num" id="LN42">42</td><td class="line"><span class='directive'>#include "uhash.h"</span></td></tr>
+<tr><td class="num" id="LN43">43</td><td class="line"><span class='directive'>#include "ucln_cmn.h"</span></td></tr>
+<tr><td class="num" id="LN44">44</td><td class="line"><span class='directive'>#include "ustr_imp.h"</span></td></tr>
+<tr><td class="num" id="LN45">45</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN46">46</td><td class="line"><span class='macro'>U_CDECL_BEGIN<span class='expansion'>extern "C" {</span></span></td></tr>
+<tr><td class="num" id="LN47">47</td><td class="line"><span class='keyword'>static</span> UBool U_CALLCONV locale_cleanup(<span class='keyword'>void</span>);</td></tr>
+<tr><td class="num" id="LN48">48</td><td class="line"><span class='macro'>U_CDECL_END<span class='expansion'>}</span></span></td></tr>
+<tr><td class="num" id="LN49">49</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN50">50</td><td class="line"><span class='macro'>U_NAMESPACE_BEGIN<span class='expansion'>extern "C++" { namespace icu_54 {</span></span></td></tr>
+<tr><td class="num" id="LN51">51</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN52">52</td><td class="line"><span class='keyword'>static</span> Locale   *gLocaleCache = <span class='macro'>NULL<span class='expansion'>__null</span></span>;</td></tr>
+<tr><td class="num" id="LN53">53</td><td class="line"><span class='keyword'>static</span> UInitOnce gLocaleCacheInitOnce = <span class='macro'>U_INITONCE_INITIALIZER<span class='expansion'>{0, U_ZERO_ERROR}</span></span>;</td></tr>
+<tr><td class="num" id="LN54">54</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN55">55</td><td class="line"><span class='comment'>// gDefaultLocaleMutex protects all access to gDefaultLocalesHashT and gDefaultLocale.</span></td></tr>
+<tr><td class="num" id="LN56">56</td><td class="line"><span class='keyword'>static</span> UMutex gDefaultLocaleMutex = <span class='macro'>U_MUTEX_INITIALIZER<span class='expansion'>{{ { 0, 0, 0, 0, 0, 0, 0, { 0, 0 } } }}</span></span>;</td></tr>
+<tr><td class="num" id="LN57">57</td><td class="line"><span class='keyword'>static</span> UHashtable *gDefaultLocalesHashT = <span class='macro'>NULL<span class='expansion'>__null</span></span>;</td></tr>
+<tr><td class="num" id="LN58">58</td><td class="line"><span class='keyword'>static</span> Locale *gDefaultLocale = <span class='macro'>NULL<span class='expansion'>__null</span></span>;</td></tr>
+<tr><td class="num" id="LN59">59</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN60">60</td><td class="line"><span class='macro'>U_NAMESPACE_END<span class='expansion'>} }</span></span></td></tr>
+<tr><td class="num" id="LN61">61</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN62">62</td><td class="line"><span class='keyword'>typedef</span> <span class='keyword'>enum</span> ELocalePos {</td></tr>
+<tr><td class="num" id="LN63">63</td><td class="line">    eENGLISH,</td></tr>
+<tr><td class="num" id="LN64">64</td><td class="line">    eFRENCH,</td></tr>
+<tr><td class="num" id="LN65">65</td><td class="line">    eGERMAN,</td></tr>
+<tr><td class="num" id="LN66">66</td><td class="line">    eITALIAN,</td></tr>
+<tr><td class="num" id="LN67">67</td><td class="line">    eJAPANESE,</td></tr>
+<tr><td class="num" id="LN68">68</td><td class="line">    eKOREAN,</td></tr>
+<tr><td class="num" id="LN69">69</td><td class="line">    eCHINESE,</td></tr>
+<tr><td class="num" id="LN70">70</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN71">71</td><td class="line">    eFRANCE,</td></tr>
+<tr><td class="num" id="LN72">72</td><td class="line">    eGERMANY,</td></tr>
+<tr><td class="num" id="LN73">73</td><td class="line">    eITALY,</td></tr>
+<tr><td class="num" id="LN74">74</td><td class="line">    eJAPAN,</td></tr>
+<tr><td class="num" id="LN75">75</td><td class="line">    eKOREA,</td></tr>
+<tr><td class="num" id="LN76">76</td><td class="line">    eCHINA,      <span class='comment'>/* Alias for PRC */</span></td></tr>
+<tr><td class="num" id="LN77">77</td><td class="line">    eTAIWAN,</td></tr>
+<tr><td class="num" id="LN78">78</td><td class="line">    eUK,</td></tr>
+<tr><td class="num" id="LN79">79</td><td class="line">    eUS,</td></tr>
+<tr><td class="num" id="LN80">80</td><td class="line">    eCANADA,</td></tr>
+<tr><td class="num" id="LN81">81</td><td class="line">    eCANADA_FRENCH,</td></tr>
+<tr><td class="num" id="LN82">82</td><td class="line">    eROOT,</td></tr>
+<tr><td class="num" id="LN83">83</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN84">84</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN85">85</td><td class="line">    <span class='comment'>//eDEFAULT,</span></td></tr>
+<tr><td class="num" id="LN86">86</td><td class="line">    eMAX_LOCALES</td></tr>
+<tr><td class="num" id="LN87">87</td><td class="line">} ELocalePos;</td></tr>
+<tr><td class="num" id="LN88">88</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN89">89</td><td class="line"><span class='macro'>U_CFUNC<span class='expansion'>extern "C"</span></span> int32_t <span class='macro'>locale_getKeywords<span class='expansion'>locale_getKeywords_54</span></span>(<span class='keyword'>const</span> <span class='keyword'>char</span> *localeID,</td></tr>
+<tr><td class="num" id="LN90">90</td><td class="line">            <span class='keyword'>char</span> prev,</td></tr>
+<tr><td class="num" id="LN91">91</td><td class="line">            <span class='keyword'>char</span> *keywords, int32_t keywordCapacity,</td></tr>
+<tr><td class="num" id="LN92">92</td><td class="line">            <span class='keyword'>char</span> *values, int32_t valuesCapacity, int32_t *valLen,</td></tr>
+<tr><td class="num" id="LN93">93</td><td class="line">            UBool valuesToo,</td></tr>
+<tr><td class="num" id="LN94">94</td><td class="line">            UErrorCode *status);</td></tr>
+<tr><td class="num" id="LN95">95</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN96">96</td><td class="line"><span class='macro'>U_CDECL_BEGIN<span class='expansion'>extern "C" {</span></span></td></tr>
+<tr><td class="num" id="LN97">97</td><td class="line"><span class='comment'>//</span></td></tr>
+<tr><td class="num" id="LN98">98</td><td class="line"><span class='comment'>// Deleter function for Locales owned by the default Locale hash table/</span></td></tr>
+<tr><td class="num" id="LN99">99</td><td class="line"><span class='comment'>//</span></td></tr>
+<tr><td class="num" id="LN100">100</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>void</span> U_CALLCONV</td></tr>
+<tr><td class="num" id="LN101">101</td><td class="line">deleteLocale(<span class='keyword'>void</span> *obj) {</td></tr>
+<tr><td class="num" id="LN102">102</td><td class="line">    <span class='keyword'>delete</span> (icu::Locale *) obj;</td></tr>
+<tr><td class="num" id="LN103">103</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN104">104</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN105">105</td><td class="line"><span class='keyword'>static</span> UBool U_CALLCONV locale_cleanup(<span class='keyword'>void</span>)</td></tr>
+<tr><td class="num" id="LN106">106</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN107">107</td><td class="line">    <span class='macro'>U_NAMESPACE_USE<span class='expansion'>using namespace icu_54;</span></span></td></tr>
+<tr><td class="num" id="LN108">108</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN109">109</td><td class="line">    <span class='keyword'>delete</span> [] gLocaleCache;</td></tr>
+<tr><td class="num" id="LN110">110</td><td class="line">    gLocaleCache = <span class='macro'>NULL<span class='expansion'>__null</span></span>;</td></tr>
+<tr><td class="num" id="LN111">111</td><td class="line">    gLocaleCacheInitOnce.reset();</td></tr>
+<tr><td class="num" id="LN112">112</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN113">113</td><td class="line">    <span class='keyword'>if</span> (gDefaultLocalesHashT) {</td></tr>
+<tr><td class="num" id="LN114">114</td><td class="line">        <span class='macro'>uhash_close<span class='expansion'>uhash_close_54</span></span>(gDefaultLocalesHashT);   <span class='comment'>// Automatically deletes all elements, using deleter func.</span></td></tr>
+<tr><td class="num" id="LN115">115</td><td class="line">        gDefaultLocalesHashT = <span class='macro'>NULL<span class='expansion'>__null</span></span>;</td></tr>
+<tr><td class="num" id="LN116">116</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN117">117</td><td class="line">    gDefaultLocale = <span class='macro'>NULL<span class='expansion'>__null</span></span>;</td></tr>
+<tr><td class="num" id="LN118">118</td><td class="line">    <span class='keyword'>return</span> <span class='macro'>TRUE<span class='expansion'>1</span></span>;</td></tr>
+<tr><td class="num" id="LN119">119</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN120">120</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN121">121</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN122">122</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>void</span> U_CALLCONV locale_init(UErrorCode &amp;status) {</td></tr>
+<tr><td class="num" id="LN123">123</td><td class="line">    <span class='macro'>U_NAMESPACE_USE<span class='expansion'>using namespace icu_54;</span></span></td></tr>
+<tr><td class="num" id="LN124">124</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN125">125</td><td class="line">    U_ASSERT(gLocaleCache == NULL);</td></tr>
+<tr><td class="num" id="LN126">126</td><td class="line">    gLocaleCache = <span class='keyword'>new</span> Locale[(<span class='keyword'>int</span>)eMAX_LOCALES];</td></tr>
+<tr><td class="num" id="LN127">127</td><td class="line">    <span class='keyword'>if</span> (gLocaleCache == <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num" id="LN128">128</td><td class="line">        status = U_MEMORY_ALLOCATION_ERROR;</td></tr>
+<tr><td class="num" id="LN129">129</td><td class="line">        <span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN130">130</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN131">131</td><td class="line">    <span class='macro'>ucln_common_registerCleanup<span class='expansion'>ucln_common_registerCleanup_54</span></span>(UCLN_COMMON_LOCALE, locale_cleanup);</td></tr>
+<tr><td class="num" id="LN132">132</td><td class="line">    gLocaleCache[eROOT]          = Locale(<span class='string_literal'>""</span>);</td></tr>
+<tr><td class="num" id="LN133">133</td><td class="line">    gLocaleCache[eENGLISH]       = Locale(<span class='string_literal'>"en"</span>);</td></tr>
+<tr><td class="num" id="LN134">134</td><td class="line">    gLocaleCache[eFRENCH]        = Locale(<span class='string_literal'>"fr"</span>);</td></tr>
+<tr><td class="num" id="LN135">135</td><td class="line">    gLocaleCache[eGERMAN]        = Locale(<span class='string_literal'>"de"</span>);</td></tr>
+<tr><td class="num" id="LN136">136</td><td class="line">    gLocaleCache[eITALIAN]       = Locale(<span class='string_literal'>"it"</span>);</td></tr>
+<tr><td class="num" id="LN137">137</td><td class="line">    gLocaleCache[eJAPANESE]      = Locale(<span class='string_literal'>"ja"</span>);</td></tr>
+<tr><td class="num" id="LN138">138</td><td class="line">    gLocaleCache[eKOREAN]        = Locale(<span class='string_literal'>"ko"</span>);</td></tr>
+<tr><td class="num" id="LN139">139</td><td class="line">    gLocaleCache[eCHINESE]       = Locale(<span class='string_literal'>"zh"</span>);</td></tr>
+<tr><td class="num" id="LN140">140</td><td class="line">    gLocaleCache[eFRANCE]        = Locale(<span class='string_literal'>"fr"</span>, <span class='string_literal'>"FR"</span>);</td></tr>
+<tr><td class="num" id="LN141">141</td><td class="line">    gLocaleCache[eGERMANY]       = Locale(<span class='string_literal'>"de"</span>, <span class='string_literal'>"DE"</span>);</td></tr>
+<tr><td class="num" id="LN142">142</td><td class="line">    gLocaleCache[eITALY]         = Locale(<span class='string_literal'>"it"</span>, <span class='string_literal'>"IT"</span>);</td></tr>
+<tr><td class="num" id="LN143">143</td><td class="line">    gLocaleCache[eJAPAN]         = Locale(<span class='string_literal'>"ja"</span>, <span class='string_literal'>"JP"</span>);</td></tr>
+<tr><td class="num" id="LN144">144</td><td class="line">    gLocaleCache[eKOREA]         = Locale(<span class='string_literal'>"ko"</span>, <span class='string_literal'>"KR"</span>);</td></tr>
+<tr><td class="num" id="LN145">145</td><td class="line">    gLocaleCache[eCHINA]         = Locale(<span class='string_literal'>"zh"</span>, <span class='string_literal'>"CN"</span>);</td></tr>
+<tr><td class="num" id="LN146">146</td><td class="line">    gLocaleCache[eTAIWAN]        = Locale(<span class='string_literal'>"zh"</span>, <span class='string_literal'>"TW"</span>);</td></tr>
+<tr><td class="num" id="LN147">147</td><td class="line">    gLocaleCache[eUK]            = Locale(<span class='string_literal'>"en"</span>, <span class='string_literal'>"GB"</span>);</td></tr>
+<tr><td class="num" id="LN148">148</td><td class="line">    gLocaleCache[eUS]            = Locale(<span class='string_literal'>"en"</span>, <span class='string_literal'>"US"</span>);</td></tr>
+<tr><td class="num" id="LN149">149</td><td class="line">    gLocaleCache[eCANADA]        = Locale(<span class='string_literal'>"en"</span>, <span class='string_literal'>"CA"</span>);</td></tr>
+<tr><td class="num" id="LN150">150</td><td class="line">    gLocaleCache[eCANADA_FRENCH] = Locale(<span class='string_literal'>"fr"</span>, <span class='string_literal'>"CA"</span>);</td></tr>
+<tr><td class="num" id="LN151">151</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN152">152</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN153">153</td><td class="line"><span class='macro'>U_CDECL_END<span class='expansion'>}</span></span></td></tr>
+<tr><td class="num" id="LN154">154</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN155">155</td><td class="line"><span class='macro'>U_NAMESPACE_BEGIN<span class='expansion'>extern "C++" { namespace icu_54 {</span></span></td></tr>
+<tr><td class="num" id="LN156">156</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN157">157</td><td class="line">Locale *locale_set_default_internal(<span class='keyword'>const</span> <span class='keyword'>char</span> *id, UErrorCode&amp; status) {</td></tr>
+<tr><td class="num" id="LN158">158</td><td class="line">    <span class='comment'>// Synchronize this entire function.</span></td></tr>
+<tr><td class="num" id="LN159">159</td><td class="line">    Mutex lock(&amp;gDefaultLocaleMutex);</td></tr>
+<tr><td class="num" id="LN160">160</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN161">161</td><td class="line">    UBool canonicalize = <span class='macro'>FALSE<span class='expansion'>0</span></span>;</td></tr>
+<tr><td class="num" id="LN162">162</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN163">163</td><td class="line">    <span class='comment'>// If given a NULL string for the locale id, grab the default</span></td></tr>
+<tr><td class="num" id="LN164">164</td><td class="line">    <span class='comment'>//   name from the system.</span></td></tr>
+<tr><td class="num" id="LN165">165</td><td class="line">    <span class='comment'>//   (Different from most other locale APIs, where a null name means use</span></td></tr>
+<tr><td class="num" id="LN166">166</td><td class="line">    <span class='comment'>//    the current ICU default locale.)</span></td></tr>
+<tr><td class="num" id="LN167">167</td><td class="line">    <span class='keyword'>if</span> (id == <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num" id="LN168">168</td><td class="line">        id = <span class='macro'>uprv_getDefaultLocaleID<span class='expansion'>uprv_getDefaultLocaleID_54</span></span>();   <span class='comment'>// This function not thread safe? TODO: verify.</span></td></tr>
+<tr><td class="num" id="LN169">169</td><td class="line">        canonicalize = <span class='macro'>TRUE<span class='expansion'>1</span></span>; <span class='comment'>// always canonicalize host ID</span></td></tr>
+<tr><td class="num" id="LN170">170</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN171">171</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN172">172</td><td class="line">    <span class='keyword'>char</span> localeNameBuf[512];</td></tr>
+<tr><td class="num" id="LN173">173</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN174">174</td><td class="line">    <span class='keyword'>if</span> (canonicalize) {</td></tr>
+<tr><td class="num" id="LN175">175</td><td class="line">        <span class='macro'>uloc_canonicalize<span class='expansion'>uloc_canonicalize_54</span></span>(id, localeNameBuf, <span class='keyword'>sizeof</span>(localeNameBuf)-1, &amp;status);</td></tr>
+<tr><td class="num" id="LN176">176</td><td class="line">    } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN177">177</td><td class="line">        <span class='macro'>uloc_getName<span class='expansion'>uloc_getName_54</span></span>(id, localeNameBuf, <span class='keyword'>sizeof</span>(localeNameBuf)-1, &amp;status);</td></tr>
+<tr><td class="num" id="LN178">178</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN179">179</td><td class="line">    localeNameBuf[<span class='keyword'>sizeof</span>(localeNameBuf)-1] = 0;  <span class='comment'>// Force null termination in event of</span></td></tr>
+<tr><td class="num" id="LN180">180</td><td class="line">                                                 <span class='comment'>//   a long name filling the buffer.</span></td></tr>
+<tr><td class="num" id="LN181">181</td><td class="line">                                                 <span class='comment'>//   (long names are truncated.)</span></td></tr>
+<tr><td class="num" id="LN182">182</td><td class="line">                                                 <span class='comment'>//</span></td></tr>
+<tr><td class="num" id="LN183">183</td><td class="line">    <span class='keyword'>if</span> (U_FAILURE(status)) {</td></tr>
+<tr><td class="num" id="LN184">184</td><td class="line">        <span class='keyword'>return</span> gDefaultLocale;</td></tr>
+<tr><td class="num" id="LN185">185</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN186">186</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN187">187</td><td class="line">    <span class='keyword'>if</span> (gDefaultLocalesHashT == <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num" id="LN188">188</td><td class="line">        gDefaultLocalesHashT = <span class='macro'>uhash_open<span class='expansion'>uhash_open_54</span></span>(<span class='macro'>uhash_hashChars<span class='expansion'>uhash_hashChars_54</span></span>, <span class='macro'>uhash_compareChars<span class='expansion'>uhash_compareChars_54</span></span>, <span class='macro'>NULL<span class='expansion'>__null</span></span>, &amp;status);</td></tr>
+<tr><td class="num" id="LN189">189</td><td class="line">        <span class='keyword'>if</span> (U_FAILURE(status)) {</td></tr>
+<tr><td class="num" id="LN190">190</td><td class="line">            <span class='keyword'>return</span> gDefaultLocale;</td></tr>
+<tr><td class="num" id="LN191">191</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN192">192</td><td class="line">        <span class='macro'>uhash_setValueDeleter<span class='expansion'>uhash_setValueDeleter_54</span></span>(gDefaultLocalesHashT, deleteLocale);</td></tr>
+<tr><td class="num" id="LN193">193</td><td class="line">        <span class='macro'>ucln_common_registerCleanup<span class='expansion'>ucln_common_registerCleanup_54</span></span>(UCLN_COMMON_LOCALE, locale_cleanup);</td></tr>
+<tr><td class="num" id="LN194">194</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN195">195</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN196">196</td><td class="line">    Locale *newDefault = (Locale *)<span class='macro'>uhash_get<span class='expansion'>uhash_get_54</span></span>(gDefaultLocalesHashT, localeNameBuf);</td></tr>
+<tr><td class="num" id="LN197">197</td><td class="line">    <span class='keyword'>if</span> (newDefault == <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num" id="LN198">198</td><td class="line">        newDefault = <span class='keyword'>new</span> Locale(Locale::eBOGUS);</td></tr>
+<tr><td class="num" id="LN199">199</td><td class="line">        <span class='keyword'>if</span> (newDefault == <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num" id="LN200">200</td><td class="line">            status = U_MEMORY_ALLOCATION_ERROR;</td></tr>
+<tr><td class="num" id="LN201">201</td><td class="line">            <span class='keyword'>return</span> gDefaultLocale;</td></tr>
+<tr><td class="num" id="LN202">202</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN203">203</td><td class="line">        newDefault-&gt;init(localeNameBuf, <span class='macro'>FALSE<span class='expansion'>0</span></span>);</td></tr>
+<tr><td class="num" id="LN204">204</td><td class="line">        <span class='macro'>uhash_put<span class='expansion'>uhash_put_54</span></span>(gDefaultLocalesHashT, (<span class='keyword'>char</span>*) newDefault-&gt;getName(), newDefault, &amp;status);</td></tr>
+<tr><td class="num" id="LN205">205</td><td class="line">        <span class='keyword'>if</span> (U_FAILURE(status)) {</td></tr>
+<tr><td class="num" id="LN206">206</td><td class="line">            <span class='keyword'>return</span> gDefaultLocale;</td></tr>
+<tr><td class="num" id="LN207">207</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN208">208</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN209">209</td><td class="line">    gDefaultLocale = newDefault;</td></tr>
+<tr><td class="num" id="LN210">210</td><td class="line">    <span class='keyword'>return</span> gDefaultLocale;</td></tr>
+<tr><td class="num" id="LN211">211</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN212">212</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN213">213</td><td class="line"><span class='macro'>U_NAMESPACE_END<span class='expansion'>} }</span></span></td></tr>
+<tr><td class="num" id="LN214">214</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN215">215</td><td class="line"><span class='comment'>/* sfb 07/21/99 */</span></td></tr>
+<tr><td class="num" id="LN216">216</td><td class="line"><span class='macro'>U_CFUNC<span class='expansion'>extern "C"</span></span> <span class='keyword'>void</span></td></tr>
+<tr><td class="num" id="LN217">217</td><td class="line"><span class='macro'>locale_set_default<span class='expansion'>locale_set_default_54</span></span>(<span class='keyword'>const</span> <span class='keyword'>char</span> *id)</td></tr>
+<tr><td class="num" id="LN218">218</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN219">219</td><td class="line">    <span class='macro'>U_NAMESPACE_USE<span class='expansion'>using namespace icu_54;</span></span></td></tr>
+<tr><td class="num" id="LN220">220</td><td class="line">    UErrorCode status = U_ZERO_ERROR;</td></tr>
+<tr><td class="num" id="LN221">221</td><td class="line">    locale_set_default_internal(id, status);</td></tr>
+<tr><td class="num" id="LN222">222</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN223">223</td><td class="line"><span class='comment'>/* end */</span></td></tr>
+<tr><td class="num" id="LN224">224</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN225">225</td><td class="line"><span class='macro'>U_CFUNC<span class='expansion'>extern "C"</span></span> <span class='keyword'>const</span> <span class='keyword'>char</span> *</td></tr>
+<tr><td class="num" id="LN226">226</td><td class="line"><span class='macro'>locale_get_default<span class='expansion'>locale_get_default_54</span></span>(<span class='keyword'>void</span>)</td></tr>
+<tr><td class="num" id="LN227">227</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN228">228</td><td class="line">    <span class='macro'>U_NAMESPACE_USE<span class='expansion'>using namespace icu_54;</span></span></td></tr>
+<tr><td class="num" id="LN229">229</td><td class="line">    <span class='keyword'>return</span> Locale::getDefault().getName();</td></tr>
+<tr><td class="num" id="LN230">230</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN231">231</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN232">232</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN233">233</td><td class="line"><span class='macro'>U_NAMESPACE_BEGIN<span class='expansion'>extern "C++" { namespace icu_54 {</span></span></td></tr>
+<tr><td class="num" id="LN234">234</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN235">235</td><td class="line"><span class='macro'>UOBJECT_DEFINE_RTTI_IMPLEMENTATION(Locale)<span class='expansion'>UClassID Locale::getStaticClassID() { static char classID = 0<br>; return (UClassID)&amp;classID; } UClassID Locale::getDynamicClassID<br>() const { return Locale::getStaticClassID(); }</span></span></td></tr>
+<tr><td class="num" id="LN236">236</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN237">237</td><td class="line"><span class='comment'>/*Character separating the posix id fields*/</span></td></tr>
+<tr><td class="num" id="LN238">238</td><td class="line"><span class='comment'>// '_'</span></td></tr>
+<tr><td class="num" id="LN239">239</td><td class="line"><span class='comment'>// In the platform codepage.</span></td></tr>
+<tr><td class="num" id="LN240">240</td><td class="line"><span class='directive'>#define <span class='macro'>SEP_CHAR<span class='expansion'>'_'</span></span> '_'</span></td></tr>
+<tr><td class="num" id="LN241">241</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN242">242</td><td class="line">Locale::~Locale()</td></tr>
+<tr><td class="num" id="LN243">243</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN244">244</td><td class="line">    <span class='keyword'>if</span> (baseName != fullName) {</td></tr>
+<tr><td class="num" id="LN245">245</td><td class="line">        <span class='macro'>uprv_free<span class='expansion'>uprv_free_54</span></span>(baseName);</td></tr>
+<tr><td class="num" id="LN246">246</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN247">247</td><td class="line">    baseName = <span class='macro'>NULL<span class='expansion'>__null</span></span>;</td></tr>
+<tr><td class="num" id="LN248">248</td><td class="line">    <span class='comment'>/*if fullName is on the heap, we free it*/</span></td></tr>
+<tr><td class="num" id="LN249">249</td><td class="line">    <span class='keyword'>if</span> (fullName != fullNameBuffer)</td></tr>
+<tr><td class="num" id="LN250">250</td><td class="line">    {</td></tr>
+<tr><td class="num" id="LN251">251</td><td class="line">        <span class='macro'>uprv_free<span class='expansion'>uprv_free_54</span></span>(fullName);</td></tr>
+<tr><td class="num" id="LN252">252</td><td class="line">        fullName = <span class='macro'>NULL<span class='expansion'>__null</span></span>;</td></tr>
+<tr><td class="num" id="LN253">253</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN254">254</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN255">255</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN256">256</td><td class="line">Locale::Locale()</td></tr>
+<tr><td class="num" id="LN257">257</td><td class="line">    : UObject(), fullName(fullNameBuffer), baseName(<span class='macro'>NULL<span class='expansion'>__null</span></span>)</td></tr>
+<tr><td class="num" id="LN258">258</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN259">259</td><td class="line">    init(<span class='macro'>NULL<span class='expansion'>__null</span></span>, <span class='macro'>FALSE<span class='expansion'>0</span></span>);</td></tr>
+<tr><td class="num" id="LN260">260</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN261">261</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN262">262</td><td class="line"><span class='comment'>/*</span></td></tr>
+<tr><td class="num" id="LN263">263</td><td class="line"> <span class='comment'>* Internal constructor to allow construction of a locale object with</span></td></tr>
+<tr><td class="num" id="LN264">264</td><td class="line"> <span class='comment'>*   NO side effects.   (Default constructor tries to get</span></td></tr>
+<tr><td class="num" id="LN265">265</td><td class="line"> <span class='comment'>*   the default locale.)</span></td></tr>
+<tr><td class="num" id="LN266">266</td><td class="line"> <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN267">267</td><td class="line">Locale::Locale(Locale::ELocaleType)</td></tr>
+<tr><td class="num" id="LN268">268</td><td class="line">    : UObject(), fullName(fullNameBuffer), baseName(<span class='macro'>NULL<span class='expansion'>__null</span></span>)</td></tr>
+<tr><td class="num" id="LN269">269</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN270">270</td><td class="line">    setToBogus();</td></tr>
+<tr><td class="num" id="LN271">271</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN272">272</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN273">273</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN274">274</td><td class="line">Locale::Locale( <span class='keyword'>const</span>   <span class='keyword'>char</span> * newLanguage,</td></tr>
+<tr><td class="num" id="LN275">275</td><td class="line">                <span class='keyword'>const</span>   <span class='keyword'>char</span> * newCountry,</td></tr>
+<tr><td class="num" id="LN276">276</td><td class="line">                <span class='keyword'>const</span>   <span class='keyword'>char</span> * newVariant,</td></tr>
+<tr><td class="num" id="LN277">277</td><td class="line">                <span class='keyword'>const</span>   <span class='keyword'>char</span> * newKeywords)</td></tr>
+<tr><td class="num" id="LN278">278</td><td class="line">    : UObject(), fullName(fullNameBuffer), baseName(<span class='macro'>NULL<span class='expansion'>__null</span></span>)</td></tr>
+<tr><td class="num" id="LN279">279</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN280">280</td><td class="line">    <span class='keyword'>if</span>( (newLanguage==<span class='macro'>NULL<span class='expansion'>__null</span></span>) &amp;&amp; (newCountry == <span class='macro'>NULL<span class='expansion'>__null</span></span>) &amp;&amp; (newVariant == <span class='macro'>NULL<span class='expansion'>__null</span></span>) )</td></tr>
+<tr><td class="num" id="LN281">281</td><td class="line">    {</td></tr>
+<tr><td class="num" id="LN282">282</td><td class="line">        init(<span class='macro'>NULL<span class='expansion'>__null</span></span>, <span class='macro'>FALSE<span class='expansion'>0</span></span>); <span class='comment'>/* shortcut */</span></td></tr>
+<tr><td class="num" id="LN283">283</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN284">284</td><td class="line">    <span class='keyword'>else</span></td></tr>
+<tr><td class="num" id="LN285">285</td><td class="line">    {</td></tr>
+<tr><td class="num" id="LN286">286</td><td class="line">        MaybeStackArray&lt;<span class='keyword'>char</span>, <span class='macro'>ULOC_FULLNAME_CAPACITY<span class='expansion'>157</span></span>&gt; togo;</td></tr>
+<tr><td class="num" id="LN287">287</td><td class="line">        int32_t size = 0;</td></tr>
+<tr><td class="num" id="LN288">288</td><td class="line">        int32_t lsize = 0;</td></tr>
+<tr><td class="num" id="LN289">289</td><td class="line">        int32_t csize = 0;</td></tr>
+<tr><td class="num" id="LN290">290</td><td class="line">        int32_t vsize = 0;</td></tr>
+<tr><td class="num" id="LN291">291</td><td class="line">        int32_t ksize = 0;</td></tr>
+<tr><td class="num" id="LN292">292</td><td class="line">        <span class='keyword'>char</span>    *p;</td></tr>
+<tr><td class="num" id="LN293">293</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN294">294</td><td class="line">        <span class='comment'>// Calculate the size of the resulting string.</span></td></tr>
+<tr><td class="num" id="LN295">295</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN296">296</td><td class="line">        <span class='comment'>// Language</span></td></tr>
+<tr><td class="num" id="LN297">297</td><td class="line">        <span class='keyword'>if</span> ( newLanguage != <span class='macro'>NULL<span class='expansion'>__null</span></span> )</td></tr>
+<tr><td class="num" id="LN298">298</td><td class="line">        {</td></tr>
+<tr><td class="num" id="LN299">299</td><td class="line">            lsize = (int32_t)<span class='macro'>uprv_strlen(newLanguage)<span class='expansion'>:: strlen(newLanguage)</span></span>;</td></tr>
+<tr><td class="num" id="LN300">300</td><td class="line">            size = lsize;</td></tr>
+<tr><td class="num" id="LN301">301</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN302">302</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN303">303</td><td class="line">        <span class='comment'>// _Country</span></td></tr>
+<tr><td class="num" id="LN304">304</td><td class="line">        <span class='keyword'>if</span> ( newCountry != <span class='macro'>NULL<span class='expansion'>__null</span></span> )</td></tr>
+<tr><td class="num" id="LN305">305</td><td class="line">        {</td></tr>
+<tr><td class="num" id="LN306">306</td><td class="line">            csize = (int32_t)<span class='macro'>uprv_strlen(newCountry)<span class='expansion'>:: strlen(newCountry)</span></span>;</td></tr>
+<tr><td class="num" id="LN307">307</td><td class="line">            size += csize;</td></tr>
+<tr><td class="num" id="LN308">308</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN309">309</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN310">310</td><td class="line">        <span class='comment'>// _Variant</span></td></tr>
+<tr><td class="num" id="LN311">311</td><td class="line">        <span class='keyword'>if</span> ( newVariant != <span class='macro'>NULL<span class='expansion'>__null</span></span> )</td></tr>
+<tr><td class="num" id="LN312">312</td><td class="line">        {</td></tr>
+<tr><td class="num" id="LN313">313</td><td class="line">            <span class='comment'>// remove leading _'s</span></td></tr>
+<tr><td class="num" id="LN314">314</td><td class="line">            <span class='keyword'>while</span>(newVariant[0] == <span class='macro'>SEP_CHAR<span class='expansion'>'_'</span></span>)</td></tr>
+<tr><td class="num" id="LN315">315</td><td class="line">            {</td></tr>
+<tr><td class="num" id="LN316">316</td><td class="line">                newVariant++;</td></tr>
+<tr><td class="num" id="LN317">317</td><td class="line">            }</td></tr>
+<tr><td class="num" id="LN318">318</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN319">319</td><td class="line">            <span class='comment'>// remove trailing _'s</span></td></tr>
+<tr><td class="num" id="LN320">320</td><td class="line">            vsize = (int32_t)<span class='macro'>uprv_strlen(newVariant)<span class='expansion'>:: strlen(newVariant)</span></span>;</td></tr>
+<tr><td class="num" id="LN321">321</td><td class="line">            <span class='keyword'>while</span>( (vsize&gt;1) &amp;&amp; (newVariant[vsize-1] == <span class='macro'>SEP_CHAR<span class='expansion'>'_'</span></span>) )</td></tr>
+<tr><td class="num" id="LN322">322</td><td class="line">            {</td></tr>
+<tr><td class="num" id="LN323">323</td><td class="line">                vsize--;</td></tr>
+<tr><td class="num" id="LN324">324</td><td class="line">            }</td></tr>
+<tr><td class="num" id="LN325">325</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN326">326</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN327">327</td><td class="line">        <span class='keyword'>if</span>( vsize &gt; 0 )</td></tr>
+<tr><td class="num" id="LN328">328</td><td class="line">        {</td></tr>
+<tr><td class="num" id="LN329">329</td><td class="line">            size += vsize;</td></tr>
+<tr><td class="num" id="LN330">330</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN331">331</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN332">332</td><td class="line">        <span class='comment'>// Separator rules:</span></td></tr>
+<tr><td class="num" id="LN333">333</td><td class="line">        <span class='keyword'>if</span> ( vsize &gt; 0 )</td></tr>
+<tr><td class="num" id="LN334">334</td><td class="line">        {</td></tr>
+<tr><td class="num" id="LN335">335</td><td class="line">            size += 2;  <span class='comment'>// at least: __v</span></td></tr>
+<tr><td class="num" id="LN336">336</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN337">337</td><td class="line">        <span class='keyword'>else</span> <span class='keyword'>if</span> ( csize &gt; 0 )</td></tr>
+<tr><td class="num" id="LN338">338</td><td class="line">        {</td></tr>
+<tr><td class="num" id="LN339">339</td><td class="line">            size += 1;  <span class='comment'>// at least: _v</span></td></tr>
+<tr><td class="num" id="LN340">340</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN341">341</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN342">342</td><td class="line">        <span class='keyword'>if</span> ( newKeywords != <span class='macro'>NULL<span class='expansion'>__null</span></span>)</td></tr>
+<tr><td class="num" id="LN343">343</td><td class="line">        {</td></tr>
+<tr><td class="num" id="LN344">344</td><td class="line">            ksize = (int32_t)<span class='macro'>uprv_strlen(newKeywords)<span class='expansion'>:: strlen(newKeywords)</span></span>;</td></tr>
+<tr><td class="num" id="LN345">345</td><td class="line">            size += ksize + 1;</td></tr>
+<tr><td class="num" id="LN346">346</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN347">347</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN348">348</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN349">349</td><td class="line">        <span class='comment'>//  NOW we have the full locale string..</span></td></tr>
+<tr><td class="num" id="LN350">350</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN351">351</td><td class="line">        <span class='comment'>/*if the whole string is longer than our internal limit, we need</span></td></tr>
+<tr><td class="num" id="LN352">352</td><td class="line">        <span class='comment'>to go to the heap for temporary buffers*/</span></td></tr>
+<tr><td class="num" id="LN353">353</td><td class="line">        <span class='keyword'>if</span> (size &gt;= togo.getCapacity())</td></tr>
+<tr><td class="num" id="LN354">354</td><td class="line">        {</td></tr>
+<tr><td class="num" id="LN355">355</td><td class="line">            <span class='comment'>// If togo_heap could not be created, initialize with default settings.</span></td></tr>
+<tr><td class="num" id="LN356">356</td><td class="line">            <span class='keyword'>if</span> (togo.resize(size+1) == <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num" id="LN357">357</td><td class="line">                init(<span class='macro'>NULL<span class='expansion'>__null</span></span>, <span class='macro'>FALSE<span class='expansion'>0</span></span>);</td></tr>
+<tr><td class="num" id="LN358">358</td><td class="line">            }</td></tr>
+<tr><td class="num" id="LN359">359</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN360">360</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN361">361</td><td class="line">        togo[0] = 0;</td></tr>
+<tr><td class="num" id="LN362">362</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN363">363</td><td class="line">        <span class='comment'>// Now, copy it back.</span></td></tr>
+<tr><td class="num" id="LN364">364</td><td class="line">        p = togo.getAlias();</td></tr>
+<tr><td class="num" id="LN365">365</td><td class="line">        <span class='keyword'>if</span> ( lsize != 0 )</td></tr>
+<tr><td class="num" id="LN366">366</td><td class="line">        {</td></tr>
+<tr><td class="num" id="LN367">367</td><td class="line">            <span class='macro'>uprv_strcpy(p, newLanguage)<span class='expansion'>:: strcpy(p, newLanguage)</span></span>;</td></tr>
+<tr><td class="num" id="LN368">368</td><td class="line">            p += lsize;</td></tr>
+<tr><td class="num" id="LN369">369</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN370">370</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN371">371</td><td class="line">        <span class='keyword'>if</span> ( ( vsize != 0 ) || (csize != 0) )  <span class='comment'>// at least:  __v</span></td></tr>
+<tr><td class="num" id="LN372">372</td><td class="line">        {                                      <span class='comment'>//            ^</span></td></tr>
+<tr><td class="num" id="LN373">373</td><td class="line">            *p++ = <span class='macro'>SEP_CHAR<span class='expansion'>'_'</span></span>;</td></tr>
+<tr><td class="num" id="LN374">374</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN375">375</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN376">376</td><td class="line">        <span class='keyword'>if</span> ( csize != 0 )</td></tr>
+<tr><td class="num" id="LN377">377</td><td class="line">        {</td></tr>
+<tr><td class="num" id="LN378">378</td><td class="line">            <span class='macro'>uprv_strcpy(p, newCountry)<span class='expansion'>:: strcpy(p, newCountry)</span></span>;</td></tr>
+<tr><td class="num" id="LN379">379</td><td class="line">            p += csize;</td></tr>
+<tr><td class="num" id="LN380">380</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN381">381</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN382">382</td><td class="line">        <span class='keyword'>if</span> ( vsize != 0)</td></tr>
+<tr><td class="num" id="LN383">383</td><td class="line">        {</td></tr>
+<tr><td class="num" id="LN384">384</td><td class="line">            *p++ = <span class='macro'>SEP_CHAR<span class='expansion'>'_'</span></span>; <span class='comment'>// at least: __v</span></td></tr>
+<tr><td class="num" id="LN385">385</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN386">386</td><td class="line">            <span class='macro'>uprv_strncpy(p, newVariant, vsize)<span class='expansion'>:: strncpy(p, newVariant, vsize)</span></span>;  <span class='comment'>// Must use strncpy because</span></td></tr>
+<tr><td class="num" id="LN387">387</td><td class="line">            p += vsize;                          <span class='comment'>// of trimming (above).</span></td></tr>
+<tr><td class="num" id="LN388">388</td><td class="line">            *p = 0; <span class='comment'>// terminate</span></td></tr>
+<tr><td class="num" id="LN389">389</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN390">390</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN391">391</td><td class="line">        <span class='keyword'>if</span> ( ksize != 0)</td></tr>
+<tr><td class="num" id="LN392">392</td><td class="line">        {</td></tr>
+<tr><td class="num" id="LN393">393</td><td class="line">            <span class='keyword'>if</span> (<span class='macro'>uprv_strchr(newKeywords, '=')<span class='expansion'>:: strchr(newKeywords, '=')</span></span>) {</td></tr>
+<tr><td class="num" id="LN394">394</td><td class="line">                *p++ = '@'; <span class='comment'>/* keyword parsing */</span></td></tr>
+<tr><td class="num" id="LN395">395</td><td class="line">            }</td></tr>
+<tr><td class="num" id="LN396">396</td><td class="line">            <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN397">397</td><td class="line">                *p++ = '_'; <span class='comment'>/* Variant parsing with a script */</span></td></tr>
+<tr><td class="num" id="LN398">398</td><td class="line">                <span class='keyword'>if</span> ( vsize == 0) {</td></tr>
+<tr><td class="num" id="LN399">399</td><td class="line">                    *p++ = '_'; <span class='comment'>/* No country found */</span></td></tr>
+<tr><td class="num" id="LN400">400</td><td class="line">                }</td></tr>
+<tr><td class="num" id="LN401">401</td><td class="line">            }</td></tr>
+<tr><td class="num" id="LN402">402</td><td class="line">            <span class='macro'>uprv_strcpy(p, newKeywords)<span class='expansion'>:: strcpy(p, newKeywords)</span></span>;</td></tr>
+<tr><td class="num" id="LN403">403</td><td class="line">            p += ksize;</td></tr>
+<tr><td class="num" id="LN404">404</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN405">405</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN406">406</td><td class="line">        <span class='comment'>// Parse it, because for example 'language' might really be a complete</span></td></tr>
+<tr><td class="num" id="LN407">407</td><td class="line">        <span class='comment'>// string.</span></td></tr>
+<tr><td class="num" id="LN408">408</td><td class="line">        init(togo.getAlias(), <span class='macro'>FALSE<span class='expansion'>0</span></span>);</td></tr>
+<tr><td class="num" id="LN409">409</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN410">410</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN411">411</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN412">412</td><td class="line">Locale::Locale(<span class='keyword'>const</span> Locale &amp;other)</td></tr>
+<tr><td class="num" id="LN413">413</td><td class="line">    : UObject(other), fullName(fullNameBuffer), baseName(<span class='macro'>NULL<span class='expansion'>__null</span></span>)</td></tr>
+<tr><td class="num" id="LN414">414</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN415">415</td><td class="line">    *<span class='keyword'>this</span> = other;</td></tr>
+<tr><td class="num" id="LN416">416</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN417">417</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN418">418</td><td class="line">Locale &amp;Locale::<span class='keyword'>operator</span>=(<span class='keyword'>const</span> Locale &amp;other)</td></tr>
+<tr><td class="num" id="LN419">419</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN420">420</td><td class="line">    <span class='keyword'>if</span> (<span class='keyword'>this</span> == &amp;other) {</td></tr>
+<tr><td class="num" id="LN421">421</td><td class="line">        <span class='keyword'>return</span> *<span class='keyword'>this</span>;</td></tr>
+<tr><td class="num" id="LN422">422</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN423">423</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN424">424</td><td class="line">    <span class='comment'>/* Free our current storage */</span></td></tr>
+<tr><td class="num" id="LN425">425</td><td class="line">    <span class='keyword'>if</span> (baseName != fullName) {</td></tr>
+<tr><td class="num" id="LN426">426</td><td class="line">        <span class='macro'>uprv_free<span class='expansion'>uprv_free_54</span></span>(baseName);</td></tr>
+<tr><td class="num" id="LN427">427</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN428">428</td><td class="line">    baseName = <span class='macro'>NULL<span class='expansion'>__null</span></span>;</td></tr>
+<tr><td class="num" id="LN429">429</td><td class="line">    <span class='keyword'>if</span>(fullName != fullNameBuffer) {</td></tr>
+<tr><td class="num" id="LN430">430</td><td class="line">        <span class='macro'>uprv_free<span class='expansion'>uprv_free_54</span></span>(fullName);</td></tr>
+<tr><td class="num" id="LN431">431</td><td class="line">        fullName = fullNameBuffer;</td></tr>
+<tr><td class="num" id="LN432">432</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN433">433</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN434">434</td><td class="line">    <span class='comment'>/* Allocate the full name if necessary */</span></td></tr>
+<tr><td class="num" id="LN435">435</td><td class="line">    <span class='keyword'>if</span>(other.fullName != other.fullNameBuffer) {</td></tr>
+<tr><td class="num" id="LN436">436</td><td class="line">        fullName = (<span class='keyword'>char</span> *)<span class='macro'>uprv_malloc<span class='expansion'>uprv_malloc_54</span></span>(<span class='keyword'>sizeof</span>(<span class='keyword'>char</span>)*(<span class='macro'>uprv_strlen(other.fullName)<span class='expansion'>:: strlen(other.fullName)</span></span>+1));</td></tr>
+<tr><td class="num" id="LN437">437</td><td class="line">        <span class='keyword'>if</span> (fullName == <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num" id="LN438">438</td><td class="line">            <span class='keyword'>return</span> *<span class='keyword'>this</span>;</td></tr>
+<tr><td class="num" id="LN439">439</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN440">440</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN441">441</td><td class="line">    <span class='comment'>/* Copy the full name */</span></td></tr>
+<tr><td class="num" id="LN442">442</td><td class="line">    <span class='macro'>uprv_strcpy(fullName, other.fullName)<span class='expansion'>:: strcpy(fullName, other.fullName)</span></span>;</td></tr>
+<tr><td class="num" id="LN443">443</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN444">444</td><td class="line">    <span class='comment'>/* Copy the baseName if it differs from fullName. */</span></td></tr>
+<tr><td class="num" id="LN445">445</td><td class="line">    <span class='keyword'>if</span> (other.baseName == other.fullName) {</td></tr>
+<tr><td class="num" id="LN446">446</td><td class="line">        baseName = fullName;</td></tr>
+<tr><td class="num" id="LN447">447</td><td class="line">    } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN448">448</td><td class="line">        <span class='keyword'>if</span> (other.baseName) {</td></tr>
+<tr><td class="num" id="LN449">449</td><td class="line">            baseName = <span class='macro'>uprv_strdup<span class='expansion'>uprv_strdup_54</span></span>(other.baseName);</td></tr>
+<tr><td class="num" id="LN450">450</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN451">451</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN452">452</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN453">453</td><td class="line">    <span class='comment'>/* Copy the language and country fields */</span></td></tr>
+<tr><td class="num" id="LN454">454</td><td class="line">    <span class='macro'>uprv_strcpy(language, other.language)<span class='expansion'>:: strcpy(language, other.language)</span></span>;</td></tr>
+<tr><td class="num" id="LN455">455</td><td class="line">    <span class='macro'>uprv_strcpy(script, other.script)<span class='expansion'>:: strcpy(script, other.script)</span></span>;</td></tr>
+<tr><td class="num" id="LN456">456</td><td class="line">    <span class='macro'>uprv_strcpy(country, other.country)<span class='expansion'>:: strcpy(country, other.country)</span></span>;</td></tr>
+<tr><td class="num" id="LN457">457</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN458">458</td><td class="line">    <span class='comment'>/* The variantBegin is an offset, just copy it */</span></td></tr>
+<tr><td class="num" id="LN459">459</td><td class="line">    variantBegin = other.variantBegin;</td></tr>
+<tr><td class="num" id="LN460">460</td><td class="line">    fIsBogus = other.fIsBogus;</td></tr>
+<tr><td class="num" id="LN461">461</td><td class="line">    <span class='keyword'>return</span> *<span class='keyword'>this</span>;</td></tr>
+<tr><td class="num" id="LN462">462</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN463">463</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN464">464</td><td class="line">Locale *</td></tr>
+<tr><td class="num" id="LN465">465</td><td class="line">Locale::clone() <span class='keyword'>const</span> {</td></tr>
+<tr><td class="num" id="LN466">466</td><td class="line">    <span class='keyword'>return</span> <span class='keyword'>new</span> Locale(*<span class='keyword'>this</span>);</td></tr>
+<tr><td class="num" id="LN467">467</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN468">468</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN469">469</td><td class="line">UBool</td></tr>
+<tr><td class="num" id="LN470">470</td><td class="line">Locale::<span class='keyword'>operator</span>==( <span class='keyword'>const</span>   Locale&amp; other) <span class='keyword'>const</span></td></tr>
+<tr><td class="num" id="LN471">471</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN472">472</td><td class="line">    <span class='keyword'>return</span> (<span class='macro'>uprv_strcmp(other.fullName, fullName)<span class='expansion'>:: strcmp(other.fullName, fullName)</span></span> == 0);</td></tr>
+<tr><td class="num" id="LN473">473</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN474">474</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN475">475</td><td class="line"><span class='directive'>#define <span class='macro'>ISASCIIALPHA(c)<span class='expansion'>(((c) &gt;= 'a' &amp;&amp; (c) &lt;= 'z') || ((c) &gt;= 'A' &amp;&amp;<br> (c) &lt;= 'Z'))</span></span> (((c) &gt;= 'a' &amp;&amp; (c) &lt;= 'z') || ((c) &gt;= 'A' &amp;&amp; (c) &lt;= 'Z'))</span></td></tr>
+<tr><td class="num" id="LN476">476</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN477">477</td><td class="line"><span class='comment'>/*This function initializes a Locale from a C locale ID*/</span></td></tr>
+<tr><td class="num" id="LN478">478</td><td class="line">Locale&amp; Locale::init(<span class='keyword'>const</span> <span class='keyword'>char</span>* localeID, UBool canonicalize)</td></tr>
+<tr><td class="num" id="LN479">479</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN480">480</td><td class="line">    fIsBogus = <span class='macro'>FALSE<span class='expansion'>0</span></span>;</td></tr>
+<tr><td class="num" id="LN481">481</td><td class="line">    <span class='comment'>/* Free our current storage */</span></td></tr>
+<tr><td class="num" id="LN482">482</td><td class="line">    <span class='keyword'>if</span> (baseName != fullName) {</td></tr>
+<tr><td class="num" id="LN483">483</td><td class="line">        <span class='macro'>uprv_free<span class='expansion'>uprv_free_54</span></span>(baseName);</td></tr>
+<tr><td class="num" id="LN484">484</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN485">485</td><td class="line">    baseName = <span class='macro'>NULL<span class='expansion'>__null</span></span>;</td></tr>
+<tr><td class="num" id="LN486">486</td><td class="line">    <span class='keyword'>if</span>(fullName != fullNameBuffer) {</td></tr>
+<tr><td class="num" id="LN487">487</td><td class="line">        <span class='macro'>uprv_free<span class='expansion'>uprv_free_54</span></span>(fullName);</td></tr>
+<tr><td class="num" id="LN488">488</td><td class="line">        fullName = fullNameBuffer;</td></tr>
+<tr><td class="num" id="LN489">489</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN490">490</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN491">491</td><td class="line">    <span class='comment'>// not a loop:</span></td></tr>
+<tr><td class="num" id="LN492">492</td><td class="line">    <span class='comment'>// just an easy way to have a common error-exit</span></td></tr>
+<tr><td class="num" id="LN493">493</td><td class="line">    <span class='comment'>// without goto and without another function</span></td></tr>
+<tr><td class="num" id="LN494">494</td><td class="line">    <span class='keyword'>do</span> {</td></tr>
+<tr><td class="num" id="LN495">495</td><td class="line">        <span class='keyword'>char</span> *separator;</td></tr>
+<tr><td class="num" id="LN496">496</td><td class="line">        <span class='keyword'>char</span> *field[5] = {0};</td></tr>
+<tr><td class="num" id="LN497">497</td><td class="line">        int32_t fieldLen[5] = {0};</td></tr>
+<tr><td class="num" id="LN498">498</td><td class="line">        int32_t fieldIdx;</td></tr>
+<tr><td class="num" id="LN499">499</td><td class="line">        int32_t variantField;</td></tr>
+<tr><td class="num" id="LN500">500</td><td class="line">        int32_t length;</td></tr>
+<tr><td class="num" id="LN501">501</td><td class="line">        UErrorCode err;</td></tr>
+<tr><td class="num" id="LN502">502</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN503">503</td><td class="line">        <span class='keyword'>if</span>(localeID == <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num" id="LN504">504</td><td class="line">            <span class='comment'>// not an error, just set the default locale</span></td></tr>
+<tr><td class="num" id="LN505">505</td><td class="line">            <span class='keyword'>return</span> *<span class='keyword'>this</span> = getDefault();</td></tr>
+<tr><td class="num" id="LN506">506</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN507">507</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN508">508</td><td class="line">        <span class='comment'>/* preset all fields to empty */</span></td></tr>
+<tr><td class="num" id="LN509">509</td><td class="line">        language[0] = script[0] = country[0] = 0;</td></tr>
+<tr><td class="num" id="LN510">510</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN511">511</td><td class="line">        <span class='comment'>// "canonicalize" the locale ID to ICU/Java format</span></td></tr>
+<tr><td class="num" id="LN512">512</td><td class="line">        err = U_ZERO_ERROR;</td></tr>
+<tr><td class="num" id="LN513">513</td><td class="line">        length = canonicalize ?</td></tr>
+<tr><td class="num" id="LN514">514</td><td class="line">            <span class='macro'>uloc_canonicalize<span class='expansion'>uloc_canonicalize_54</span></span>(localeID, fullName, <span class='keyword'>sizeof</span>(fullNameBuffer), &amp;err) :</td></tr>
+<tr><td class="num" id="LN515">515</td><td class="line">            <span class='macro'>uloc_getName<span class='expansion'>uloc_getName_54</span></span>(localeID, fullName, <span class='keyword'>sizeof</span>(fullNameBuffer), &amp;err);</td></tr>
+<tr><td class="num" id="LN516">516</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN517">517</td><td class="line">        <span class='keyword'>if</span>(err == U_BUFFER_OVERFLOW_ERROR || length &gt;= (int32_t)<span class='keyword'>sizeof</span>(fullNameBuffer)) {</td></tr>
+<tr><td class="num" id="LN518">518</td><td class="line">            <span class='comment'>/*Go to heap for the fullName if necessary*/</span></td></tr>
+<tr><td class="num" id="LN519">519</td><td class="line">            fullName = (<span class='keyword'>char</span> *)<span class='macro'>uprv_malloc<span class='expansion'>uprv_malloc_54</span></span>(<span class='keyword'>sizeof</span>(<span class='keyword'>char</span>)*(length + 1));</td></tr>
+<tr><td class="num" id="LN520">520</td><td class="line">            <span class='keyword'>if</span>(fullName == 0) {</td></tr>
+<tr><td class="num" id="LN521">521</td><td class="line">                fullName = fullNameBuffer;</td></tr>
+<tr><td class="num" id="LN522">522</td><td class="line">                <span class='keyword'>break</span>; <span class='comment'>// error: out of memory</span></td></tr>
+<tr><td class="num" id="LN523">523</td><td class="line">            }</td></tr>
+<tr><td class="num" id="LN524">524</td><td class="line">            err = U_ZERO_ERROR;</td></tr>
+<tr><td class="num" id="LN525">525</td><td class="line">            length = canonicalize ?</td></tr>
+<tr><td class="num" id="LN526">526</td><td class="line">                <span class='macro'>uloc_canonicalize<span class='expansion'>uloc_canonicalize_54</span></span>(localeID, fullName, length+1, &amp;err) :</td></tr>
+<tr><td class="num" id="LN527">527</td><td class="line">                <span class='macro'>uloc_getName<span class='expansion'>uloc_getName_54</span></span>(localeID, fullName, length+1, &amp;err);</td></tr>
+<tr><td class="num" id="LN528">528</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN529">529</td><td class="line">        <span class='keyword'>if</span>(U_FAILURE(err) || err == U_STRING_NOT_TERMINATED_WARNING) {</td></tr>
+<tr><td class="num" id="LN530">530</td><td class="line">            <span class='comment'>/* should never occur */</span></td></tr>
+<tr><td class="num" id="LN531">531</td><td class="line">            <span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN532">532</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN533">533</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN534">534</td><td class="line">        variantBegin = length;</td></tr>
+<tr><td class="num" id="LN535">535</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN536">536</td><td class="line">        <span class='comment'>/* after uloc_getName/canonicalize() we know that only '_' are separators */</span></td></tr>
+<tr><td class="num" id="LN537">537</td><td class="line">        separator = <span class="mrange">field[0] = fullName</span>;</td></tr>
+<tr><td class="num"></td><td class="line"><div id="EndPath" class="msg msgEvent" style="margin-left:9ex">Value stored to 'separator' is never read</div></td></tr>
+<tr><td class="num" id="LN538">538</td><td class="line">        fieldIdx = 1;</td></tr>
+<tr><td class="num" id="LN539">539</td><td class="line">        <span class='keyword'>while</span> ((separator = <span class='macro'>uprv_strchr(field[fieldIdx-1], SEP_CHAR)<span class='expansion'>:: strchr(field[fieldIdx-1], '_')</span></span>) &amp;&amp; fieldIdx &lt; (int32_t)(<span class='keyword'>sizeof</span>(field)/<span class='keyword'>sizeof</span>(field[0]))-1) {</td></tr>
+<tr><td class="num" id="LN540">540</td><td class="line">            field[fieldIdx] = separator + 1;</td></tr>
+<tr><td class="num" id="LN541">541</td><td class="line">            fieldLen[fieldIdx-1] = (int32_t)(separator - field[fieldIdx-1]);</td></tr>
+<tr><td class="num" id="LN542">542</td><td class="line">            fieldIdx++;</td></tr>
+<tr><td class="num" id="LN543">543</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN544">544</td><td class="line">        <span class='comment'>// variant may contain @foo or .foo POSIX cruft; remove it</span></td></tr>
+<tr><td class="num" id="LN545">545</td><td class="line">        separator = <span class='macro'>uprv_strchr(field[fieldIdx-1], '@')<span class='expansion'>:: strchr(field[fieldIdx-1], '@')</span></span>;</td></tr>
+<tr><td class="num" id="LN546">546</td><td class="line">        <span class='keyword'>char</span>* sep2 = <span class='macro'>uprv_strchr(field[fieldIdx-1], '.')<span class='expansion'>:: strchr(field[fieldIdx-1], '.')</span></span>;</td></tr>
+<tr><td class="num" id="LN547">547</td><td class="line">        <span class='keyword'>if</span> (separator!=<span class='macro'>NULL<span class='expansion'>__null</span></span> || sep2!=<span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num" id="LN548">548</td><td class="line">            <span class='keyword'>if</span> (separator==<span class='macro'>NULL<span class='expansion'>__null</span></span> || (sep2!=<span class='macro'>NULL<span class='expansion'>__null</span></span> &amp;&amp; separator &gt; sep2)) {</td></tr>
+<tr><td class="num" id="LN549">549</td><td class="line">                separator = sep2;</td></tr>
+<tr><td class="num" id="LN550">550</td><td class="line">            }</td></tr>
+<tr><td class="num" id="LN551">551</td><td class="line">            fieldLen[fieldIdx-1] = (int32_t)(separator - field[fieldIdx-1]);</td></tr>
+<tr><td class="num" id="LN552">552</td><td class="line">        } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN553">553</td><td class="line">            fieldLen[fieldIdx-1] = length - (int32_t)(field[fieldIdx-1] - fullName);</td></tr>
+<tr><td class="num" id="LN554">554</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN555">555</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN556">556</td><td class="line">        <span class='keyword'>if</span> (fieldLen[0] &gt;= (int32_t)(<span class='keyword'>sizeof</span>(language)))</td></tr>
+<tr><td class="num" id="LN557">557</td><td class="line">        {</td></tr>
+<tr><td class="num" id="LN558">558</td><td class="line">            <span class='keyword'>break</span>; <span class='comment'>// error: the language field is too long</span></td></tr>
+<tr><td class="num" id="LN559">559</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN560">560</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN561">561</td><td class="line">        variantField = 1; <span class='comment'>/* Usually the 2nd one, except when a script or country is also used. */</span></td></tr>
+<tr><td class="num" id="LN562">562</td><td class="line">        <span class='keyword'>if</span> (fieldLen[0] &gt; 0) {</td></tr>
+<tr><td class="num" id="LN563">563</td><td class="line">            <span class='comment'>/* We have a language */</span></td></tr>
+<tr><td class="num" id="LN564">564</td><td class="line">            <span class='macro'>uprv_memcpy(language, fullName, fieldLen[0])<span class='expansion'>:: memcpy(language, fullName, fieldLen[0])</span></span>;</td></tr>
+<tr><td class="num" id="LN565">565</td><td class="line">            language[fieldLen[0]] = 0;</td></tr>
+<tr><td class="num" id="LN566">566</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN567">567</td><td class="line">        <span class='keyword'>if</span> (fieldLen[1] == 4 &amp;&amp; <span class='macro'>ISASCIIALPHA(field[1][0])<span class='expansion'>(((field[1][0]) &gt;= 'a' &amp;&amp; (field[1][0]) &lt;= 'z')<br> || ((field[1][0]) &gt;= 'A' &amp;&amp; (field[1][0]) &lt;= 'Z'<br>))</span></span> &amp;&amp;</td></tr>
+<tr><td class="num" id="LN568">568</td><td class="line">                <span class='macro'>ISASCIIALPHA(field[1][1])<span class='expansion'>(((field[1][1]) &gt;= 'a' &amp;&amp; (field[1][1]) &lt;= 'z')<br> || ((field[1][1]) &gt;= 'A' &amp;&amp; (field[1][1]) &lt;= 'Z'<br>))</span></span> &amp;&amp; <span class='macro'>ISASCIIALPHA(field[1][2])<span class='expansion'>(((field[1][2]) &gt;= 'a' &amp;&amp; (field[1][2]) &lt;= 'z')<br> || ((field[1][2]) &gt;= 'A' &amp;&amp; (field[1][2]) &lt;= 'Z'<br>))</span></span> &amp;&amp;</td></tr>
+<tr><td class="num" id="LN569">569</td><td class="line">                <span class='macro'>ISASCIIALPHA(field[1][3])<span class='expansion'>(((field[1][3]) &gt;= 'a' &amp;&amp; (field[1][3]) &lt;= 'z')<br> || ((field[1][3]) &gt;= 'A' &amp;&amp; (field[1][3]) &lt;= 'Z'<br>))</span></span>) {</td></tr>
+<tr><td class="num" id="LN570">570</td><td class="line">            <span class='comment'>/* We have at least a script */</span></td></tr>
+<tr><td class="num" id="LN571">571</td><td class="line">            <span class='macro'>uprv_memcpy(script, field[1], fieldLen[1])<span class='expansion'>:: memcpy(script, field[1], fieldLen[1])</span></span>;</td></tr>
+<tr><td class="num" id="LN572">572</td><td class="line">            script[fieldLen[1]] = 0;</td></tr>
+<tr><td class="num" id="LN573">573</td><td class="line">            variantField++;</td></tr>
+<tr><td class="num" id="LN574">574</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN575">575</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN576">576</td><td class="line">        <span class='keyword'>if</span> (fieldLen[variantField] == 2 || fieldLen[variantField] == 3) {</td></tr>
+<tr><td class="num" id="LN577">577</td><td class="line">            <span class='comment'>/* We have a country */</span></td></tr>
+<tr><td class="num" id="LN578">578</td><td class="line">            <span class='macro'>uprv_memcpy(country, field[variantField], fieldLen[variantField])<span class='expansion'>:: memcpy(country, field[variantField], fieldLen[variantField<br>])</span></span>;</td></tr>
+<tr><td class="num" id="LN579">579</td><td class="line">            country[fieldLen[variantField]] = 0;</td></tr>
+<tr><td class="num" id="LN580">580</td><td class="line">            variantField++;</td></tr>
+<tr><td class="num" id="LN581">581</td><td class="line">        } <span class='keyword'>else</span> <span class='keyword'>if</span> (fieldLen[variantField] == 0) {</td></tr>
+<tr><td class="num" id="LN582">582</td><td class="line">            variantField++; <span class='comment'>/* script or country empty but variant in next field (i.e. en__POSIX) */</span></td></tr>
+<tr><td class="num" id="LN583">583</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN584">584</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN585">585</td><td class="line">        <span class='keyword'>if</span> (fieldLen[variantField] &gt; 0) {</td></tr>
+<tr><td class="num" id="LN586">586</td><td class="line">            <span class='comment'>/* We have a variant */</span></td></tr>
+<tr><td class="num" id="LN587">587</td><td class="line">            variantBegin = (int32_t)(field[variantField] - fullName);</td></tr>
+<tr><td class="num" id="LN588">588</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN589">589</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN590">590</td><td class="line">        err = U_ZERO_ERROR;</td></tr>
+<tr><td class="num" id="LN591">591</td><td class="line">        initBaseName(err);</td></tr>
+<tr><td class="num" id="LN592">592</td><td class="line">        <span class='keyword'>if</span> (U_FAILURE(err)) {</td></tr>
+<tr><td class="num" id="LN593">593</td><td class="line">            <span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN594">594</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN595">595</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN596">596</td><td class="line">        <span class='comment'>// successful end of init()</span></td></tr>
+<tr><td class="num" id="LN597">597</td><td class="line">        <span class='keyword'>return</span> *<span class='keyword'>this</span>;</td></tr>
+<tr><td class="num" id="LN598">598</td><td class="line">    } <span class='keyword'>while</span>(0); <span class='comment'>/*loop doesn't iterate*/</span></td></tr>
+<tr><td class="num" id="LN599">599</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN600">600</td><td class="line">    <span class='comment'>// when an error occurs, then set this object to "bogus" (there is no UErrorCode here)</span></td></tr>
+<tr><td class="num" id="LN601">601</td><td class="line">    setToBogus();</td></tr>
+<tr><td class="num" id="LN602">602</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN603">603</td><td class="line">    <span class='keyword'>return</span> *<span class='keyword'>this</span>;</td></tr>
+<tr><td class="num" id="LN604">604</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN605">605</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN606">606</td><td class="line"><span class='comment'>/*</span></td></tr>
+<tr><td class="num" id="LN607">607</td><td class="line"> <span class='comment'>* Set up the base name.</span></td></tr>
+<tr><td class="num" id="LN608">608</td><td class="line"> <span class='comment'>* If there are no key words, it's exactly the full name.</span></td></tr>
+<tr><td class="num" id="LN609">609</td><td class="line"> <span class='comment'>* If key words exist, it's the full name truncated at the '@' character.</span></td></tr>
+<tr><td class="num" id="LN610">610</td><td class="line"> <span class='comment'>* Need to set up both at init() and after setting a keyword.</span></td></tr>
+<tr><td class="num" id="LN611">611</td><td class="line"> <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN612">612</td><td class="line"><span class='keyword'>void</span></td></tr>
+<tr><td class="num" id="LN613">613</td><td class="line">Locale::initBaseName(UErrorCode &amp;status) {</td></tr>
+<tr><td class="num" id="LN614">614</td><td class="line">    <span class='keyword'>if</span> (U_FAILURE(status)) {</td></tr>
+<tr><td class="num" id="LN615">615</td><td class="line">        <span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN616">616</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN617">617</td><td class="line">    U_ASSERT(baseName==NULL || baseName==fullName);</td></tr>
+<tr><td class="num" id="LN618">618</td><td class="line">    <span class='keyword'>const</span> <span class='keyword'>char</span> *atPtr = <span class='macro'>uprv_strchr(fullName, '@')<span class='expansion'>:: strchr(fullName, '@')</span></span>;</td></tr>
+<tr><td class="num" id="LN619">619</td><td class="line">    <span class='keyword'>const</span> <span class='keyword'>char</span> *eqPtr = <span class='macro'>uprv_strchr(fullName, '=')<span class='expansion'>:: strchr(fullName, '=')</span></span>;</td></tr>
+<tr><td class="num" id="LN620">620</td><td class="line">    <span class='keyword'>if</span> (atPtr &amp;&amp; eqPtr &amp;&amp; atPtr &lt; eqPtr) {</td></tr>
+<tr><td class="num" id="LN621">621</td><td class="line">        <span class='comment'>// Key words exist.</span></td></tr>
+<tr><td class="num" id="LN622">622</td><td class="line">        int32_t baseNameLength = (int32_t)(atPtr - fullName);</td></tr>
+<tr><td class="num" id="LN623">623</td><td class="line">        baseName = (<span class='keyword'>char</span> *)<span class='macro'>uprv_malloc<span class='expansion'>uprv_malloc_54</span></span>(baseNameLength + 1);</td></tr>
+<tr><td class="num" id="LN624">624</td><td class="line">        <span class='keyword'>if</span> (baseName == <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num" id="LN625">625</td><td class="line">            status = U_MEMORY_ALLOCATION_ERROR;</td></tr>
+<tr><td class="num" id="LN626">626</td><td class="line">            <span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN627">627</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN628">628</td><td class="line">        <span class='macro'>uprv_strncpy(baseName, fullName, baseNameLength)<span class='expansion'>:: strncpy(baseName, fullName, baseNameLength)</span></span>;</td></tr>
+<tr><td class="num" id="LN629">629</td><td class="line">        baseName[baseNameLength] = 0;</td></tr>
+<tr><td class="num" id="LN630">630</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN631">631</td><td class="line">        <span class='comment'>// The original computation of variantBegin leaves it equal to the length</span></td></tr>
+<tr><td class="num" id="LN632">632</td><td class="line">        <span class='comment'>// of fullName if there is no variant.  It should instead be</span></td></tr>
+<tr><td class="num" id="LN633">633</td><td class="line">        <span class='comment'>// the length of the baseName.</span></td></tr>
+<tr><td class="num" id="LN634">634</td><td class="line">        <span class='keyword'>if</span> (variantBegin &gt; baseNameLength) {</td></tr>
+<tr><td class="num" id="LN635">635</td><td class="line">            variantBegin = baseNameLength;</td></tr>
+<tr><td class="num" id="LN636">636</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN637">637</td><td class="line">    } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN638">638</td><td class="line">        baseName = fullName;</td></tr>
+<tr><td class="num" id="LN639">639</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN640">640</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN641">641</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN642">642</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN643">643</td><td class="line">int32_t</td></tr>
+<tr><td class="num" id="LN644">644</td><td class="line">Locale::hashCode() <span class='keyword'>const</span></td></tr>
+<tr><td class="num" id="LN645">645</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN646">646</td><td class="line">    <span class='keyword'>return</span> <span class='macro'>ustr_hashCharsN<span class='expansion'>ustr_hashCharsN_54</span></span>(fullName, <span class='macro'>uprv_strlen(fullName)<span class='expansion'>:: strlen(fullName)</span></span>);</td></tr>
+<tr><td class="num" id="LN647">647</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN648">648</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN649">649</td><td class="line"><span class='keyword'>void</span></td></tr>
+<tr><td class="num" id="LN650">650</td><td class="line">Locale::setToBogus() {</td></tr>
+<tr><td class="num" id="LN651">651</td><td class="line">    <span class='comment'>/* Free our current storage */</span></td></tr>
+<tr><td class="num" id="LN652">652</td><td class="line">    <span class='keyword'>if</span>(baseName != fullName) {</td></tr>
+<tr><td class="num" id="LN653">653</td><td class="line">        <span class='macro'>uprv_free<span class='expansion'>uprv_free_54</span></span>(baseName);</td></tr>
+<tr><td class="num" id="LN654">654</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN655">655</td><td class="line">    baseName = <span class='macro'>NULL<span class='expansion'>__null</span></span>;</td></tr>
+<tr><td class="num" id="LN656">656</td><td class="line">    <span class='keyword'>if</span>(fullName != fullNameBuffer) {</td></tr>
+<tr><td class="num" id="LN657">657</td><td class="line">        <span class='macro'>uprv_free<span class='expansion'>uprv_free_54</span></span>(fullName);</td></tr>
+<tr><td class="num" id="LN658">658</td><td class="line">        fullName = fullNameBuffer;</td></tr>
+<tr><td class="num" id="LN659">659</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN660">660</td><td class="line">    *fullNameBuffer = 0;</td></tr>
+<tr><td class="num" id="LN661">661</td><td class="line">    *language = 0;</td></tr>
+<tr><td class="num" id="LN662">662</td><td class="line">    *script = 0;</td></tr>
+<tr><td class="num" id="LN663">663</td><td class="line">    *country = 0;</td></tr>
+<tr><td class="num" id="LN664">664</td><td class="line">    fIsBogus = <span class='macro'>TRUE<span class='expansion'>1</span></span>;</td></tr>
+<tr><td class="num" id="LN665">665</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN666">666</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN667">667</td><td class="line"><span class='keyword'>const</span> Locale&amp; U_EXPORT2</td></tr>
+<tr><td class="num" id="LN668">668</td><td class="line">Locale::getDefault()</td></tr>
+<tr><td class="num" id="LN669">669</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN670">670</td><td class="line">    {</td></tr>
+<tr><td class="num" id="LN671">671</td><td class="line">        Mutex lock(&amp;gDefaultLocaleMutex);</td></tr>
+<tr><td class="num" id="LN672">672</td><td class="line">        <span class='keyword'>if</span> (gDefaultLocale != <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num" id="LN673">673</td><td class="line">            <span class='keyword'>return</span> *gDefaultLocale;</td></tr>
+<tr><td class="num" id="LN674">674</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN675">675</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN676">676</td><td class="line">    UErrorCode status = U_ZERO_ERROR;</td></tr>
+<tr><td class="num" id="LN677">677</td><td class="line">    <span class='keyword'>return</span> *locale_set_default_internal(<span class='macro'>NULL<span class='expansion'>__null</span></span>, status);</td></tr>
+<tr><td class="num" id="LN678">678</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN679">679</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN680">680</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN681">681</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN682">682</td><td class="line"><span class='keyword'>void</span> U_EXPORT2</td></tr>
+<tr><td class="num" id="LN683">683</td><td class="line">Locale::setDefault( <span class='keyword'>const</span>   Locale&amp;     newLocale,</td></tr>
+<tr><td class="num" id="LN684">684</td><td class="line">                            UErrorCode&amp;  status)</td></tr>
+<tr><td class="num" id="LN685">685</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN686">686</td><td class="line">    <span class='keyword'>if</span> (U_FAILURE(status)) {</td></tr>
+<tr><td class="num" id="LN687">687</td><td class="line">        <span class='keyword'>return</span>;</td></tr>
+<tr><td class="num" id="LN688">688</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN689">689</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN690">690</td><td class="line">    <span class='comment'>/* Set the default from the full name string of the supplied locale.</span></td></tr>
+<tr><td class="num" id="LN691">691</td><td class="line">     <span class='comment'>* This is a convenient way to access the default locale caching mechanisms.</span></td></tr>
+<tr><td class="num" id="LN692">692</td><td class="line">     <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN693">693</td><td class="line">    <span class='keyword'>const</span> <span class='keyword'>char</span> *localeID = newLocale.getName();</td></tr>
+<tr><td class="num" id="LN694">694</td><td class="line">    locale_set_default_internal(localeID, status);</td></tr>
+<tr><td class="num" id="LN695">695</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN696">696</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN697">697</td><td class="line">Locale U_EXPORT2</td></tr>
+<tr><td class="num" id="LN698">698</td><td class="line">Locale::createFromName (<span class='keyword'>const</span> <span class='keyword'>char</span> *name)</td></tr>
+<tr><td class="num" id="LN699">699</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN700">700</td><td class="line">    <span class='keyword'>if</span> (name) {</td></tr>
+<tr><td class="num" id="LN701">701</td><td class="line">        Locale l(<span class='string_literal'>""</span>);</td></tr>
+<tr><td class="num" id="LN702">702</td><td class="line">        l.init(name, <span class='macro'>FALSE<span class='expansion'>0</span></span>);</td></tr>
+<tr><td class="num" id="LN703">703</td><td class="line">        <span class='keyword'>return</span> l;</td></tr>
+<tr><td class="num" id="LN704">704</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN705">705</td><td class="line">    <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN706">706</td><td class="line">        <span class='keyword'>return</span> getDefault();</td></tr>
+<tr><td class="num" id="LN707">707</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN708">708</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN709">709</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN710">710</td><td class="line">Locale U_EXPORT2</td></tr>
+<tr><td class="num" id="LN711">711</td><td class="line">Locale::createCanonical(<span class='keyword'>const</span> <span class='keyword'>char</span>* name) {</td></tr>
+<tr><td class="num" id="LN712">712</td><td class="line">    Locale loc(<span class='string_literal'>""</span>);</td></tr>
+<tr><td class="num" id="LN713">713</td><td class="line">    loc.init(name, <span class='macro'>TRUE<span class='expansion'>1</span></span>);</td></tr>
+<tr><td class="num" id="LN714">714</td><td class="line">    <span class='keyword'>return</span> loc;</td></tr>
+<tr><td class="num" id="LN715">715</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN716">716</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN717">717</td><td class="line"><span class='keyword'>const</span> <span class='keyword'>char</span> *</td></tr>
+<tr><td class="num" id="LN718">718</td><td class="line">Locale::getISO3Language() <span class='keyword'>const</span></td></tr>
+<tr><td class="num" id="LN719">719</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN720">720</td><td class="line">    <span class='keyword'>return</span> <span class='macro'>uloc_getISO3Language<span class='expansion'>uloc_getISO3Language_54</span></span>(fullName);</td></tr>
+<tr><td class="num" id="LN721">721</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN722">722</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN723">723</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN724">724</td><td class="line"><span class='keyword'>const</span> <span class='keyword'>char</span> *</td></tr>
+<tr><td class="num" id="LN725">725</td><td class="line">Locale::getISO3Country() <span class='keyword'>const</span></td></tr>
+<tr><td class="num" id="LN726">726</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN727">727</td><td class="line">    <span class='keyword'>return</span> <span class='macro'>uloc_getISO3Country<span class='expansion'>uloc_getISO3Country_54</span></span>(fullName);</td></tr>
+<tr><td class="num" id="LN728">728</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN729">729</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN730">730</td><td class="line"><span class='comment'>/**</span></td></tr>
+<tr><td class="num" id="LN731">731</td><td class="line"> <span class='comment'>* Return the LCID value as specified in the "LocaleID" resource for this</span></td></tr>
+<tr><td class="num" id="LN732">732</td><td class="line"> <span class='comment'>* locale.  The LocaleID must be expressed as a hexadecimal number, from</span></td></tr>
+<tr><td class="num" id="LN733">733</td><td class="line"> <span class='comment'>* one to four digits.  If the LocaleID resource is not present, or is</span></td></tr>
+<tr><td class="num" id="LN734">734</td><td class="line"> <span class='comment'>* in an incorrect format, 0 is returned.  The LocaleID is for use in</span></td></tr>
+<tr><td class="num" id="LN735">735</td><td class="line"> <span class='comment'>* Windows (it is an LCID), but is available on all platforms.</span></td></tr>
+<tr><td class="num" id="LN736">736</td><td class="line"> <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN737">737</td><td class="line">uint32_t</td></tr>
+<tr><td class="num" id="LN738">738</td><td class="line">Locale::getLCID() <span class='keyword'>const</span></td></tr>
+<tr><td class="num" id="LN739">739</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN740">740</td><td class="line">    <span class='keyword'>return</span> <span class='macro'>uloc_getLCID<span class='expansion'>uloc_getLCID_54</span></span>(fullName);</td></tr>
+<tr><td class="num" id="LN741">741</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN742">742</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN743">743</td><td class="line"><span class='keyword'>const</span> <span class='keyword'>char</span>* <span class='keyword'>const</span>* U_EXPORT2 Locale::getISOCountries()</td></tr>
+<tr><td class="num" id="LN744">744</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN745">745</td><td class="line">    <span class='keyword'>return</span> <span class='macro'>uloc_getISOCountries<span class='expansion'>uloc_getISOCountries_54</span></span>();</td></tr>
+<tr><td class="num" id="LN746">746</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN747">747</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN748">748</td><td class="line"><span class='keyword'>const</span> <span class='keyword'>char</span>* <span class='keyword'>const</span>* U_EXPORT2 Locale::getISOLanguages()</td></tr>
+<tr><td class="num" id="LN749">749</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN750">750</td><td class="line">    <span class='keyword'>return</span> <span class='macro'>uloc_getISOLanguages<span class='expansion'>uloc_getISOLanguages_54</span></span>();</td></tr>
+<tr><td class="num" id="LN751">751</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN752">752</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN753">753</td><td class="line"><span class='comment'>// Set the locale's data based on a posix id.</span></td></tr>
+<tr><td class="num" id="LN754">754</td><td class="line"><span class='keyword'>void</span> Locale::setFromPOSIXID(<span class='keyword'>const</span> <span class='keyword'>char</span> *posixID)</td></tr>
+<tr><td class="num" id="LN755">755</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN756">756</td><td class="line">    init(posixID, <span class='macro'>TRUE<span class='expansion'>1</span></span>);</td></tr>
+<tr><td class="num" id="LN757">757</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN758">758</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN759">759</td><td class="line"><span class='keyword'>const</span> Locale &amp; U_EXPORT2</td></tr>
+<tr><td class="num" id="LN760">760</td><td class="line">Locale::getRoot(<span class='keyword'>void</span>)</td></tr>
+<tr><td class="num" id="LN761">761</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN762">762</td><td class="line">    <span class='keyword'>return</span> getLocale(eROOT);</td></tr>
+<tr><td class="num" id="LN763">763</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN764">764</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN765">765</td><td class="line"><span class='keyword'>const</span> Locale &amp; U_EXPORT2</td></tr>
+<tr><td class="num" id="LN766">766</td><td class="line">Locale::getEnglish(<span class='keyword'>void</span>)</td></tr>
+<tr><td class="num" id="LN767">767</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN768">768</td><td class="line">    <span class='keyword'>return</span> getLocale(eENGLISH);</td></tr>
+<tr><td class="num" id="LN769">769</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN770">770</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN771">771</td><td class="line"><span class='keyword'>const</span> Locale &amp; U_EXPORT2</td></tr>
+<tr><td class="num" id="LN772">772</td><td class="line">Locale::getFrench(<span class='keyword'>void</span>)</td></tr>
+<tr><td class="num" id="LN773">773</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN774">774</td><td class="line">    <span class='keyword'>return</span> getLocale(eFRENCH);</td></tr>
+<tr><td class="num" id="LN775">775</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN776">776</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN777">777</td><td class="line"><span class='keyword'>const</span> Locale &amp; U_EXPORT2</td></tr>
+<tr><td class="num" id="LN778">778</td><td class="line">Locale::getGerman(<span class='keyword'>void</span>)</td></tr>
+<tr><td class="num" id="LN779">779</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN780">780</td><td class="line">    <span class='keyword'>return</span> getLocale(eGERMAN);</td></tr>
+<tr><td class="num" id="LN781">781</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN782">782</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN783">783</td><td class="line"><span class='keyword'>const</span> Locale &amp; U_EXPORT2</td></tr>
+<tr><td class="num" id="LN784">784</td><td class="line">Locale::getItalian(<span class='keyword'>void</span>)</td></tr>
+<tr><td class="num" id="LN785">785</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN786">786</td><td class="line">    <span class='keyword'>return</span> getLocale(eITALIAN);</td></tr>
+<tr><td class="num" id="LN787">787</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN788">788</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN789">789</td><td class="line"><span class='keyword'>const</span> Locale &amp; U_EXPORT2</td></tr>
+<tr><td class="num" id="LN790">790</td><td class="line">Locale::getJapanese(<span class='keyword'>void</span>)</td></tr>
+<tr><td class="num" id="LN791">791</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN792">792</td><td class="line">    <span class='keyword'>return</span> getLocale(eJAPANESE);</td></tr>
+<tr><td class="num" id="LN793">793</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN794">794</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN795">795</td><td class="line"><span class='keyword'>const</span> Locale &amp; U_EXPORT2</td></tr>
+<tr><td class="num" id="LN796">796</td><td class="line">Locale::getKorean(<span class='keyword'>void</span>)</td></tr>
+<tr><td class="num" id="LN797">797</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN798">798</td><td class="line">    <span class='keyword'>return</span> getLocale(eKOREAN);</td></tr>
+<tr><td class="num" id="LN799">799</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN800">800</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN801">801</td><td class="line"><span class='keyword'>const</span> Locale &amp; U_EXPORT2</td></tr>
+<tr><td class="num" id="LN802">802</td><td class="line">Locale::getChinese(<span class='keyword'>void</span>)</td></tr>
+<tr><td class="num" id="LN803">803</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN804">804</td><td class="line">    <span class='keyword'>return</span> getLocale(eCHINESE);</td></tr>
+<tr><td class="num" id="LN805">805</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN806">806</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN807">807</td><td class="line"><span class='keyword'>const</span> Locale &amp; U_EXPORT2</td></tr>
+<tr><td class="num" id="LN808">808</td><td class="line">Locale::getSimplifiedChinese(<span class='keyword'>void</span>)</td></tr>
+<tr><td class="num" id="LN809">809</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN810">810</td><td class="line">    <span class='keyword'>return</span> getLocale(eCHINA);</td></tr>
+<tr><td class="num" id="LN811">811</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN812">812</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN813">813</td><td class="line"><span class='keyword'>const</span> Locale &amp; U_EXPORT2</td></tr>
+<tr><td class="num" id="LN814">814</td><td class="line">Locale::getTraditionalChinese(<span class='keyword'>void</span>)</td></tr>
+<tr><td class="num" id="LN815">815</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN816">816</td><td class="line">    <span class='keyword'>return</span> getLocale(eTAIWAN);</td></tr>
+<tr><td class="num" id="LN817">817</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN818">818</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN819">819</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN820">820</td><td class="line"><span class='keyword'>const</span> Locale &amp; U_EXPORT2</td></tr>
+<tr><td class="num" id="LN821">821</td><td class="line">Locale::getFrance(<span class='keyword'>void</span>)</td></tr>
+<tr><td class="num" id="LN822">822</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN823">823</td><td class="line">    <span class='keyword'>return</span> getLocale(eFRANCE);</td></tr>
+<tr><td class="num" id="LN824">824</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN825">825</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN826">826</td><td class="line"><span class='keyword'>const</span> Locale &amp; U_EXPORT2</td></tr>
+<tr><td class="num" id="LN827">827</td><td class="line">Locale::getGermany(<span class='keyword'>void</span>)</td></tr>
+<tr><td class="num" id="LN828">828</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN829">829</td><td class="line">    <span class='keyword'>return</span> getLocale(eGERMANY);</td></tr>
+<tr><td class="num" id="LN830">830</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN831">831</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN832">832</td><td class="line"><span class='keyword'>const</span> Locale &amp; U_EXPORT2</td></tr>
+<tr><td class="num" id="LN833">833</td><td class="line">Locale::getItaly(<span class='keyword'>void</span>)</td></tr>
+<tr><td class="num" id="LN834">834</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN835">835</td><td class="line">    <span class='keyword'>return</span> getLocale(eITALY);</td></tr>
+<tr><td class="num" id="LN836">836</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN837">837</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN838">838</td><td class="line"><span class='keyword'>const</span> Locale &amp; U_EXPORT2</td></tr>
+<tr><td class="num" id="LN839">839</td><td class="line">Locale::getJapan(<span class='keyword'>void</span>)</td></tr>
+<tr><td class="num" id="LN840">840</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN841">841</td><td class="line">    <span class='keyword'>return</span> getLocale(eJAPAN);</td></tr>
+<tr><td class="num" id="LN842">842</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN843">843</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN844">844</td><td class="line"><span class='keyword'>const</span> Locale &amp; U_EXPORT2</td></tr>
+<tr><td class="num" id="LN845">845</td><td class="line">Locale::getKorea(<span class='keyword'>void</span>)</td></tr>
+<tr><td class="num" id="LN846">846</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN847">847</td><td class="line">    <span class='keyword'>return</span> getLocale(eKOREA);</td></tr>
+<tr><td class="num" id="LN848">848</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN849">849</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN850">850</td><td class="line"><span class='keyword'>const</span> Locale &amp; U_EXPORT2</td></tr>
+<tr><td class="num" id="LN851">851</td><td class="line">Locale::getChina(<span class='keyword'>void</span>)</td></tr>
+<tr><td class="num" id="LN852">852</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN853">853</td><td class="line">    <span class='keyword'>return</span> getLocale(eCHINA);</td></tr>
+<tr><td class="num" id="LN854">854</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN855">855</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN856">856</td><td class="line"><span class='keyword'>const</span> Locale &amp; U_EXPORT2</td></tr>
+<tr><td class="num" id="LN857">857</td><td class="line">Locale::getPRC(<span class='keyword'>void</span>)</td></tr>
+<tr><td class="num" id="LN858">858</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN859">859</td><td class="line">    <span class='keyword'>return</span> getLocale(eCHINA);</td></tr>
+<tr><td class="num" id="LN860">860</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN861">861</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN862">862</td><td class="line"><span class='keyword'>const</span> Locale &amp; U_EXPORT2</td></tr>
+<tr><td class="num" id="LN863">863</td><td class="line">Locale::getTaiwan(<span class='keyword'>void</span>)</td></tr>
+<tr><td class="num" id="LN864">864</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN865">865</td><td class="line">    <span class='keyword'>return</span> getLocale(eTAIWAN);</td></tr>
+<tr><td class="num" id="LN866">866</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN867">867</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN868">868</td><td class="line"><span class='keyword'>const</span> Locale &amp; U_EXPORT2</td></tr>
+<tr><td class="num" id="LN869">869</td><td class="line">Locale::getUK(<span class='keyword'>void</span>)</td></tr>
+<tr><td class="num" id="LN870">870</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN871">871</td><td class="line">    <span class='keyword'>return</span> getLocale(eUK);</td></tr>
+<tr><td class="num" id="LN872">872</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN873">873</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN874">874</td><td class="line"><span class='keyword'>const</span> Locale &amp; U_EXPORT2</td></tr>
+<tr><td class="num" id="LN875">875</td><td class="line">Locale::getUS(<span class='keyword'>void</span>)</td></tr>
+<tr><td class="num" id="LN876">876</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN877">877</td><td class="line">    <span class='keyword'>return</span> getLocale(eUS);</td></tr>
+<tr><td class="num" id="LN878">878</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN879">879</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN880">880</td><td class="line"><span class='keyword'>const</span> Locale &amp; U_EXPORT2</td></tr>
+<tr><td class="num" id="LN881">881</td><td class="line">Locale::getCanada(<span class='keyword'>void</span>)</td></tr>
+<tr><td class="num" id="LN882">882</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN883">883</td><td class="line">    <span class='keyword'>return</span> getLocale(eCANADA);</td></tr>
+<tr><td class="num" id="LN884">884</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN885">885</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN886">886</td><td class="line"><span class='keyword'>const</span> Locale &amp; U_EXPORT2</td></tr>
+<tr><td class="num" id="LN887">887</td><td class="line">Locale::getCanadaFrench(<span class='keyword'>void</span>)</td></tr>
+<tr><td class="num" id="LN888">888</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN889">889</td><td class="line">    <span class='keyword'>return</span> getLocale(eCANADA_FRENCH);</td></tr>
+<tr><td class="num" id="LN890">890</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN891">891</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN892">892</td><td class="line"><span class='keyword'>const</span> Locale &amp;</td></tr>
+<tr><td class="num" id="LN893">893</td><td class="line">Locale::getLocale(<span class='keyword'>int</span> locid)</td></tr>
+<tr><td class="num" id="LN894">894</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN895">895</td><td class="line">    Locale *localeCache = getLocaleCache();</td></tr>
+<tr><td class="num" id="LN896">896</td><td class="line">    U_ASSERT((locid &lt; eMAX_LOCALES)&amp;&amp;(locid&gt;=0));</td></tr>
+<tr><td class="num" id="LN897">897</td><td class="line">    <span class='keyword'>if</span> (localeCache == <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num" id="LN898">898</td><td class="line">        <span class='comment'>// Failure allocating the locale cache.</span></td></tr>
+<tr><td class="num" id="LN899">899</td><td class="line">        <span class='comment'>//   The best we can do is return a NULL reference.</span></td></tr>
+<tr><td class="num" id="LN900">900</td><td class="line">        locid = 0;</td></tr>
+<tr><td class="num" id="LN901">901</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN902">902</td><td class="line">    <span class='keyword'>return</span> localeCache[locid]; <span class='comment'>/*operating on NULL*/</span></td></tr>
+<tr><td class="num" id="LN903">903</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN904">904</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN905">905</td><td class="line"><span class='comment'>/*</span></td></tr>
+<tr><td class="num" id="LN906">906</td><td class="line"><span class='comment'>This function is defined this way in order to get around static</span></td></tr>
+<tr><td class="num" id="LN907">907</td><td class="line"><span class='comment'>initialization and static destruction.</span></td></tr>
+<tr><td class="num" id="LN908">908</td><td class="line"> <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN909">909</td><td class="line">Locale *</td></tr>
+<tr><td class="num" id="LN910">910</td><td class="line">Locale::getLocaleCache(<span class='keyword'>void</span>)</td></tr>
+<tr><td class="num" id="LN911">911</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN912">912</td><td class="line">    UErrorCode status = U_ZERO_ERROR;</td></tr>
+<tr><td class="num" id="LN913">913</td><td class="line">    umtx_initOnce(gLocaleCacheInitOnce, locale_init, status);</td></tr>
+<tr><td class="num" id="LN914">914</td><td class="line">    <span class='keyword'>return</span> gLocaleCache;</td></tr>
+<tr><td class="num" id="LN915">915</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN916">916</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN917">917</td><td class="line"><span class='keyword'>class</span> KeywordEnumeration : <span class='keyword'>public</span> StringEnumeration {</td></tr>
+<tr><td class="num" id="LN918">918</td><td class="line"><span class='keyword'>private</span>:</td></tr>
+<tr><td class="num" id="LN919">919</td><td class="line">    <span class='keyword'>char</span> *keywords;</td></tr>
+<tr><td class="num" id="LN920">920</td><td class="line">    <span class='keyword'>char</span> *current;</td></tr>
+<tr><td class="num" id="LN921">921</td><td class="line">    int32_t length;</td></tr>
+<tr><td class="num" id="LN922">922</td><td class="line">    UnicodeString currUSKey;</td></tr>
+<tr><td class="num" id="LN923">923</td><td class="line">    <span class='keyword'>static</span> <span class='keyword'>const</span> <span class='keyword'>char</span> fgClassID;<span class='comment'>/* Warning this is used beyond the typical RTTI usage. */</span></td></tr>
+<tr><td class="num" id="LN924">924</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN925">925</td><td class="line"><span class='keyword'>public</span>:</td></tr>
+<tr><td class="num" id="LN926">926</td><td class="line">    <span class='keyword'>static</span> UClassID U_EXPORT2 getStaticClassID(<span class='keyword'>void</span>) { <span class='keyword'>return</span> (UClassID)&amp;fgClassID; }</td></tr>
+<tr><td class="num" id="LN927">927</td><td class="line">    <span class='keyword'>virtual</span> UClassID getDynamicClassID(<span class='keyword'>void</span>) <span class='keyword'>const</span> { <span class='keyword'>return</span> getStaticClassID(); }</td></tr>
+<tr><td class="num" id="LN928">928</td><td class="line"><span class='keyword'>public</span>:</td></tr>
+<tr><td class="num" id="LN929">929</td><td class="line">    KeywordEnumeration(<span class='keyword'>const</span> <span class='keyword'>char</span> *keys, int32_t keywordLen, int32_t currentIndex, UErrorCode &amp;status)</td></tr>
+<tr><td class="num" id="LN930">930</td><td class="line">        : keywords((<span class='keyword'>char</span> *)&amp;fgClassID), current((<span class='keyword'>char</span> *)&amp;fgClassID), length(0) {</td></tr>
+<tr><td class="num" id="LN931">931</td><td class="line">        <span class='keyword'>if</span>(U_SUCCESS(status) &amp;&amp; keywordLen != 0) {</td></tr>
+<tr><td class="num" id="LN932">932</td><td class="line">            <span class='keyword'>if</span>(keys == <span class='macro'>NULL<span class='expansion'>__null</span></span> || keywordLen &lt; 0) {</td></tr>
+<tr><td class="num" id="LN933">933</td><td class="line">                status = U_ILLEGAL_ARGUMENT_ERROR;</td></tr>
+<tr><td class="num" id="LN934">934</td><td class="line">            } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN935">935</td><td class="line">                keywords = (<span class='keyword'>char</span> *)<span class='macro'>uprv_malloc<span class='expansion'>uprv_malloc_54</span></span>(keywordLen+1);</td></tr>
+<tr><td class="num" id="LN936">936</td><td class="line">                <span class='keyword'>if</span> (keywords == <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num" id="LN937">937</td><td class="line">                    status = U_MEMORY_ALLOCATION_ERROR;</td></tr>
+<tr><td class="num" id="LN938">938</td><td class="line">                }</td></tr>
+<tr><td class="num" id="LN939">939</td><td class="line">                <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN940">940</td><td class="line">                    <span class='macro'>uprv_memcpy(keywords, keys, keywordLen)<span class='expansion'>:: memcpy(keywords, keys, keywordLen)</span></span>;</td></tr>
+<tr><td class="num" id="LN941">941</td><td class="line">                    keywords[keywordLen] = 0;</td></tr>
+<tr><td class="num" id="LN942">942</td><td class="line">                    current = keywords + currentIndex;</td></tr>
+<tr><td class="num" id="LN943">943</td><td class="line">                    length = keywordLen;</td></tr>
+<tr><td class="num" id="LN944">944</td><td class="line">                }</td></tr>
+<tr><td class="num" id="LN945">945</td><td class="line">            }</td></tr>
+<tr><td class="num" id="LN946">946</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN947">947</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN948">948</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN949">949</td><td class="line">    <span class='keyword'>virtual</span> ~KeywordEnumeration();</td></tr>
+<tr><td class="num" id="LN950">950</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN951">951</td><td class="line">    <span class='keyword'>virtual</span> StringEnumeration * clone() <span class='keyword'>const</span></td></tr>
+<tr><td class="num" id="LN952">952</td><td class="line">    {</td></tr>
+<tr><td class="num" id="LN953">953</td><td class="line">        UErrorCode status = U_ZERO_ERROR;</td></tr>
+<tr><td class="num" id="LN954">954</td><td class="line">        <span class='keyword'>return</span> <span class='keyword'>new</span> KeywordEnumeration(keywords, length, (int32_t)(current - keywords), status);</td></tr>
+<tr><td class="num" id="LN955">955</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN956">956</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN957">957</td><td class="line">    <span class='keyword'>virtual</span> int32_t count(UErrorCode &amp;<span class='comment'>/*status*/</span>) <span class='keyword'>const</span> {</td></tr>
+<tr><td class="num" id="LN958">958</td><td class="line">        <span class='keyword'>char</span> *kw = keywords;</td></tr>
+<tr><td class="num" id="LN959">959</td><td class="line">        int32_t result = 0;</td></tr>
+<tr><td class="num" id="LN960">960</td><td class="line">        <span class='keyword'>while</span>(*kw) {</td></tr>
+<tr><td class="num" id="LN961">961</td><td class="line">            result++;</td></tr>
+<tr><td class="num" id="LN962">962</td><td class="line">            kw += <span class='macro'>uprv_strlen(kw)<span class='expansion'>:: strlen(kw)</span></span>+1;</td></tr>
+<tr><td class="num" id="LN963">963</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN964">964</td><td class="line">        <span class='keyword'>return</span> result;</td></tr>
+<tr><td class="num" id="LN965">965</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN966">966</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN967">967</td><td class="line">    <span class='keyword'>virtual</span> <span class='keyword'>const</span> <span class='keyword'>char</span>* next(int32_t* resultLength, UErrorCode&amp; status) {</td></tr>
+<tr><td class="num" id="LN968">968</td><td class="line">        <span class='keyword'>const</span> <span class='keyword'>char</span>* result;</td></tr>
+<tr><td class="num" id="LN969">969</td><td class="line">        int32_t len;</td></tr>
+<tr><td class="num" id="LN970">970</td><td class="line">        <span class='keyword'>if</span>(U_SUCCESS(status) &amp;&amp; *current != 0) {</td></tr>
+<tr><td class="num" id="LN971">971</td><td class="line">            result = current;</td></tr>
+<tr><td class="num" id="LN972">972</td><td class="line">            len = (int32_t)<span class='macro'>uprv_strlen(current)<span class='expansion'>:: strlen(current)</span></span>;</td></tr>
+<tr><td class="num" id="LN973">973</td><td class="line">            current += len+1;</td></tr>
+<tr><td class="num" id="LN974">974</td><td class="line">            <span class='keyword'>if</span>(resultLength != <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num" id="LN975">975</td><td class="line">                *resultLength = len;</td></tr>
+<tr><td class="num" id="LN976">976</td><td class="line">            }</td></tr>
+<tr><td class="num" id="LN977">977</td><td class="line">        } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN978">978</td><td class="line">            <span class='keyword'>if</span>(resultLength != <span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num" id="LN979">979</td><td class="line">                *resultLength = 0;</td></tr>
+<tr><td class="num" id="LN980">980</td><td class="line">            }</td></tr>
+<tr><td class="num" id="LN981">981</td><td class="line">            result = <span class='macro'>NULL<span class='expansion'>__null</span></span>;</td></tr>
+<tr><td class="num" id="LN982">982</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN983">983</td><td class="line">        <span class='keyword'>return</span> result;</td></tr>
+<tr><td class="num" id="LN984">984</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN985">985</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN986">986</td><td class="line">    <span class='keyword'>virtual</span> <span class='keyword'>const</span> UnicodeString* snext(UErrorCode&amp; status) {</td></tr>
+<tr><td class="num" id="LN987">987</td><td class="line">        int32_t resultLength = 0;</td></tr>
+<tr><td class="num" id="LN988">988</td><td class="line">        <span class='keyword'>const</span> <span class='keyword'>char</span> *s = next(&amp;resultLength, status);</td></tr>
+<tr><td class="num" id="LN989">989</td><td class="line">        <span class='keyword'>return</span> setChars(s, resultLength, status);</td></tr>
+<tr><td class="num" id="LN990">990</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN991">991</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN992">992</td><td class="line">    <span class='keyword'>virtual</span> <span class='keyword'>void</span> reset(UErrorCode&amp; <span class='comment'>/*status*/</span>) {</td></tr>
+<tr><td class="num" id="LN993">993</td><td class="line">        current = keywords;</td></tr>
+<tr><td class="num" id="LN994">994</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN995">995</td><td class="line">};</td></tr>
+<tr><td class="num" id="LN996">996</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN997">997</td><td class="line"><span class='keyword'>const</span> <span class='keyword'>char</span> KeywordEnumeration::fgClassID = '\0';</td></tr>
+<tr><td class="num" id="LN998">998</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN999">999</td><td class="line">KeywordEnumeration::~KeywordEnumeration() {</td></tr>
+<tr><td class="num" id="LN1000">1000</td><td class="line">    <span class='macro'>uprv_free<span class='expansion'>uprv_free_54</span></span>(keywords);</td></tr>
+<tr><td class="num" id="LN1001">1001</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN1002">1002</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1003">1003</td><td class="line">StringEnumeration *</td></tr>
+<tr><td class="num" id="LN1004">1004</td><td class="line">Locale::createKeywords(UErrorCode &amp;status) <span class='keyword'>const</span></td></tr>
+<tr><td class="num" id="LN1005">1005</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN1006">1006</td><td class="line">    <span class='keyword'>char</span> keywords[256];</td></tr>
+<tr><td class="num" id="LN1007">1007</td><td class="line">    int32_t keywordCapacity = 256;</td></tr>
+<tr><td class="num" id="LN1008">1008</td><td class="line">    StringEnumeration *result = <span class='macro'>NULL<span class='expansion'>__null</span></span>;</td></tr>
+<tr><td class="num" id="LN1009">1009</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1010">1010</td><td class="line">    <span class='keyword'>const</span> <span class='keyword'>char</span>* variantStart = <span class='macro'>uprv_strchr(fullName, '@')<span class='expansion'>:: strchr(fullName, '@')</span></span>;</td></tr>
+<tr><td class="num" id="LN1011">1011</td><td class="line">    <span class='keyword'>const</span> <span class='keyword'>char</span>* assignment = <span class='macro'>uprv_strchr(fullName, '=')<span class='expansion'>:: strchr(fullName, '=')</span></span>;</td></tr>
+<tr><td class="num" id="LN1012">1012</td><td class="line">    <span class='keyword'>if</span>(variantStart) {</td></tr>
+<tr><td class="num" id="LN1013">1013</td><td class="line">        <span class='keyword'>if</span>(assignment &gt; variantStart) {</td></tr>
+<tr><td class="num" id="LN1014">1014</td><td class="line">            int32_t keyLen = <span class='macro'>locale_getKeywords<span class='expansion'>locale_getKeywords_54</span></span>(variantStart+1, '@', keywords, keywordCapacity, <span class='macro'>NULL<span class='expansion'>__null</span></span>, 0, <span class='macro'>NULL<span class='expansion'>__null</span></span>, <span class='macro'>FALSE<span class='expansion'>0</span></span>, &amp;status);</td></tr>
+<tr><td class="num" id="LN1015">1015</td><td class="line">            <span class='keyword'>if</span>(keyLen) {</td></tr>
+<tr><td class="num" id="LN1016">1016</td><td class="line">                result = <span class='keyword'>new</span> KeywordEnumeration(keywords, keyLen, 0, status);</td></tr>
+<tr><td class="num" id="LN1017">1017</td><td class="line">            }</td></tr>
+<tr><td class="num" id="LN1018">1018</td><td class="line">        } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN1019">1019</td><td class="line">            status = U_INVALID_FORMAT_ERROR;</td></tr>
+<tr><td class="num" id="LN1020">1020</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN1021">1021</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN1022">1022</td><td class="line">    <span class='keyword'>return</span> result;</td></tr>
+<tr><td class="num" id="LN1023">1023</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN1024">1024</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1025">1025</td><td class="line">int32_t</td></tr>
+<tr><td class="num" id="LN1026">1026</td><td class="line">Locale::getKeywordValue(<span class='keyword'>const</span> <span class='keyword'>char</span>* keywordName, <span class='keyword'>char</span> *buffer, int32_t bufLen, UErrorCode &amp;status) <span class='keyword'>const</span></td></tr>
+<tr><td class="num" id="LN1027">1027</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN1028">1028</td><td class="line">    <span class='keyword'>return</span> <span class='macro'>uloc_getKeywordValue<span class='expansion'>uloc_getKeywordValue_54</span></span>(fullName, keywordName, buffer, bufLen, &amp;status);</td></tr>
+<tr><td class="num" id="LN1029">1029</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN1030">1030</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1031">1031</td><td class="line"><span class='keyword'>void</span></td></tr>
+<tr><td class="num" id="LN1032">1032</td><td class="line">Locale::setKeywordValue(<span class='keyword'>const</span> <span class='keyword'>char</span>* keywordName, <span class='keyword'>const</span> <span class='keyword'>char</span>* keywordValue, UErrorCode &amp;status)</td></tr>
+<tr><td class="num" id="LN1033">1033</td><td class="line">{</td></tr>
+<tr><td class="num" id="LN1034">1034</td><td class="line">    <span class='macro'>uloc_setKeywordValue<span class='expansion'>uloc_setKeywordValue_54</span></span>(keywordName, keywordValue, fullName, <span class='macro'>ULOC_FULLNAME_CAPACITY<span class='expansion'>157</span></span>, &amp;status);</td></tr>
+<tr><td class="num" id="LN1035">1035</td><td class="line">    <span class='keyword'>if</span> (U_SUCCESS(status) &amp;&amp; baseName == fullName) {</td></tr>
+<tr><td class="num" id="LN1036">1036</td><td class="line">        <span class='comment'>// May have added the first keyword, meaning that the fullName is no longer also the baseName.</span></td></tr>
+<tr><td class="num" id="LN1037">1037</td><td class="line">        initBaseName(status);</td></tr>
+<tr><td class="num" id="LN1038">1038</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN1039">1039</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN1040">1040</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1041">1041</td><td class="line"><span class='keyword'>const</span> <span class='keyword'>char</span> *</td></tr>
+<tr><td class="num" id="LN1042">1042</td><td class="line">Locale::getBaseName() <span class='keyword'>const</span> {</td></tr>
+<tr><td class="num" id="LN1043">1043</td><td class="line">    <span class='keyword'>return</span> baseName;</td></tr>
+<tr><td class="num" id="LN1044">1044</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN1045">1045</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN1046">1046</td><td class="line"><span class='comment'>//eof</span></td></tr>
+<tr><td class="num" id="LN1047">1047</td><td class="line"><span class='macro'>U_NAMESPACE_END<span class='expansion'>} }</span></span></td></tr>
+</table></body></html>

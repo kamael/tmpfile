@@ -1,0 +1,955 @@
+<!doctype html>
+<html>
+<head>
+<title>../third_party/icu/source/common/ustrcase.cpp</title>
+<style type="text/css">
+ body { color:#000000; background-color:#ffffff }
+ body { font-family:Helvetica, sans-serif; font-size:10pt }
+ h1 { font-size:14pt }
+ .code { border-collapse:collapse; width:100%; }
+ .code { font-family: "Monospace", monospace; font-size:10pt }
+ .code { line-height: 1.2em }
+ .comment { color: green; font-style: oblique }
+ .keyword { color: blue }
+ .string_literal { color: red }
+ .directive { color: darkmagenta }
+ .expansion { display: none; }
+ .macro:hover .expansion { display: block; border: 2px solid #FF0000; padding: 2px; background-color:#FFF0F0; font-weight: normal;   -webkit-border-radius:5px;  -webkit-box-shadow:1px 1px 7px #000;   border-radius:5px;  box-shadow:1px 1px 7px #000; position: absolute; top: -1em; left:10em; z-index: 1 } 
+ .macro { color: darkmagenta; background-color:LemonChiffon; position: relative }
+ .num { width:2.5em; padding-right:2ex; background-color:#eeeeee }
+ .num { text-align:right; font-size:8pt }
+ .num { color:#444444 }
+ .line { padding-left: 1ex; border-left: 3px solid #ccc }
+ .line { white-space: pre }
+ .msg { -webkit-box-shadow:1px 1px 7px #000 }
+ .msg { box-shadow:1px 1px 7px #000 }
+ .msg { -webkit-border-radius:5px }
+ .msg { border-radius:5px }
+ .msg { font-family:Helvetica, sans-serif; font-size:8pt }
+ .msg { float:left }
+ .msg { padding:0.25em 1ex 0.25em 1ex }
+ .msg { margin-top:10px; margin-bottom:10px }
+ .msg { font-weight:bold }
+ .msg { max-width:60em; word-wrap: break-word; white-space: pre-wrap }
+ .msgT { padding:0x; spacing:0x }
+ .msgEvent { background-color:#fff8b4; color:#000000 }
+ .msgControl { background-color:#bbbbbb; color:#000000 }
+ .mrange { background-color:#dfddf3 }
+ .mrange { border-bottom:1px solid #6F9DBE }
+ .PathIndex { font-weight: bold; padding:0px 5px; margin-right:5px; }
+ .PathIndex { -webkit-border-radius:8px }
+ .PathIndex { border-radius:8px }
+ .PathIndexEvent { background-color:#bfba87 }
+ .PathIndexControl { background-color:#8c8c8c }
+ .PathNav a { text-decoration:none; font-size: larger }
+ .CodeInsertionHint { font-weight: bold; background-color: #10dd10 }
+ .CodeRemovalHint { background-color:#de1010 }
+ .CodeRemovalHint { border-bottom:1px solid #6F9DBE }
+ table.simpletable {
+   padding: 5px;
+   font-size:12pt;
+   margin:20px;
+   border-collapse: collapse; border-spacing: 0px;
+ }
+ td.rowname {
+   text-align:right; font-weight:bold; color:#444444;
+   padding-right:2ex; }
+</style>
+</head>
+<body>
+<!-- BUGDESC Assigned value is garbage or undefined -->
+
+<!-- BUGTYPE Assigned value is garbage or undefined -->
+
+<!-- BUGCATEGORY Logic error -->
+
+<!-- BUGFILE /home/haha/code/v8_5_0/v8/out/../third_party/icu/source/common/ustrcase.cpp -->
+
+<!-- FILENAME ustrcase.cpp -->
+
+<!-- FUNCTIONNAME u_strcmpFold_54 -->
+
+<!-- ISSUEHASHCONTENTOFLINEINCONTEXT ec4704f92ba80b4caa4a48febe385ee5 -->
+
+<!-- BUGLINE 647 -->
+
+<!-- BUGCOLUMN 23 -->
+
+<!-- BUGPATHLENGTH 58 -->
+
+<!-- BUGMETAEND -->
+<!-- REPORTHEADER -->
+<h3>Bug Summary</h3>
+<table class="simpletable">
+<tr><td class="rowname">File:</td><td>out/../third_party/icu/source/common/ustrcase.cpp</td></tr>
+<tr><td class="rowname">Location:</td><td><a href="#EndPath">line 647, column 23</a></td></tr>
+<tr><td class="rowname">Description:</td><td>Assigned value is garbage or undefined</td></tr>
+</table>
+<!-- REPORTSUMMARYEXTRA -->
+<h3>Annotated Source Code</h3>
+<table class="code">
+<tr><td class="num" id="LN1">1</td><td class="line"><span class='comment'>/*</span></td></tr>
+<tr><td class="num" id="LN2">2</td><td class="line"><span class='comment'>*******************************************************************************</span></td></tr>
+<tr><td class="num" id="LN3">3</td><td class="line"><span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN4">4</td><td class="line"><span class='comment'>*   Copyright (C) 2001-2014, International Business Machines</span></td></tr>
+<tr><td class="num" id="LN5">5</td><td class="line"><span class='comment'>*   Corporation and others.  All Rights Reserved.</span></td></tr>
+<tr><td class="num" id="LN6">6</td><td class="line"><span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN7">7</td><td class="line"><span class='comment'>*******************************************************************************</span></td></tr>
+<tr><td class="num" id="LN8">8</td><td class="line"><span class='comment'>*   file name:  ustrcase.cpp</span></td></tr>
+<tr><td class="num" id="LN9">9</td><td class="line"><span class='comment'>*   encoding:   US-ASCII</span></td></tr>
+<tr><td class="num" id="LN10">10</td><td class="line"><span class='comment'>*   tab size:   8 (not used)</span></td></tr>
+<tr><td class="num" id="LN11">11</td><td class="line"><span class='comment'>*   indentation:4</span></td></tr>
+<tr><td class="num" id="LN12">12</td><td class="line"><span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN13">13</td><td class="line"><span class='comment'>*   created on: 2002feb20</span></td></tr>
+<tr><td class="num" id="LN14">14</td><td class="line"><span class='comment'>*   created by: Markus W. Scherer</span></td></tr>
+<tr><td class="num" id="LN15">15</td><td class="line"><span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN16">16</td><td class="line"><span class='comment'>*   Implementation file for string casing C API functions.</span></td></tr>
+<tr><td class="num" id="LN17">17</td><td class="line"><span class='comment'>*   Uses functions from uchar.c for basic functionality that requires access</span></td></tr>
+<tr><td class="num" id="LN18">18</td><td class="line"><span class='comment'>*   to the Unicode Character Database (uprops.dat).</span></td></tr>
+<tr><td class="num" id="LN19">19</td><td class="line"><span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN20">20</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN21">21</td><td class="line"><span class='directive'>#include "unicode/utypes.h"</span></td></tr>
+<tr><td class="num" id="LN22">22</td><td class="line"><span class='directive'>#include "unicode/brkiter.h"</span></td></tr>
+<tr><td class="num" id="LN23">23</td><td class="line"><span class='directive'>#include "unicode/ustring.h"</span></td></tr>
+<tr><td class="num" id="LN24">24</td><td class="line"><span class='directive'>#include "unicode/ucasemap.h"</span></td></tr>
+<tr><td class="num" id="LN25">25</td><td class="line"><span class='directive'>#include "unicode/ubrk.h"</span></td></tr>
+<tr><td class="num" id="LN26">26</td><td class="line"><span class='directive'>#include "unicode/utf.h"</span></td></tr>
+<tr><td class="num" id="LN27">27</td><td class="line"><span class='directive'>#include "unicode/utf16.h"</span></td></tr>
+<tr><td class="num" id="LN28">28</td><td class="line"><span class='directive'>#include "cmemory.h"</span></td></tr>
+<tr><td class="num" id="LN29">29</td><td class="line"><span class='directive'>#include "ucase.h"</span></td></tr>
+<tr><td class="num" id="LN30">30</td><td class="line"><span class='directive'>#include "ustr_imp.h"</span></td></tr>
+<tr><td class="num" id="LN31">31</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN32">32</td><td class="line"><span class='macro'>U_NAMESPACE_USE<span class='expansion'>using namespace icu_54;</span></span></td></tr>
+<tr><td class="num" id="LN33">33</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN34">34</td><td class="line"><span class='comment'>/* string casing ------------------------------------------------------------ */</span></td></tr>
+<tr><td class="num" id="LN35">35</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN36">36</td><td class="line"><span class='comment'>/* Appends a full case mapping result, see UCASE_MAX_STRING_LENGTH. */</span></td></tr>
+<tr><td class="num" id="LN37">37</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>inline</span> int32_t</td></tr>
+<tr><td class="num" id="LN38">38</td><td class="line">appendResult(UChar *dest, int32_t destIndex, int32_t destCapacity,</td></tr>
+<tr><td class="num" id="LN39">39</td><td class="line">             int32_t result, <span class='keyword'>const</span> UChar *s) {</td></tr>
+<tr><td class="num" id="LN40">40</td><td class="line">    UChar32 c;</td></tr>
+<tr><td class="num" id="LN41">41</td><td class="line">    int32_t length;</td></tr>
+<tr><td class="num" id="LN42">42</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN43">43</td><td class="line">    <span class='comment'>/* decode the result */</span></td></tr>
+<tr><td class="num" id="LN44">44</td><td class="line">    <span class='keyword'>if</span>(result&lt;0) {</td></tr>
+<tr><td class="num" id="LN45">45</td><td class="line">        <span class='comment'>/* (not) original code point */</span></td></tr>
+<tr><td class="num" id="LN46">46</td><td class="line">        c=~result;</td></tr>
+<tr><td class="num" id="LN47">47</td><td class="line">        length=-1;</td></tr>
+<tr><td class="num" id="LN48">48</td><td class="line">    } <span class='keyword'>else</span> <span class='keyword'>if</span>(result&lt;=UCASE_MAX_STRING_LENGTH) {</td></tr>
+<tr><td class="num" id="LN49">49</td><td class="line">        c=<span class='macro'>U_SENTINEL<span class='expansion'>(-1)</span></span>;</td></tr>
+<tr><td class="num" id="LN50">50</td><td class="line">        length=result;</td></tr>
+<tr><td class="num" id="LN51">51</td><td class="line">    } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN52">52</td><td class="line">        c=result;</td></tr>
+<tr><td class="num" id="LN53">53</td><td class="line">        length=-1;</td></tr>
+<tr><td class="num" id="LN54">54</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN55">55</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN56">56</td><td class="line">    <span class='keyword'>if</span>(destIndex&lt;destCapacity) {</td></tr>
+<tr><td class="num" id="LN57">57</td><td class="line">        <span class='comment'>/* append the result */</span></td></tr>
+<tr><td class="num" id="LN58">58</td><td class="line">        <span class='keyword'>if</span>(length&lt;0) {</td></tr>
+<tr><td class="num" id="LN59">59</td><td class="line">            <span class='comment'>/* code point */</span></td></tr>
+<tr><td class="num" id="LN60">60</td><td class="line">            UBool isError=<span class='macro'>FALSE<span class='expansion'>0</span></span>;</td></tr>
+<tr><td class="num" id="LN61">61</td><td class="line">            <span class='macro'>U16_APPEND(dest, destIndex, destCapacity, c, isError)<span class='expansion'>{ if((uint32_t)(c)&lt;=0xffff) { (dest)[(destIndex)++]=(uint16_t<br>)(c); } else if((uint32_t)(c)&lt;=0x10ffff &amp;&amp; (destIndex<br>)+1&lt;(destCapacity)) { (dest)[(destIndex)++]=(uint16_t)(((c<br>)&gt;&gt;10)+0xd7c0); (dest)[(destIndex)++]=(uint16_t)(((c)&amp;<br>0x3ff)|0xdc00); } else { (isError)=1; } }</span></span>;</td></tr>
+<tr><td class="num" id="LN62">62</td><td class="line">            <span class='keyword'>if</span>(isError) {</td></tr>
+<tr><td class="num" id="LN63">63</td><td class="line">                <span class='comment'>/* overflow, nothing written */</span></td></tr>
+<tr><td class="num" id="LN64">64</td><td class="line">                destIndex+=<span class='macro'>U16_LENGTH(c)<span class='expansion'>((uint32_t)(c)&lt;=0xffff ? 1 : 2)</span></span>;</td></tr>
+<tr><td class="num" id="LN65">65</td><td class="line">            }</td></tr>
+<tr><td class="num" id="LN66">66</td><td class="line">        } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN67">67</td><td class="line">            <span class='comment'>/* string */</span></td></tr>
+<tr><td class="num" id="LN68">68</td><td class="line">            <span class='keyword'>if</span>((destIndex+length)&lt;=destCapacity) {</td></tr>
+<tr><td class="num" id="LN69">69</td><td class="line">                <span class='keyword'>while</span>(length&gt;0) {</td></tr>
+<tr><td class="num" id="LN70">70</td><td class="line">                    dest[destIndex++]=*s++;</td></tr>
+<tr><td class="num" id="LN71">71</td><td class="line">                    --length;</td></tr>
+<tr><td class="num" id="LN72">72</td><td class="line">                }</td></tr>
+<tr><td class="num" id="LN73">73</td><td class="line">            } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN74">74</td><td class="line">                <span class='comment'>/* overflow */</span></td></tr>
+<tr><td class="num" id="LN75">75</td><td class="line">                destIndex+=length;</td></tr>
+<tr><td class="num" id="LN76">76</td><td class="line">            }</td></tr>
+<tr><td class="num" id="LN77">77</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN78">78</td><td class="line">    } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN79">79</td><td class="line">        <span class='comment'>/* preflight */</span></td></tr>
+<tr><td class="num" id="LN80">80</td><td class="line">        <span class='keyword'>if</span>(length&lt;0) {</td></tr>
+<tr><td class="num" id="LN81">81</td><td class="line">            destIndex+=<span class='macro'>U16_LENGTH(c)<span class='expansion'>((uint32_t)(c)&lt;=0xffff ? 1 : 2)</span></span>;</td></tr>
+<tr><td class="num" id="LN82">82</td><td class="line">        } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN83">83</td><td class="line">            destIndex+=length;</td></tr>
+<tr><td class="num" id="LN84">84</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN85">85</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN86">86</td><td class="line">    <span class='keyword'>return</span> destIndex;</td></tr>
+<tr><td class="num" id="LN87">87</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN88">88</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN89">89</td><td class="line"><span class='keyword'>static</span> UChar32 U_CALLCONV</td></tr>
+<tr><td class="num" id="LN90">90</td><td class="line">utf16_caseContextIterator(<span class='keyword'>void</span> *context, int8_t dir) {</td></tr>
+<tr><td class="num" id="LN91">91</td><td class="line">    UCaseContext *csc=(UCaseContext *)context;</td></tr>
+<tr><td class="num" id="LN92">92</td><td class="line">    UChar32 c;</td></tr>
+<tr><td class="num" id="LN93">93</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN94">94</td><td class="line">    <span class='keyword'>if</span>(dir&lt;0) {</td></tr>
+<tr><td class="num" id="LN95">95</td><td class="line">        <span class='comment'>/* reset for backward iteration */</span></td></tr>
+<tr><td class="num" id="LN96">96</td><td class="line">        csc-&gt;index=csc-&gt;cpStart;</td></tr>
+<tr><td class="num" id="LN97">97</td><td class="line">        csc-&gt;dir=dir;</td></tr>
+<tr><td class="num" id="LN98">98</td><td class="line">    } <span class='keyword'>else</span> <span class='keyword'>if</span>(dir&gt;0) {</td></tr>
+<tr><td class="num" id="LN99">99</td><td class="line">        <span class='comment'>/* reset for forward iteration */</span></td></tr>
+<tr><td class="num" id="LN100">100</td><td class="line">        csc-&gt;index=csc-&gt;cpLimit;</td></tr>
+<tr><td class="num" id="LN101">101</td><td class="line">        csc-&gt;dir=dir;</td></tr>
+<tr><td class="num" id="LN102">102</td><td class="line">    } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN103">103</td><td class="line">        <span class='comment'>/* continue current iteration direction */</span></td></tr>
+<tr><td class="num" id="LN104">104</td><td class="line">        dir=csc-&gt;dir;</td></tr>
+<tr><td class="num" id="LN105">105</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN106">106</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN107">107</td><td class="line">    <span class='keyword'>if</span>(dir&lt;0) {</td></tr>
+<tr><td class="num" id="LN108">108</td><td class="line">        <span class='keyword'>if</span>(csc-&gt;start&lt;csc-&gt;index) {</td></tr>
+<tr><td class="num" id="LN109">109</td><td class="line">            <span class='macro'>U16_PREV((<span class='keyword'>const</span> UChar *)csc-&gt;p, csc-&gt;start, csc-&gt;index, c)<span class='expansion'>{ (c)=((const UChar *)csc-&gt;p)[--(csc-&gt;index)]; if((((c)<br>&amp;0xfffffc00)==0xdc00)) { uint16_t __c2; if((csc-&gt;index<br>)&gt;(csc-&gt;start) &amp;&amp; (((__c2=((const UChar *)csc-&gt;<br>p)[(csc-&gt;index)-1])&amp;0xfffffc00)==0xd800)) { --(csc-&gt;<br>index); (c)=(((UChar32)(__c2)&lt;&lt;10UL)+(UChar32)((c))-((0xd800<br>&lt;&lt;10UL)+0xdc00-0x10000)); } } }</span></span>;</td></tr>
+<tr><td class="num" id="LN110">110</td><td class="line">            <span class='keyword'>return</span> c;</td></tr>
+<tr><td class="num" id="LN111">111</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN112">112</td><td class="line">    } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN113">113</td><td class="line">        <span class='keyword'>if</span>(csc-&gt;index&lt;csc-&gt;limit) {</td></tr>
+<tr><td class="num" id="LN114">114</td><td class="line">            <span class='macro'>U16_NEXT((<span class='keyword'>const</span> UChar *)csc-&gt;p, csc-&gt;index, csc-&gt;limit, c)<span class='expansion'>{ (c)=((const UChar *)csc-&gt;p)[(csc-&gt;index)++]; if((((c)<br>&amp;0xfffffc00)==0xd800)) { uint16_t __c2; if((csc-&gt;index<br>)!=(csc-&gt;limit) &amp;&amp; (((__c2=((const UChar *)csc-&gt;<br>p)[(csc-&gt;index)])&amp;0xfffffc00)==0xdc00)) { ++(csc-&gt;index<br>); (c)=(((UChar32)((c))&lt;&lt;10UL)+(UChar32)(__c2)-((0xd800<br>&lt;&lt;10UL)+0xdc00-0x10000)); } } }</span></span>;</td></tr>
+<tr><td class="num" id="LN115">115</td><td class="line">            <span class='keyword'>return</span> c;</td></tr>
+<tr><td class="num" id="LN116">116</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN117">117</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN118">118</td><td class="line">    <span class='keyword'>return</span> <span class='macro'>U_SENTINEL<span class='expansion'>(-1)</span></span>;</td></tr>
+<tr><td class="num" id="LN119">119</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN120">120</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN121">121</td><td class="line"><span class='comment'>/*</span></td></tr>
+<tr><td class="num" id="LN122">122</td><td class="line"> <span class='comment'>* Case-maps [srcStart..srcLimit[ but takes</span></td></tr>
+<tr><td class="num" id="LN123">123</td><td class="line"> <span class='comment'>* context [0..srcLength[ into account.</span></td></tr>
+<tr><td class="num" id="LN124">124</td><td class="line"> <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN125">125</td><td class="line"><span class='keyword'>static</span> int32_t</td></tr>
+<tr><td class="num" id="LN126">126</td><td class="line">_caseMap(<span class='keyword'>const</span> UCaseMap *csm, UCaseMapFull *map,</td></tr>
+<tr><td class="num" id="LN127">127</td><td class="line">         UChar *dest, int32_t destCapacity,</td></tr>
+<tr><td class="num" id="LN128">128</td><td class="line">         <span class='keyword'>const</span> UChar *src, UCaseContext *csc,</td></tr>
+<tr><td class="num" id="LN129">129</td><td class="line">         int32_t srcStart, int32_t srcLimit,</td></tr>
+<tr><td class="num" id="LN130">130</td><td class="line">         UErrorCode *pErrorCode) {</td></tr>
+<tr><td class="num" id="LN131">131</td><td class="line">    <span class='keyword'>const</span> UChar *s;</td></tr>
+<tr><td class="num" id="LN132">132</td><td class="line">    UChar32 c, c2 = 0;</td></tr>
+<tr><td class="num" id="LN133">133</td><td class="line">    int32_t srcIndex, destIndex;</td></tr>
+<tr><td class="num" id="LN134">134</td><td class="line">    int32_t locCache;</td></tr>
+<tr><td class="num" id="LN135">135</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN136">136</td><td class="line">    locCache=csm-&gt;locCache;</td></tr>
+<tr><td class="num" id="LN137">137</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN138">138</td><td class="line">    <span class='comment'>/* case mapping loop */</span></td></tr>
+<tr><td class="num" id="LN139">139</td><td class="line">    srcIndex=srcStart;</td></tr>
+<tr><td class="num" id="LN140">140</td><td class="line">    destIndex=0;</td></tr>
+<tr><td class="num" id="LN141">141</td><td class="line">    <span class='keyword'>while</span>(srcIndex&lt;srcLimit) {</td></tr>
+<tr><td class="num" id="LN142">142</td><td class="line">        csc-&gt;cpStart=srcIndex;</td></tr>
+<tr><td class="num" id="LN143">143</td><td class="line">        <span class='macro'>U16_NEXT(src, srcIndex, srcLimit, c)<span class='expansion'>{ (c)=(src)[(srcIndex)++]; if((((c)&amp;0xfffffc00)==0xd800))<br> { uint16_t __c2; if((srcIndex)!=(srcLimit) &amp;&amp; (((__c2<br>=(src)[(srcIndex)])&amp;0xfffffc00)==0xdc00)) { ++(srcIndex);<br> (c)=(((UChar32)((c))&lt;&lt;10UL)+(UChar32)(__c2)-((0xd800&lt;&lt;<br>10UL)+0xdc00-0x10000)); } } }</span></span>;</td></tr>
+<tr><td class="num" id="LN144">144</td><td class="line">        csc-&gt;cpLimit=srcIndex;</td></tr>
+<tr><td class="num" id="LN145">145</td><td class="line">        c=map(csm-&gt;csp, c, utf16_caseContextIterator, csc, &amp;s, csm-&gt;locale, &amp;locCache);</td></tr>
+<tr><td class="num" id="LN146">146</td><td class="line">        <span class='keyword'>if</span>((destIndex&lt;destCapacity) &amp;&amp; (c&lt;0 ? (c2=~c)&lt;=0xffff : UCASE_MAX_STRING_LENGTH&lt;c &amp;&amp; (c2=c)&lt;=0xffff)) {</td></tr>
+<tr><td class="num" id="LN147">147</td><td class="line">            <span class='comment'>/* fast path version of appendResult() for BMP results */</span></td></tr>
+<tr><td class="num" id="LN148">148</td><td class="line">            dest[destIndex++]=(UChar)c2;</td></tr>
+<tr><td class="num" id="LN149">149</td><td class="line">        } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN150">150</td><td class="line">            destIndex=appendResult(dest, destIndex, destCapacity, c, s);</td></tr>
+<tr><td class="num" id="LN151">151</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN152">152</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN153">153</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN154">154</td><td class="line">    <span class='keyword'>if</span>(destIndex&gt;destCapacity) {</td></tr>
+<tr><td class="num" id="LN155">155</td><td class="line">        *pErrorCode=U_BUFFER_OVERFLOW_ERROR;</td></tr>
+<tr><td class="num" id="LN156">156</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN157">157</td><td class="line">    <span class='keyword'>return</span> destIndex;</td></tr>
+<tr><td class="num" id="LN158">158</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN159">159</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN160">160</td><td class="line"><span class='directive'>#if !<span class='macro'>UCONFIG_NO_BREAK_ITERATION<span class='expansion'>0</span></span></span></td></tr>
+<tr><td class="num" id="LN161">161</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN162">162</td><td class="line"><span class='macro'>U_CFUNC<span class='expansion'>extern "C"</span></span> int32_t U_CALLCONV</td></tr>
+<tr><td class="num" id="LN163">163</td><td class="line"><span class='macro'>ustrcase_internalToTitle<span class='expansion'>ustrcase_internalToTitle_54</span></span>(<span class='keyword'>const</span> UCaseMap *csm,</td></tr>
+<tr><td class="num" id="LN164">164</td><td class="line">                         UChar *dest, int32_t destCapacity,</td></tr>
+<tr><td class="num" id="LN165">165</td><td class="line">                         <span class='keyword'>const</span> UChar *src, int32_t srcLength,</td></tr>
+<tr><td class="num" id="LN166">166</td><td class="line">                         UErrorCode *pErrorCode) {</td></tr>
+<tr><td class="num" id="LN167">167</td><td class="line">    <span class='keyword'>const</span> UChar *s;</td></tr>
+<tr><td class="num" id="LN168">168</td><td class="line">    UChar32 c;</td></tr>
+<tr><td class="num" id="LN169">169</td><td class="line">    int32_t prev, titleStart, titleLimit, idx, destIndex, length;</td></tr>
+<tr><td class="num" id="LN170">170</td><td class="line">    UBool isFirstIndex;</td></tr>
+<tr><td class="num" id="LN171">171</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN172">172</td><td class="line">    <span class='keyword'>if</span>(U_FAILURE(*pErrorCode)) {</td></tr>
+<tr><td class="num" id="LN173">173</td><td class="line">        <span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN174">174</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN175">175</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN176">176</td><td class="line">    <span class='comment'>// Use the C++ abstract base class to minimize dependencies.</span></td></tr>
+<tr><td class="num" id="LN177">177</td><td class="line">    <span class='comment'>// TODO: Change UCaseMap.iter to store a BreakIterator directly.</span></td></tr>
+<tr><td class="num" id="LN178">178</td><td class="line">    BreakIterator *bi=<span class='keyword'>reinterpret_cast</span>&lt;BreakIterator *&gt;(csm-&gt;iter);</td></tr>
+<tr><td class="num" id="LN179">179</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN180">180</td><td class="line">    <span class='comment'>/* set up local variables */</span></td></tr>
+<tr><td class="num" id="LN181">181</td><td class="line">    int32_t locCache=csm-&gt;locCache;</td></tr>
+<tr><td class="num" id="LN182">182</td><td class="line">    UCaseContext csc=<span class='macro'>UCASECONTEXT_INITIALIZER<span class='expansion'>{ __null, 0, 0, 0, 0, 0, 0, 0, 0, 0 }</span></span>;</td></tr>
+<tr><td class="num" id="LN183">183</td><td class="line">    csc.p=(<span class='keyword'>void</span> *)src;</td></tr>
+<tr><td class="num" id="LN184">184</td><td class="line">    csc.limit=srcLength;</td></tr>
+<tr><td class="num" id="LN185">185</td><td class="line">    destIndex=0;</td></tr>
+<tr><td class="num" id="LN186">186</td><td class="line">    prev=0;</td></tr>
+<tr><td class="num" id="LN187">187</td><td class="line">    isFirstIndex=<span class='macro'>TRUE<span class='expansion'>1</span></span>;</td></tr>
+<tr><td class="num" id="LN188">188</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN189">189</td><td class="line">    <span class='comment'>/* titlecasing loop */</span></td></tr>
+<tr><td class="num" id="LN190">190</td><td class="line">    <span class='keyword'>while</span>(prev&lt;srcLength) {</td></tr>
+<tr><td class="num" id="LN191">191</td><td class="line">        <span class='comment'>/* find next index where to titlecase */</span></td></tr>
+<tr><td class="num" id="LN192">192</td><td class="line">        <span class='keyword'>if</span>(isFirstIndex) {</td></tr>
+<tr><td class="num" id="LN193">193</td><td class="line">            isFirstIndex=<span class='macro'>FALSE<span class='expansion'>0</span></span>;</td></tr>
+<tr><td class="num" id="LN194">194</td><td class="line">            idx=bi-&gt;first();</td></tr>
+<tr><td class="num" id="LN195">195</td><td class="line">        } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN196">196</td><td class="line">            idx=bi-&gt;next();</td></tr>
+<tr><td class="num" id="LN197">197</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN198">198</td><td class="line">        <span class='keyword'>if</span>(idx==<span class='macro'>UBRK_DONE<span class='expansion'>((int32_t) -1)</span></span> || idx&gt;srcLength) {</td></tr>
+<tr><td class="num" id="LN199">199</td><td class="line">            idx=srcLength;</td></tr>
+<tr><td class="num" id="LN200">200</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN201">201</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN202">202</td><td class="line">        <span class='comment'>/*</span></td></tr>
+<tr><td class="num" id="LN203">203</td><td class="line">         <span class='comment'>* Unicode 4 &amp; 5 section 3.13 Default Case Operations:</span></td></tr>
+<tr><td class="num" id="LN204">204</td><td class="line">         <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN205">205</td><td class="line">         <span class='comment'>* R3  toTitlecase(X): Find the word boundaries based on Unicode Standard Annex</span></td></tr>
+<tr><td class="num" id="LN206">206</td><td class="line">         <span class='comment'>* #29, "Text Boundaries." Between each pair of word boundaries, find the first</span></td></tr>
+<tr><td class="num" id="LN207">207</td><td class="line">         <span class='comment'>* cased character F. If F exists, map F to default_title(F); then map each</span></td></tr>
+<tr><td class="num" id="LN208">208</td><td class="line">         <span class='comment'>* subsequent character C to default_lower(C).</span></td></tr>
+<tr><td class="num" id="LN209">209</td><td class="line">         <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN210">210</td><td class="line">         <span class='comment'>* In this implementation, segment [prev..index[ into 3 parts:</span></td></tr>
+<tr><td class="num" id="LN211">211</td><td class="line">         <span class='comment'>* a) uncased characters (copy as-is) [prev..titleStart[</span></td></tr>
+<tr><td class="num" id="LN212">212</td><td class="line">         <span class='comment'>* b) first case letter (titlecase)         [titleStart..titleLimit[</span></td></tr>
+<tr><td class="num" id="LN213">213</td><td class="line">         <span class='comment'>* c) subsequent characters (lowercase)                 [titleLimit..index[</span></td></tr>
+<tr><td class="num" id="LN214">214</td><td class="line">         <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN215">215</td><td class="line">        <span class='keyword'>if</span>(prev&lt;idx) {</td></tr>
+<tr><td class="num" id="LN216">216</td><td class="line">            <span class='comment'>/* find and copy uncased characters [prev..titleStart[ */</span></td></tr>
+<tr><td class="num" id="LN217">217</td><td class="line">            titleStart=titleLimit=prev;</td></tr>
+<tr><td class="num" id="LN218">218</td><td class="line">            <span class='macro'>U16_NEXT(src, titleLimit, idx, c)<span class='expansion'>{ (c)=(src)[(titleLimit)++]; if((((c)&amp;0xfffffc00)==0xd800<br>)) { uint16_t __c2; if((titleLimit)!=(idx) &amp;&amp; (((__c2<br>=(src)[(titleLimit)])&amp;0xfffffc00)==0xdc00)) { ++(titleLimit<br>); (c)=(((UChar32)((c))&lt;&lt;10UL)+(UChar32)(__c2)-((0xd800<br>&lt;&lt;10UL)+0xdc00-0x10000)); } } }</span></span>;</td></tr>
+<tr><td class="num" id="LN219">219</td><td class="line">            <span class='keyword'>if</span>((csm-&gt;options&amp;<span class='macro'>U_TITLECASE_NO_BREAK_ADJUSTMENT<span class='expansion'>0x200</span></span>)==0 &amp;&amp; UCASE_NONE==<span class='macro'>ucase_getType<span class='expansion'>ucase_getType_54</span></span>(csm-&gt;csp, c)) {</td></tr>
+<tr><td class="num" id="LN220">220</td><td class="line">                <span class='comment'>/* Adjust the titlecasing index (titleStart) to the next cased character. */</span></td></tr>
+<tr><td class="num" id="LN221">221</td><td class="line">                <span class='keyword'>for</span>(;;) {</td></tr>
+<tr><td class="num" id="LN222">222</td><td class="line">                    titleStart=titleLimit;</td></tr>
+<tr><td class="num" id="LN223">223</td><td class="line">                    <span class='keyword'>if</span>(titleLimit==idx) {</td></tr>
+<tr><td class="num" id="LN224">224</td><td class="line">                        <span class='comment'>/*</span></td></tr>
+<tr><td class="num" id="LN225">225</td><td class="line">                         <span class='comment'>* only uncased characters in [prev..index[</span></td></tr>
+<tr><td class="num" id="LN226">226</td><td class="line">                         <span class='comment'>* stop with titleStart==titleLimit==index</span></td></tr>
+<tr><td class="num" id="LN227">227</td><td class="line">                         <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN228">228</td><td class="line">                        <span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN229">229</td><td class="line">                    }</td></tr>
+<tr><td class="num" id="LN230">230</td><td class="line">                    <span class='macro'>U16_NEXT(src, titleLimit, idx, c)<span class='expansion'>{ (c)=(src)[(titleLimit)++]; if((((c)&amp;0xfffffc00)==0xd800<br>)) { uint16_t __c2; if((titleLimit)!=(idx) &amp;&amp; (((__c2<br>=(src)[(titleLimit)])&amp;0xfffffc00)==0xdc00)) { ++(titleLimit<br>); (c)=(((UChar32)((c))&lt;&lt;10UL)+(UChar32)(__c2)-((0xd800<br>&lt;&lt;10UL)+0xdc00-0x10000)); } } }</span></span>;</td></tr>
+<tr><td class="num" id="LN231">231</td><td class="line">                    <span class='keyword'>if</span>(UCASE_NONE!=<span class='macro'>ucase_getType<span class='expansion'>ucase_getType_54</span></span>(csm-&gt;csp, c)) {</td></tr>
+<tr><td class="num" id="LN232">232</td><td class="line">                        <span class='keyword'>break</span>; <span class='comment'>/* cased letter at [titleStart..titleLimit[ */</span></td></tr>
+<tr><td class="num" id="LN233">233</td><td class="line">                    }</td></tr>
+<tr><td class="num" id="LN234">234</td><td class="line">                }</td></tr>
+<tr><td class="num" id="LN235">235</td><td class="line">                length=titleStart-prev;</td></tr>
+<tr><td class="num" id="LN236">236</td><td class="line">                <span class='keyword'>if</span>(length&gt;0) {</td></tr>
+<tr><td class="num" id="LN237">237</td><td class="line">                    <span class='keyword'>if</span>((destIndex+length)&lt;=destCapacity) {</td></tr>
+<tr><td class="num" id="LN238">238</td><td class="line">                        <span class='macro'>uprv_memcpy(dest+destIndex, src+prev, length*U_SIZEOF_UCHAR)<span class='expansion'>:: memcpy(dest+destIndex, src+prev, length*2)</span></span>;</td></tr>
+<tr><td class="num" id="LN239">239</td><td class="line">                    }</td></tr>
+<tr><td class="num" id="LN240">240</td><td class="line">                    destIndex+=length;</td></tr>
+<tr><td class="num" id="LN241">241</td><td class="line">                }</td></tr>
+<tr><td class="num" id="LN242">242</td><td class="line">            }</td></tr>
+<tr><td class="num" id="LN243">243</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN244">244</td><td class="line">            <span class='keyword'>if</span>(titleStart&lt;titleLimit) {</td></tr>
+<tr><td class="num" id="LN245">245</td><td class="line">                <span class='comment'>/* titlecase c which is from [titleStart..titleLimit[ */</span></td></tr>
+<tr><td class="num" id="LN246">246</td><td class="line">                csc.cpStart=titleStart;</td></tr>
+<tr><td class="num" id="LN247">247</td><td class="line">                csc.cpLimit=titleLimit;</td></tr>
+<tr><td class="num" id="LN248">248</td><td class="line">                c=<span class='macro'>ucase_toFullTitle<span class='expansion'>ucase_toFullTitle_54</span></span>(csm-&gt;csp, c, utf16_caseContextIterator, &amp;csc, &amp;s, csm-&gt;locale, &amp;locCache);</td></tr>
+<tr><td class="num" id="LN249">249</td><td class="line">                destIndex=appendResult(dest, destIndex, destCapacity, c, s); </td></tr>
+<tr><td class="num" id="LN250">250</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN251">251</td><td class="line">                <span class='comment'>/* Special case Dutch IJ titlecasing */</span></td></tr>
+<tr><td class="num" id="LN252">252</td><td class="line">                <span class='keyword'>if</span> ( titleStart+1 &lt; idx &amp;&amp; </td></tr>
+<tr><td class="num" id="LN253">253</td><td class="line">                     <span class='macro'>ucase_getCaseLocale<span class='expansion'>ucase_getCaseLocale_54</span></span>(csm-&gt;locale,&amp;locCache) == UCASE_LOC_DUTCH &amp;&amp;</td></tr>
+<tr><td class="num" id="LN254">254</td><td class="line">                     ( src[titleStart] == (UChar32) 0x0049 || src[titleStart] == (UChar32) 0x0069 ) &amp;&amp;</td></tr>
+<tr><td class="num" id="LN255">255</td><td class="line">                     ( src[titleStart+1] == (UChar32) 0x004A || src[titleStart+1] == (UChar32) 0x006A )) { </td></tr>
+<tr><td class="num" id="LN256">256</td><td class="line">                            c=(UChar32) 0x004A;</td></tr>
+<tr><td class="num" id="LN257">257</td><td class="line">                            destIndex=appendResult(dest, destIndex, destCapacity, c, s);</td></tr>
+<tr><td class="num" id="LN258">258</td><td class="line">                            titleLimit++;</td></tr>
+<tr><td class="num" id="LN259">259</td><td class="line">                }</td></tr>
+<tr><td class="num" id="LN260">260</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN261">261</td><td class="line">                <span class='comment'>/* lowercase [titleLimit..index[ */</span></td></tr>
+<tr><td class="num" id="LN262">262</td><td class="line">                <span class='keyword'>if</span>(titleLimit&lt;idx) {</td></tr>
+<tr><td class="num" id="LN263">263</td><td class="line">                    <span class='keyword'>if</span>((csm-&gt;options&amp;<span class='macro'>U_TITLECASE_NO_LOWERCASE<span class='expansion'>0x100</span></span>)==0) {</td></tr>
+<tr><td class="num" id="LN264">264</td><td class="line">                        <span class='comment'>/* Normal operation: Lowercase the rest of the word. */</span></td></tr>
+<tr><td class="num" id="LN265">265</td><td class="line">                        destIndex+=</td></tr>
+<tr><td class="num" id="LN266">266</td><td class="line">                            _caseMap(</td></tr>
+<tr><td class="num" id="LN267">267</td><td class="line">                                csm, <span class='macro'>ucase_toFullLower<span class='expansion'>ucase_toFullLower_54</span></span>,</td></tr>
+<tr><td class="num" id="LN268">268</td><td class="line">                                dest+destIndex, destCapacity-destIndex,</td></tr>
+<tr><td class="num" id="LN269">269</td><td class="line">                                src, &amp;csc,</td></tr>
+<tr><td class="num" id="LN270">270</td><td class="line">                                titleLimit, idx,</td></tr>
+<tr><td class="num" id="LN271">271</td><td class="line">                                pErrorCode);</td></tr>
+<tr><td class="num" id="LN272">272</td><td class="line">                    } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN273">273</td><td class="line">                        <span class='comment'>/* Optionally just copy the rest of the word unchanged. */</span></td></tr>
+<tr><td class="num" id="LN274">274</td><td class="line">                        length=idx-titleLimit;</td></tr>
+<tr><td class="num" id="LN275">275</td><td class="line">                        <span class='keyword'>if</span>((destIndex+length)&lt;=destCapacity) {</td></tr>
+<tr><td class="num" id="LN276">276</td><td class="line">                            <span class='macro'>uprv_memcpy(dest+destIndex, src+titleLimit, length*U_SIZEOF_UCHAR)<span class='expansion'>:: memcpy(dest+destIndex, src+titleLimit, length*2)</span></span>;</td></tr>
+<tr><td class="num" id="LN277">277</td><td class="line">                        }</td></tr>
+<tr><td class="num" id="LN278">278</td><td class="line">                        destIndex+=length;</td></tr>
+<tr><td class="num" id="LN279">279</td><td class="line">                    }</td></tr>
+<tr><td class="num" id="LN280">280</td><td class="line">                }</td></tr>
+<tr><td class="num" id="LN281">281</td><td class="line">            }</td></tr>
+<tr><td class="num" id="LN282">282</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN283">283</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN284">284</td><td class="line">        prev=idx;</td></tr>
+<tr><td class="num" id="LN285">285</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN286">286</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN287">287</td><td class="line">    <span class='keyword'>if</span>(destIndex&gt;destCapacity) {</td></tr>
+<tr><td class="num" id="LN288">288</td><td class="line">        *pErrorCode=U_BUFFER_OVERFLOW_ERROR;</td></tr>
+<tr><td class="num" id="LN289">289</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN290">290</td><td class="line">    <span class='keyword'>return</span> destIndex;</td></tr>
+<tr><td class="num" id="LN291">291</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN292">292</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN293">293</td><td class="line"><span class='directive'>#endif  // !UCONFIG_NO_BREAK_ITERATION</span></td></tr>
+<tr><td class="num" id="LN294">294</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN295">295</td><td class="line"><span class='comment'>/* functions available in the common library (for unistr_case.cpp) */</span></td></tr>
+<tr><td class="num" id="LN296">296</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN297">297</td><td class="line"><span class='macro'>U_CFUNC<span class='expansion'>extern "C"</span></span> int32_t U_CALLCONV</td></tr>
+<tr><td class="num" id="LN298">298</td><td class="line"><span class='macro'>ustrcase_internalToLower<span class='expansion'>ustrcase_internalToLower_54</span></span>(<span class='keyword'>const</span> UCaseMap *csm,</td></tr>
+<tr><td class="num" id="LN299">299</td><td class="line">                         UChar *dest, int32_t destCapacity,</td></tr>
+<tr><td class="num" id="LN300">300</td><td class="line">                         <span class='keyword'>const</span> UChar *src, int32_t srcLength,</td></tr>
+<tr><td class="num" id="LN301">301</td><td class="line">                         UErrorCode *pErrorCode) {</td></tr>
+<tr><td class="num" id="LN302">302</td><td class="line">    UCaseContext csc=<span class='macro'>UCASECONTEXT_INITIALIZER<span class='expansion'>{ __null, 0, 0, 0, 0, 0, 0, 0, 0, 0 }</span></span>;</td></tr>
+<tr><td class="num" id="LN303">303</td><td class="line">    csc.p=(<span class='keyword'>void</span> *)src;</td></tr>
+<tr><td class="num" id="LN304">304</td><td class="line">    csc.limit=srcLength;</td></tr>
+<tr><td class="num" id="LN305">305</td><td class="line">    <span class='keyword'>return</span> _caseMap(</td></tr>
+<tr><td class="num" id="LN306">306</td><td class="line">        csm, <span class='macro'>ucase_toFullLower<span class='expansion'>ucase_toFullLower_54</span></span>,</td></tr>
+<tr><td class="num" id="LN307">307</td><td class="line">        dest, destCapacity,</td></tr>
+<tr><td class="num" id="LN308">308</td><td class="line">        src, &amp;csc, 0, srcLength,</td></tr>
+<tr><td class="num" id="LN309">309</td><td class="line">        pErrorCode);</td></tr>
+<tr><td class="num" id="LN310">310</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN311">311</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN312">312</td><td class="line"><span class='macro'>U_CFUNC<span class='expansion'>extern "C"</span></span> int32_t U_CALLCONV</td></tr>
+<tr><td class="num" id="LN313">313</td><td class="line"><span class='macro'>ustrcase_internalToUpper<span class='expansion'>ustrcase_internalToUpper_54</span></span>(<span class='keyword'>const</span> UCaseMap *csm,</td></tr>
+<tr><td class="num" id="LN314">314</td><td class="line">                         UChar *dest, int32_t destCapacity,</td></tr>
+<tr><td class="num" id="LN315">315</td><td class="line">                         <span class='keyword'>const</span> UChar *src, int32_t srcLength,</td></tr>
+<tr><td class="num" id="LN316">316</td><td class="line">                         UErrorCode *pErrorCode) {</td></tr>
+<tr><td class="num" id="LN317">317</td><td class="line">    UCaseContext csc=<span class='macro'>UCASECONTEXT_INITIALIZER<span class='expansion'>{ __null, 0, 0, 0, 0, 0, 0, 0, 0, 0 }</span></span>;</td></tr>
+<tr><td class="num" id="LN318">318</td><td class="line">    csc.p=(<span class='keyword'>void</span> *)src;</td></tr>
+<tr><td class="num" id="LN319">319</td><td class="line">    csc.limit=srcLength;</td></tr>
+<tr><td class="num" id="LN320">320</td><td class="line">    <span class='keyword'>return</span> _caseMap(</td></tr>
+<tr><td class="num" id="LN321">321</td><td class="line">        csm, <span class='macro'>ucase_toFullUpper<span class='expansion'>ucase_toFullUpper_54</span></span>,</td></tr>
+<tr><td class="num" id="LN322">322</td><td class="line">        dest, destCapacity,</td></tr>
+<tr><td class="num" id="LN323">323</td><td class="line">        src, &amp;csc, 0, srcLength,</td></tr>
+<tr><td class="num" id="LN324">324</td><td class="line">        pErrorCode);</td></tr>
+<tr><td class="num" id="LN325">325</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN326">326</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN327">327</td><td class="line"><span class='keyword'>static</span> int32_t</td></tr>
+<tr><td class="num" id="LN328">328</td><td class="line">ustr_foldCase(<span class='keyword'>const</span> UCaseProps *csp,</td></tr>
+<tr><td class="num" id="LN329">329</td><td class="line">              UChar *dest, int32_t destCapacity,</td></tr>
+<tr><td class="num" id="LN330">330</td><td class="line">              <span class='keyword'>const</span> UChar *src, int32_t srcLength,</td></tr>
+<tr><td class="num" id="LN331">331</td><td class="line">              uint32_t options,</td></tr>
+<tr><td class="num" id="LN332">332</td><td class="line">              UErrorCode *pErrorCode) {</td></tr>
+<tr><td class="num" id="LN333">333</td><td class="line">    int32_t srcIndex, destIndex;</td></tr>
+<tr><td class="num" id="LN334">334</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN335">335</td><td class="line">    <span class='keyword'>const</span> UChar *s;</td></tr>
+<tr><td class="num" id="LN336">336</td><td class="line">    UChar32 c, c2 = 0;</td></tr>
+<tr><td class="num" id="LN337">337</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN338">338</td><td class="line">    <span class='comment'>/* case mapping loop */</span></td></tr>
+<tr><td class="num" id="LN339">339</td><td class="line">    srcIndex=destIndex=0;</td></tr>
+<tr><td class="num" id="LN340">340</td><td class="line">    <span class='keyword'>while</span>(srcIndex&lt;srcLength) {</td></tr>
+<tr><td class="num" id="LN341">341</td><td class="line">        <span class='macro'>U16_NEXT(src, srcIndex, srcLength, c)<span class='expansion'>{ (c)=(src)[(srcIndex)++]; if((((c)&amp;0xfffffc00)==0xd800))<br> { uint16_t __c2; if((srcIndex)!=(srcLength) &amp;&amp; (((__c2<br>=(src)[(srcIndex)])&amp;0xfffffc00)==0xdc00)) { ++(srcIndex);<br> (c)=(((UChar32)((c))&lt;&lt;10UL)+(UChar32)(__c2)-((0xd800&lt;&lt;<br>10UL)+0xdc00-0x10000)); } } }</span></span>;</td></tr>
+<tr><td class="num" id="LN342">342</td><td class="line">        c=<span class='macro'>ucase_toFullFolding<span class='expansion'>ucase_toFullFolding_54</span></span>(csp, c, &amp;s, options);</td></tr>
+<tr><td class="num" id="LN343">343</td><td class="line">        <span class='keyword'>if</span>((destIndex&lt;destCapacity) &amp;&amp; (c&lt;0 ? (c2=~c)&lt;=0xffff : UCASE_MAX_STRING_LENGTH&lt;c &amp;&amp; (c2=c)&lt;=0xffff)) {</td></tr>
+<tr><td class="num" id="LN344">344</td><td class="line">            <span class='comment'>/* fast path version of appendResult() for BMP results */</span></td></tr>
+<tr><td class="num" id="LN345">345</td><td class="line">            dest[destIndex++]=(UChar)c2;</td></tr>
+<tr><td class="num" id="LN346">346</td><td class="line">        } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN347">347</td><td class="line">            destIndex=appendResult(dest, destIndex, destCapacity, c, s);</td></tr>
+<tr><td class="num" id="LN348">348</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN349">349</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN350">350</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN351">351</td><td class="line">    <span class='keyword'>if</span>(destIndex&gt;destCapacity) {</td></tr>
+<tr><td class="num" id="LN352">352</td><td class="line">        *pErrorCode=U_BUFFER_OVERFLOW_ERROR;</td></tr>
+<tr><td class="num" id="LN353">353</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN354">354</td><td class="line">    <span class='keyword'>return</span> destIndex;</td></tr>
+<tr><td class="num" id="LN355">355</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN356">356</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN357">357</td><td class="line"><span class='macro'>U_CFUNC<span class='expansion'>extern "C"</span></span> int32_t U_CALLCONV</td></tr>
+<tr><td class="num" id="LN358">358</td><td class="line"><span class='macro'>ustrcase_internalFold<span class='expansion'>ustrcase_internalFold_54</span></span>(<span class='keyword'>const</span> UCaseMap *csm,</td></tr>
+<tr><td class="num" id="LN359">359</td><td class="line">                      UChar *dest, int32_t destCapacity,</td></tr>
+<tr><td class="num" id="LN360">360</td><td class="line">                      <span class='keyword'>const</span> UChar *src, int32_t srcLength,</td></tr>
+<tr><td class="num" id="LN361">361</td><td class="line">                      UErrorCode *pErrorCode) {</td></tr>
+<tr><td class="num" id="LN362">362</td><td class="line">    <span class='keyword'>return</span> ustr_foldCase(csm-&gt;csp, dest, destCapacity, src, srcLength, csm-&gt;options, pErrorCode);</td></tr>
+<tr><td class="num" id="LN363">363</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN364">364</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN365">365</td><td class="line"><span class='macro'>U_CFUNC<span class='expansion'>extern "C"</span></span> int32_t</td></tr>
+<tr><td class="num" id="LN366">366</td><td class="line"><span class='macro'>ustrcase_map<span class='expansion'>ustrcase_map_54</span></span>(<span class='keyword'>const</span> UCaseMap *csm,</td></tr>
+<tr><td class="num" id="LN367">367</td><td class="line">             UChar *dest, int32_t destCapacity,</td></tr>
+<tr><td class="num" id="LN368">368</td><td class="line">             <span class='keyword'>const</span> UChar *src, int32_t srcLength,</td></tr>
+<tr><td class="num" id="LN369">369</td><td class="line">             UStringCaseMapper *stringCaseMapper,</td></tr>
+<tr><td class="num" id="LN370">370</td><td class="line">             UErrorCode *pErrorCode) {</td></tr>
+<tr><td class="num" id="LN371">371</td><td class="line">    UChar buffer[300];</td></tr>
+<tr><td class="num" id="LN372">372</td><td class="line">    UChar *temp;</td></tr>
+<tr><td class="num" id="LN373">373</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN374">374</td><td class="line">    int32_t destLength;</td></tr>
+<tr><td class="num" id="LN375">375</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN376">376</td><td class="line">    <span class='comment'>/* check argument values */</span></td></tr>
+<tr><td class="num" id="LN377">377</td><td class="line">    <span class='keyword'>if</span>(U_FAILURE(*pErrorCode)) {</td></tr>
+<tr><td class="num" id="LN378">378</td><td class="line">        <span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN379">379</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN380">380</td><td class="line">    <span class='keyword'>if</span>( destCapacity&lt;0 ||</td></tr>
+<tr><td class="num" id="LN381">381</td><td class="line">        (dest==<span class='macro'>NULL<span class='expansion'>__null</span></span> &amp;&amp; destCapacity&gt;0) ||</td></tr>
+<tr><td class="num" id="LN382">382</td><td class="line">        src==<span class='macro'>NULL<span class='expansion'>__null</span></span> ||</td></tr>
+<tr><td class="num" id="LN383">383</td><td class="line">        srcLength&lt;-1</td></tr>
+<tr><td class="num" id="LN384">384</td><td class="line">    ) {</td></tr>
+<tr><td class="num" id="LN385">385</td><td class="line">        *pErrorCode=U_ILLEGAL_ARGUMENT_ERROR;</td></tr>
+<tr><td class="num" id="LN386">386</td><td class="line">        <span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN387">387</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN388">388</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN389">389</td><td class="line">    <span class='comment'>/* get the string length */</span></td></tr>
+<tr><td class="num" id="LN390">390</td><td class="line">    <span class='keyword'>if</span>(srcLength==-1) {</td></tr>
+<tr><td class="num" id="LN391">391</td><td class="line">        srcLength=<span class='macro'>u_strlen<span class='expansion'>u_strlen_54</span></span>(src);</td></tr>
+<tr><td class="num" id="LN392">392</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN393">393</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN394">394</td><td class="line">    <span class='comment'>/* check for overlapping source and destination */</span></td></tr>
+<tr><td class="num" id="LN395">395</td><td class="line">    <span class='keyword'>if</span>( dest!=<span class='macro'>NULL<span class='expansion'>__null</span></span> &amp;&amp;</td></tr>
+<tr><td class="num" id="LN396">396</td><td class="line">        ((src&gt;=dest &amp;&amp; src&lt;(dest+destCapacity)) ||</td></tr>
+<tr><td class="num" id="LN397">397</td><td class="line">         (dest&gt;=src &amp;&amp; dest&lt;(src+srcLength)))</td></tr>
+<tr><td class="num" id="LN398">398</td><td class="line">    ) {</td></tr>
+<tr><td class="num" id="LN399">399</td><td class="line">        <span class='comment'>/* overlap: provide a temporary destination buffer and later copy the result */</span></td></tr>
+<tr><td class="num" id="LN400">400</td><td class="line">        <span class='keyword'>if</span>(destCapacity&lt;=<span class='macro'>UPRV_LENGTHOF(buffer)<span class='expansion'>(int32_t)(sizeof(buffer)/sizeof((buffer)[0]))</span></span>) {</td></tr>
+<tr><td class="num" id="LN401">401</td><td class="line">            <span class='comment'>/* the stack buffer is large enough */</span></td></tr>
+<tr><td class="num" id="LN402">402</td><td class="line">            temp=buffer;</td></tr>
+<tr><td class="num" id="LN403">403</td><td class="line">        } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN404">404</td><td class="line">            <span class='comment'>/* allocate a buffer */</span></td></tr>
+<tr><td class="num" id="LN405">405</td><td class="line">            temp=(UChar *)<span class='macro'>uprv_malloc<span class='expansion'>uprv_malloc_54</span></span>(destCapacity*<span class='macro'>U_SIZEOF_UCHAR<span class='expansion'>2</span></span>);</td></tr>
+<tr><td class="num" id="LN406">406</td><td class="line">            <span class='keyword'>if</span>(temp==<span class='macro'>NULL<span class='expansion'>__null</span></span>) {</td></tr>
+<tr><td class="num" id="LN407">407</td><td class="line">                *pErrorCode=U_MEMORY_ALLOCATION_ERROR;</td></tr>
+<tr><td class="num" id="LN408">408</td><td class="line">                <span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN409">409</td><td class="line">            }</td></tr>
+<tr><td class="num" id="LN410">410</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN411">411</td><td class="line">    } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN412">412</td><td class="line">        temp=dest;</td></tr>
+<tr><td class="num" id="LN413">413</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN414">414</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN415">415</td><td class="line">    destLength=stringCaseMapper(csm, temp, destCapacity, src, srcLength, pErrorCode);</td></tr>
+<tr><td class="num" id="LN416">416</td><td class="line">    <span class='keyword'>if</span>(temp!=dest) {</td></tr>
+<tr><td class="num" id="LN417">417</td><td class="line">        <span class='comment'>/* copy the result string to the destination buffer */</span></td></tr>
+<tr><td class="num" id="LN418">418</td><td class="line">        <span class='keyword'>if</span>(destLength&gt;0) {</td></tr>
+<tr><td class="num" id="LN419">419</td><td class="line">            int32_t copyLength= destLength&lt;=destCapacity ? destLength : destCapacity;</td></tr>
+<tr><td class="num" id="LN420">420</td><td class="line">            <span class='keyword'>if</span>(copyLength&gt;0) {</td></tr>
+<tr><td class="num" id="LN421">421</td><td class="line">                <span class='macro'>uprv_memmove(dest, temp, copyLength*U_SIZEOF_UCHAR)<span class='expansion'>:: memmove(dest, temp, copyLength*2)</span></span>;</td></tr>
+<tr><td class="num" id="LN422">422</td><td class="line">            }</td></tr>
+<tr><td class="num" id="LN423">423</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN424">424</td><td class="line">        <span class='keyword'>if</span>(temp!=buffer) {</td></tr>
+<tr><td class="num" id="LN425">425</td><td class="line">            <span class='macro'>uprv_free<span class='expansion'>uprv_free_54</span></span>(temp);</td></tr>
+<tr><td class="num" id="LN426">426</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN427">427</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN428">428</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN429">429</td><td class="line">    <span class='keyword'>return</span> <span class='macro'>u_terminateUChars<span class='expansion'>u_terminateUChars_54</span></span>(dest, destCapacity, destLength, pErrorCode);</td></tr>
+<tr><td class="num" id="LN430">430</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN431">431</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN432">432</td><td class="line"><span class='comment'>/* public API functions */</span></td></tr>
+<tr><td class="num" id="LN433">433</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN434">434</td><td class="line"><span class='macro'>U_CAPI<span class='expansion'>extern "C"</span></span> int32_t U_EXPORT2</td></tr>
+<tr><td class="num" id="LN435">435</td><td class="line"><span class='macro'>u_strFoldCase<span class='expansion'>u_strFoldCase_54</span></span>(UChar *dest, int32_t destCapacity,</td></tr>
+<tr><td class="num" id="LN436">436</td><td class="line">              <span class='keyword'>const</span> UChar *src, int32_t srcLength,</td></tr>
+<tr><td class="num" id="LN437">437</td><td class="line">              uint32_t options,</td></tr>
+<tr><td class="num" id="LN438">438</td><td class="line">              UErrorCode *pErrorCode) {</td></tr>
+<tr><td class="num" id="LN439">439</td><td class="line">    UCaseMap csm=<span class='macro'>UCASEMAP_INITIALIZER<span class='expansion'>{ __null, __null, { 0 }, 0, 0 }</span></span>;</td></tr>
+<tr><td class="num" id="LN440">440</td><td class="line">    csm.csp=<span class='macro'>ucase_getSingleton<span class='expansion'>ucase_getSingleton_54</span></span>();</td></tr>
+<tr><td class="num" id="LN441">441</td><td class="line">    csm.options=options;</td></tr>
+<tr><td class="num" id="LN442">442</td><td class="line">    <span class='keyword'>return</span> <span class='macro'>ustrcase_map<span class='expansion'>ustrcase_map_54</span></span>(</td></tr>
+<tr><td class="num" id="LN443">443</td><td class="line">        &amp;csm,</td></tr>
+<tr><td class="num" id="LN444">444</td><td class="line">        dest, destCapacity,</td></tr>
+<tr><td class="num" id="LN445">445</td><td class="line">        src, srcLength,</td></tr>
+<tr><td class="num" id="LN446">446</td><td class="line">        <span class='macro'>ustrcase_internalFold<span class='expansion'>ustrcase_internalFold_54</span></span>, pErrorCode);</td></tr>
+<tr><td class="num" id="LN447">447</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN448">448</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN449">449</td><td class="line"><span class='comment'>/* case-insensitive string comparisons -------------------------------------- */</span></td></tr>
+<tr><td class="num" id="LN450">450</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN451">451</td><td class="line"><span class='comment'>/*</span></td></tr>
+<tr><td class="num" id="LN452">452</td><td class="line"> <span class='comment'>* This function is a copy of unorm_cmpEquivFold() minus the parts for</span></td></tr>
+<tr><td class="num" id="LN453">453</td><td class="line"> <span class='comment'>* canonical equivalence.</span></td></tr>
+<tr><td class="num" id="LN454">454</td><td class="line"> <span class='comment'>* Keep the functions in sync, and see there for how this works.</span></td></tr>
+<tr><td class="num" id="LN455">455</td><td class="line"> <span class='comment'>* The duplication is for modularization:</span></td></tr>
+<tr><td class="num" id="LN456">456</td><td class="line"> <span class='comment'>* It makes caseless (but not canonical caseless) matches independent of</span></td></tr>
+<tr><td class="num" id="LN457">457</td><td class="line"> <span class='comment'>* the normalization code.</span></td></tr>
+<tr><td class="num" id="LN458">458</td><td class="line"> <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN459">459</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN460">460</td><td class="line"><span class='comment'>/* stack element for previous-level source/decomposition pointers */</span></td></tr>
+<tr><td class="num" id="LN461">461</td><td class="line"><span class='keyword'>struct</span> CmpEquivLevel {</td></tr>
+<tr><td class="num" id="LN462">462</td><td class="line">    <span class='keyword'>const</span> UChar *start, *s, *limit;</td></tr>
+<tr><td class="num" id="LN463">463</td><td class="line">};</td></tr>
+<tr><td class="num" id="LN464">464</td><td class="line"><span class='keyword'>typedef</span> <span class='keyword'>struct</span> CmpEquivLevel CmpEquivLevel;</td></tr>
+<tr><td class="num" id="LN465">465</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN466">466</td><td class="line"><span class='comment'>/* internal function */</span></td></tr>
+<tr><td class="num" id="LN467">467</td><td class="line"><span class='macro'>U_CFUNC<span class='expansion'>extern "C"</span></span> int32_t</td></tr>
+<tr><td class="num" id="LN468">468</td><td class="line"><span class='macro'>u_strcmpFold<span class='expansion'>u_strcmpFold_54</span></span>(<span class='keyword'>const</span> UChar *s1, int32_t length1,</td></tr>
+<tr><td class="num" id="LN469">469</td><td class="line">             <span class='keyword'>const</span> UChar *s2, int32_t length2,</td></tr>
+<tr><td class="num" id="LN470">470</td><td class="line">             uint32_t options,</td></tr>
+<tr><td class="num" id="LN471">471</td><td class="line">             UErrorCode *pErrorCode) {</td></tr>
+<tr><td class="num" id="LN472">472</td><td class="line">    <span class='keyword'>const</span> UCaseProps *csp;</td></tr>
+<tr><td class="num" id="LN473">473</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN474">474</td><td class="line">    <span class='comment'>/* current-level start/limit - s1/s2 as current */</span></td></tr>
+<tr><td class="num" id="LN475">475</td><td class="line">    <span class='keyword'>const</span> UChar *start1, *start2, *limit1, *limit2;</td></tr>
+<tr><td class="num" id="LN476">476</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN477">477</td><td class="line">    <span class='comment'>/* case folding variables */</span></td></tr>
+<tr><td class="num" id="LN478">478</td><td class="line">    <span class='keyword'>const</span> UChar *p;</td></tr>
+<tr><td class="num" id="LN479">479</td><td class="line">    int32_t length;</td></tr>
+<tr><td class="num" id="LN480">480</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN481">481</td><td class="line">    <span class='comment'>/* stacks of previous-level start/current/limit */</span></td></tr>
+<tr><td class="num" id="LN482">482</td><td class="line">    CmpEquivLevel stack1[2], stack2[2];</td></tr>
+<tr><td class="num" id="LN483">483</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN484">484</td><td class="line">    <span class='comment'>/* case folding buffers, only use current-level start/limit */</span></td></tr>
+<tr><td class="num" id="LN485">485</td><td class="line">    UChar fold1[UCASE_MAX_STRING_LENGTH+1], fold2[UCASE_MAX_STRING_LENGTH+1];</td></tr>
+<tr><td class="num" id="LN486">486</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN487">487</td><td class="line">    <span class='comment'>/* track which is the current level per string */</span></td></tr>
+<tr><td class="num" id="LN488">488</td><td class="line">    int32_t level1, level2;</td></tr>
+<tr><td class="num" id="LN489">489</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN490">490</td><td class="line">    <span class='comment'>/* current code units, and code points for lookups */</span></td></tr>
+<tr><td class="num" id="LN491">491</td><td class="line">    UChar32 c1, c2, cp1, cp2;</td></tr>
+<tr><td class="num" id="LN492">492</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN493">493</td><td class="line">    <span class='comment'>/* no argument error checking because this itself is not an API */</span></td></tr>
+<tr><td class="num" id="LN494">494</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN495">495</td><td class="line">    <span class='comment'>/*</span></td></tr>
+<tr><td class="num" id="LN496">496</td><td class="line">     <span class='comment'>* assume that at least the option U_COMPARE_IGNORE_CASE is set</span></td></tr>
+<tr><td class="num" id="LN497">497</td><td class="line">     <span class='comment'>* otherwise this function would have to behave exactly as uprv_strCompare()</span></td></tr>
+<tr><td class="num" id="LN498">498</td><td class="line">     <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN499">499</td><td class="line">    csp=<span class='macro'>ucase_getSingleton<span class='expansion'>ucase_getSingleton_54</span></span>();</td></tr>
+<tr><td class="num" id="LN500">500</td><td class="line">    <span class='keyword'>if</span>(U_FAILURE(*pErrorCode)) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path1" class="msg msgControl" style="margin-left:5ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">1</div></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path2" title="Next event (2)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN501">501</td><td class="line">        <span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN502">502</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN503">503</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN504">504</td><td class="line">    <span class='comment'>/* initialize */</span></td></tr>
+<tr><td class="num" id="LN505">505</td><td class="line">    start1=s1;</td></tr>
+<tr><td class="num" id="LN506">506</td><td class="line">    <span class='keyword'>if</span>(length1==-1) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path2" class="msg msgControl" style="margin-left:5ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">2</div></td><td><div class="PathNav"><a href="#Path1" title="Previous event (1)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path3" title="Next event (3)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN507">507</td><td class="line">        limit1=<span class='macro'>NULL<span class='expansion'>__null</span></span>;</td></tr>
+<tr><td class="num" id="LN508">508</td><td class="line">    } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN509">509</td><td class="line">        limit1=s1+length1;</td></tr>
+<tr><td class="num" id="LN510">510</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN511">511</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN512">512</td><td class="line">    start2=s2;</td></tr>
+<tr><td class="num" id="LN513">513</td><td class="line">    <span class='keyword'>if</span>(length2==-1) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path3" class="msg msgControl" style="margin-left:5ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">3</div></td><td><div class="PathNav"><a href="#Path2" title="Previous event (2)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path4" title="Next event (4)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN514">514</td><td class="line">        limit2=<span class='macro'>NULL<span class='expansion'>__null</span></span>;</td></tr>
+<tr><td class="num" id="LN515">515</td><td class="line">    } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN516">516</td><td class="line">        limit2=s2+length2;</td></tr>
+<tr><td class="num" id="LN517">517</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN518">518</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN519">519</td><td class="line">    level1=level2=0;</td></tr>
+<tr><td class="num" id="LN520">520</td><td class="line">    c1=c2=-1;</td></tr>
+<tr><td class="num" id="LN521">521</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN522">522</td><td class="line">    <span class='comment'>/* comparison loop */</span></td></tr>
+<tr><td class="num" id="LN523">523</td><td class="line">    <span class='keyword'>for</span>(;;) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path4" class="msg msgControl" style="margin-left:5ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">4</div></td><td><div class="PathNav"><a href="#Path3" title="Previous event (3)">&#x2190;</a></div></td></td><td>Loop condition is true.  Entering loop body</td><td><div class="PathNav"><a href="#Path5" title="Next event (5)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path22" class="msg msgControl" style="margin-left:5ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">22</div></td><td><div class="PathNav"><a href="#Path21" title="Previous event (21)">&#x2190;</a></div></td></td><td>Loop condition is true.  Entering loop body</td><td><div class="PathNav"><a href="#Path23" title="Next event (23)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path38" class="msg msgControl" style="margin-left:5ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">38</div></td><td><div class="PathNav"><a href="#Path37" title="Previous event (37)">&#x2190;</a></div></td></td><td>Loop condition is true.  Entering loop body</td><td><div class="PathNav"><a href="#Path39" title="Next event (39)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN524">524</td><td class="line">        <span class='comment'>/*</span></td></tr>
+<tr><td class="num" id="LN525">525</td><td class="line">         <span class='comment'>* here a code unit value of -1 means "get another code unit"</span></td></tr>
+<tr><td class="num" id="LN526">526</td><td class="line">         <span class='comment'>* below it will mean "this source is finished"</span></td></tr>
+<tr><td class="num" id="LN527">527</td><td class="line">         <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN528">528</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN529">529</td><td class="line">        <span class='keyword'>if</span>(c1&lt;0) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path5" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">5</div></td><td><div class="PathNav"><a href="#Path4" title="Previous event (4)">&#x2190;</a></div></td></td><td>Taking true branch</td><td><div class="PathNav"><a href="#Path6" title="Next event (6)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path23" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">23</div></td><td><div class="PathNav"><a href="#Path22" title="Previous event (22)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path24" title="Next event (24)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path39" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">39</div></td><td><div class="PathNav"><a href="#Path38" title="Previous event (38)">&#x2190;</a></div></td></td><td>Taking true branch</td><td><div class="PathNav"><a href="#Path40" title="Next event (40)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN530">530</td><td class="line">            <span class='comment'>/* get next code unit from string 1, post-increment */</span></td></tr>
+<tr><td class="num" id="LN531">531</td><td class="line">            <span class='keyword'>for</span>(;;) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path6" class="msg msgControl" style="margin-left:13ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">6</div></td><td><div class="PathNav"><a href="#Path5" title="Previous event (5)">&#x2190;</a></div></td></td><td>Loop condition is true.  Entering loop body</td><td><div class="PathNav"><a href="#Path7" title="Next event (7)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path40" class="msg msgControl" style="margin-left:13ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">40</div></td><td><div class="PathNav"><a href="#Path39" title="Previous event (39)">&#x2190;</a></div></td></td><td>Loop condition is true.  Entering loop body</td><td><div class="PathNav"><a href="#Path41" title="Next event (41)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path44" class="msg msgControl" style="margin-left:13ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">44</div></td><td><div class="PathNav"><a href="#Path43" title="Previous event (43)">&#x2190;</a></div></td></td><td>Loop condition is true.  Entering loop body</td><td><div class="PathNav"><a href="#Path45" title="Next event (45)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN532">532</td><td class="line">                <span class='keyword'>if</span>(<span class="mrange">s1==limit1</span> || ((c1=*s1)==0 &amp;&amp; (limit1==<span class='macro'>NULL<span class='expansion'>__null</span></span> || (options&amp;<span class='macro'>_STRNCMP_STYLE<span class='expansion'>0x1000</span></span>)))) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path41" class="msg msgControl" style="margin-left:17ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">41</div></td><td><div class="PathNav"><a href="#Path40" title="Previous event (40)">&#x2190;</a></div></td></td><td>Taking true branch</td><td><div class="PathNav"><a href="#Path42" title="Next event (42)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path45" class="msg msgEvent" style="margin-left:20ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexEvent">45</div></td><td><div class="PathNav"><a href="#Path44" title="Previous event (44)">&#x2190;</a></div></td></td><td>Assuming 's1' is not equal to 'limit1'</td><td><div class="PathNav"><a href="#Path46" title="Next event (46)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN533">533</td><td class="line">                    <span class='keyword'>if</span>(level1==0) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path42" class="msg msgControl" style="margin-left:21ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">42</div></td><td><div class="PathNav"><a href="#Path41" title="Previous event (41)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path43" title="Next event (43)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN534">534</td><td class="line">                        c1=-1;</td></tr>
+<tr><td class="num" id="LN535">535</td><td class="line">                        <span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN536">536</td><td class="line">                    }</td></tr>
+<tr><td class="num" id="LN537">537</td><td class="line">                } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN538">538</td><td class="line">                    ++s1;</td></tr>
+<tr><td class="num" id="LN539">539</td><td class="line">                    <span class='keyword'>break</span>;</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path7" class="msg msgControl" style="margin-left:21ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">7</div></td><td><div class="PathNav"><a href="#Path6" title="Previous event (6)">&#x2190;</a></div></td></td><td> Execution continues on line 552</td><td><div class="PathNav"><a href="#Path8" title="Next event (8)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path46" class="msg msgControl" style="margin-left:21ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">46</div></td><td><div class="PathNav"><a href="#Path45" title="Previous event (45)">&#x2190;</a></div></td></td><td> Execution continues on line 552</td><td><div class="PathNav"><a href="#Path47" title="Next event (47)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN540">540</td><td class="line">                }</td></tr>
+<tr><td class="num" id="LN541">541</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN542">542</td><td class="line">                <span class='comment'>/* reached end of level buffer, pop one level */</span></td></tr>
+<tr><td class="num" id="LN543">543</td><td class="line">                <span class='keyword'>do</span> {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path43" class="msg msgControl" style="margin-left:17ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">43</div></td><td><div class="PathNav"><a href="#Path42" title="Previous event (42)">&#x2190;</a></div></td></td><td>Loop condition is false.  Exiting loop</td><td><div class="PathNav"><a href="#Path44" title="Next event (44)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN544">544</td><td class="line">                    --level1;</td></tr>
+<tr><td class="num" id="LN545">545</td><td class="line">                    start1=stack1[level1].start;    <span class='comment'>/*Not uninitialized*/</span></td></tr>
+<tr><td class="num" id="LN546">546</td><td class="line">                } <span class='keyword'>while</span>(start1==<span class='macro'>NULL<span class='expansion'>__null</span></span>);</td></tr>
+<tr><td class="num" id="LN547">547</td><td class="line">                s1=stack1[level1].s;                <span class='comment'>/*Not uninitialized*/</span></td></tr>
+<tr><td class="num" id="LN548">548</td><td class="line">                limit1=stack1[level1].limit;        <span class='comment'>/*Not uninitialized*/</span></td></tr>
+<tr><td class="num" id="LN549">549</td><td class="line">            }</td></tr>
+<tr><td class="num" id="LN550">550</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN551">551</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN552">552</td><td class="line">        <span class='keyword'>if</span>(c2&lt;0) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path8" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">8</div></td><td><div class="PathNav"><a href="#Path7" title="Previous event (7)">&#x2190;</a></div></td></td><td>Taking true branch</td><td><div class="PathNav"><a href="#Path9" title="Next event (9)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path24" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">24</div></td><td><div class="PathNav"><a href="#Path23" title="Previous event (23)">&#x2190;</a></div></td></td><td>Taking true branch</td><td><div class="PathNav"><a href="#Path25" title="Next event (25)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path47" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">47</div></td><td><div class="PathNav"><a href="#Path46" title="Previous event (46)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path48" title="Next event (48)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN553">553</td><td class="line">            <span class='comment'>/* get next code unit from string 2, post-increment */</span></td></tr>
+<tr><td class="num" id="LN554">554</td><td class="line">            <span class='keyword'>for</span>(;;) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path9" class="msg msgControl" style="margin-left:13ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">9</div></td><td><div class="PathNav"><a href="#Path8" title="Previous event (8)">&#x2190;</a></div></td></td><td>Loop condition is true.  Entering loop body</td><td><div class="PathNav"><a href="#Path10" title="Next event (10)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path25" class="msg msgControl" style="margin-left:13ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">25</div></td><td><div class="PathNav"><a href="#Path24" title="Previous event (24)">&#x2190;</a></div></td></td><td>Loop condition is true.  Entering loop body</td><td><div class="PathNav"><a href="#Path26" title="Next event (26)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN555">555</td><td class="line">                <span class='keyword'>if</span>(s2==limit2 || ((c2=*s2)==0 &amp;&amp; (limit2==<span class='macro'>NULL<span class='expansion'>__null</span></span> || (options&amp;<span class='macro'>_STRNCMP_STYLE<span class='expansion'>0x1000</span></span>)))) {</td></tr>
+<tr><td class="num" id="LN556">556</td><td class="line">                    <span class='keyword'>if</span>(level2==0) {</td></tr>
+<tr><td class="num" id="LN557">557</td><td class="line">                        c2=-1;</td></tr>
+<tr><td class="num" id="LN558">558</td><td class="line">                        <span class='keyword'>break</span>;</td></tr>
+<tr><td class="num" id="LN559">559</td><td class="line">                    }</td></tr>
+<tr><td class="num" id="LN560">560</td><td class="line">                } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN561">561</td><td class="line">                    ++s2;</td></tr>
+<tr><td class="num" id="LN562">562</td><td class="line">                    <span class='keyword'>break</span>;</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path10" class="msg msgControl" style="margin-left:21ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">10</div></td><td><div class="PathNav"><a href="#Path9" title="Previous event (9)">&#x2190;</a></div></td></td><td> Execution continues on line 579</td><td><div class="PathNav"><a href="#Path11" title="Next event (11)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path26" class="msg msgControl" style="margin-left:21ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">26</div></td><td><div class="PathNav"><a href="#Path25" title="Previous event (25)">&#x2190;</a></div></td></td><td> Execution continues on line 579</td><td><div class="PathNav"><a href="#Path27" title="Next event (27)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN563">563</td><td class="line">                }</td></tr>
+<tr><td class="num" id="LN564">564</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN565">565</td><td class="line">                <span class='comment'>/* reached end of level buffer, pop one level */</span></td></tr>
+<tr><td class="num" id="LN566">566</td><td class="line">                <span class='keyword'>do</span> {</td></tr>
+<tr><td class="num" id="LN567">567</td><td class="line">                    --level2;</td></tr>
+<tr><td class="num" id="LN568">568</td><td class="line">                    start2=stack2[level2].start;    <span class='comment'>/*Not uninitialized*/</span></td></tr>
+<tr><td class="num" id="LN569">569</td><td class="line">                } <span class='keyword'>while</span>(start2==<span class='macro'>NULL<span class='expansion'>__null</span></span>);</td></tr>
+<tr><td class="num" id="LN570">570</td><td class="line">                s2=stack2[level2].s;                <span class='comment'>/*Not uninitialized*/</span></td></tr>
+<tr><td class="num" id="LN571">571</td><td class="line">                limit2=stack2[level2].limit;        <span class='comment'>/*Not uninitialized*/</span></td></tr>
+<tr><td class="num" id="LN572">572</td><td class="line">            }</td></tr>
+<tr><td class="num" id="LN573">573</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN574">574</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN575">575</td><td class="line">        <span class='comment'>/*</span></td></tr>
+<tr><td class="num" id="LN576">576</td><td class="line">         <span class='comment'>* compare c1 and c2</span></td></tr>
+<tr><td class="num" id="LN577">577</td><td class="line">         <span class='comment'>* either variable c1, c2 is -1 only if the corresponding string is finished</span></td></tr>
+<tr><td class="num" id="LN578">578</td><td class="line">         <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN579">579</td><td class="line">        <span class='keyword'>if</span>(c1==c2) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path11" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">11</div></td><td><div class="PathNav"><a href="#Path10" title="Previous event (10)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path12" title="Next event (12)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path27" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">27</div></td><td><div class="PathNav"><a href="#Path26" title="Previous event (26)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path28" title="Next event (28)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path48" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">48</div></td><td><div class="PathNav"><a href="#Path47" title="Previous event (47)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path49" title="Next event (49)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN580">580</td><td class="line">            <span class='keyword'>if</span>(c1&lt;0) {</td></tr>
+<tr><td class="num" id="LN581">581</td><td class="line">                <span class='keyword'>return</span> 0;   <span class='comment'>/* c1==c2==-1 indicating end of strings */</span></td></tr>
+<tr><td class="num" id="LN582">582</td><td class="line">            }</td></tr>
+<tr><td class="num" id="LN583">583</td><td class="line">            c1=c2=-1;       <span class='comment'>/* make us fetch new code units */</span></td></tr>
+<tr><td class="num" id="LN584">584</td><td class="line">            <span class='keyword'>continue</span>;</td></tr>
+<tr><td class="num" id="LN585">585</td><td class="line">        } <span class='keyword'>else</span> <span class='keyword'>if</span>(c1&lt;0) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path12" class="msg msgControl" style="margin-left:16ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">12</div></td><td><div class="PathNav"><a href="#Path11" title="Previous event (11)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path13" title="Next event (13)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path28" class="msg msgControl" style="margin-left:16ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">28</div></td><td><div class="PathNav"><a href="#Path27" title="Previous event (27)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path29" title="Next event (29)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path49" class="msg msgControl" style="margin-left:16ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">49</div></td><td><div class="PathNav"><a href="#Path48" title="Previous event (48)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path50" title="Next event (50)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN586">586</td><td class="line">            <span class='keyword'>return</span> -1;      <span class='comment'>/* string 1 ends before string 2 */</span></td></tr>
+<tr><td class="num" id="LN587">587</td><td class="line">        } <span class='keyword'>else</span> <span class='keyword'>if</span>(<span class="mrange">c2&lt;0</span>) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path13" class="msg msgControl" style="margin-left:16ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">13</div></td><td><div class="PathNav"><a href="#Path12" title="Previous event (12)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path14" title="Next event (14)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path29" class="msg msgEvent" style="margin-left:19ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexEvent">29</div></td><td><div class="PathNav"><a href="#Path28" title="Previous event (28)">&#x2190;</a></div></td></td><td>Assuming 'c2' is &gt;= 0</td><td><div class="PathNav"><a href="#Path30" title="Next event (30)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path30" class="msg msgControl" style="margin-left:16ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">30</div></td><td><div class="PathNav"><a href="#Path29" title="Previous event (29)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path31" title="Next event (31)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path50" class="msg msgControl" style="margin-left:16ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">50</div></td><td><div class="PathNav"><a href="#Path49" title="Previous event (49)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path51" title="Next event (51)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN588">588</td><td class="line">            <span class='keyword'>return</span> 1;       <span class='comment'>/* string 2 ends before string 1 */</span></td></tr>
+<tr><td class="num" id="LN589">589</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN590">590</td><td class="line">        <span class='comment'>/* c1!=c2 &amp;&amp; c1&gt;=0 &amp;&amp; c2&gt;=0 */</span></td></tr>
+<tr><td class="num" id="LN591">591</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN592">592</td><td class="line">        <span class='comment'>/* get complete code points for c1, c2 for lookups if either is a surrogate */</span></td></tr>
+<tr><td class="num" id="LN593">593</td><td class="line">        cp1=c1;</td></tr>
+<tr><td class="num" id="LN594">594</td><td class="line">        <span class='keyword'>if</span>(<span class='macro'>U_IS_SURROGATE(c1)<span class='expansion'>(((c1)&amp;0xfffff800)==0xd800)</span></span>) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path14" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">14</div></td><td><div class="PathNav"><a href="#Path13" title="Previous event (13)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path15" title="Next event (15)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path31" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">31</div></td><td><div class="PathNav"><a href="#Path30" title="Previous event (30)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path32" title="Next event (32)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path51" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">51</div></td><td><div class="PathNav"><a href="#Path50" title="Previous event (50)">&#x2190;</a></div></td></td><td>Taking true branch</td><td><div class="PathNav"><a href="#Path52" title="Next event (52)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN595">595</td><td class="line">            UChar c;</td></tr>
+<tr><td class="num" id="LN596">596</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN597">597</td><td class="line">            <span class='keyword'>if</span>(<span class='macro'>U_IS_SURROGATE_LEAD(c1)<span class='expansion'>(((c1)&amp;0x400)==0)</span></span>) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path52" class="msg msgControl" style="margin-left:13ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">52</div></td><td><div class="PathNav"><a href="#Path51" title="Previous event (51)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path53" title="Next event (53)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN598">598</td><td class="line">                <span class='keyword'>if</span>(s1!=limit1 &amp;&amp; <span class='macro'>U16_IS_TRAIL(c=*s1)<span class='expansion'>(((c=*s1)&amp;0xfffffc00)==0xdc00)</span></span>) {</td></tr>
+<tr><td class="num" id="LN599">599</td><td class="line">                    <span class='comment'>/* advance ++s1; only below if cp1 decomposes/case-folds */</span></td></tr>
+<tr><td class="num" id="LN600">600</td><td class="line">                    cp1=<span class='macro'>U16_GET_SUPPLEMENTARY(c1, c)<span class='expansion'>(((UChar32)(c1)&lt;&lt;10UL)+(UChar32)(c)-((0xd800&lt;&lt;10UL<br>)+0xdc00-0x10000))</span></span>;</td></tr>
+<tr><td class="num" id="LN601">601</td><td class="line">                }</td></tr>
+<tr><td class="num" id="LN602">602</td><td class="line">            } <span class='keyword'>else</span> <span class='comment'>/* isTrail(c1) */</span> {</td></tr>
+<tr><td class="num" id="LN603">603</td><td class="line">                <span class='keyword'>if</span>(start1&lt;=(s1-2) &amp;&amp; <span class='macro'>U16_IS_LEAD(c=*(s1-2))<span class='expansion'>(((c=*(s1-2))&amp;0xfffffc00)==0xd800)</span></span>) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path53" class="msg msgControl" style="margin-left:17ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">53</div></td><td><div class="PathNav"><a href="#Path52" title="Previous event (52)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path54" title="Next event (54)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN604">604</td><td class="line">                    cp1=<span class='macro'>U16_GET_SUPPLEMENTARY(c, c1)<span class='expansion'>(((UChar32)(c)&lt;&lt;10UL)+(UChar32)(c1)-((0xd800&lt;&lt;10UL<br>)+0xdc00-0x10000))</span></span>;</td></tr>
+<tr><td class="num" id="LN605">605</td><td class="line">                }</td></tr>
+<tr><td class="num" id="LN606">606</td><td class="line">            }</td></tr>
+<tr><td class="num" id="LN607">607</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN608">608</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN609">609</td><td class="line">        cp2=c2;</td></tr>
+<tr><td class="num" id="LN610">610</td><td class="line">        <span class='keyword'>if</span>(<span class='macro'>U_IS_SURROGATE(c2)<span class='expansion'>(((c2)&amp;0xfffff800)==0xd800)</span></span>) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path15" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">15</div></td><td><div class="PathNav"><a href="#Path14" title="Previous event (14)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path16" title="Next event (16)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path32" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">32</div></td><td><div class="PathNav"><a href="#Path31" title="Previous event (31)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path33" title="Next event (33)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path54" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">54</div></td><td><div class="PathNav"><a href="#Path53" title="Previous event (53)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path55" title="Next event (55)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN611">611</td><td class="line">            UChar c;</td></tr>
+<tr><td class="num" id="LN612">612</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN613">613</td><td class="line">            <span class='keyword'>if</span>(<span class='macro'>U_IS_SURROGATE_LEAD(c2)<span class='expansion'>(((c2)&amp;0x400)==0)</span></span>) {</td></tr>
+<tr><td class="num" id="LN614">614</td><td class="line">                <span class='keyword'>if</span>(s2!=limit2 &amp;&amp; <span class='macro'>U16_IS_TRAIL(c=*s2)<span class='expansion'>(((c=*s2)&amp;0xfffffc00)==0xdc00)</span></span>) {</td></tr>
+<tr><td class="num" id="LN615">615</td><td class="line">                    <span class='comment'>/* advance ++s2; only below if cp2 decomposes/case-folds */</span></td></tr>
+<tr><td class="num" id="LN616">616</td><td class="line">                    cp2=<span class='macro'>U16_GET_SUPPLEMENTARY(c2, c)<span class='expansion'>(((UChar32)(c2)&lt;&lt;10UL)+(UChar32)(c)-((0xd800&lt;&lt;10UL<br>)+0xdc00-0x10000))</span></span>;</td></tr>
+<tr><td class="num" id="LN617">617</td><td class="line">                }</td></tr>
+<tr><td class="num" id="LN618">618</td><td class="line">            } <span class='keyword'>else</span> <span class='comment'>/* isTrail(c2) */</span> {</td></tr>
+<tr><td class="num" id="LN619">619</td><td class="line">                <span class='keyword'>if</span>(start2&lt;=(s2-2) &amp;&amp; <span class='macro'>U16_IS_LEAD(c=*(s2-2))<span class='expansion'>(((c=*(s2-2))&amp;0xfffffc00)==0xd800)</span></span>) {</td></tr>
+<tr><td class="num" id="LN620">620</td><td class="line">                    cp2=<span class='macro'>U16_GET_SUPPLEMENTARY(c, c2)<span class='expansion'>(((UChar32)(c)&lt;&lt;10UL)+(UChar32)(c2)-((0xd800&lt;&lt;10UL<br>)+0xdc00-0x10000))</span></span>;</td></tr>
+<tr><td class="num" id="LN621">621</td><td class="line">                }</td></tr>
+<tr><td class="num" id="LN622">622</td><td class="line">            }</td></tr>
+<tr><td class="num" id="LN623">623</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN624">624</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN625">625</td><td class="line">        <span class='comment'>/*</span></td></tr>
+<tr><td class="num" id="LN626">626</td><td class="line">         <span class='comment'>* go down one level for each string</span></td></tr>
+<tr><td class="num" id="LN627">627</td><td class="line">         <span class='comment'>* continue with the main loop as soon as there is a real change</span></td></tr>
+<tr><td class="num" id="LN628">628</td><td class="line">         <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN629">629</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN630">630</td><td class="line">        <span class='keyword'>if</span>( level1==0 &amp;&amp;</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path16" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">16</div></td><td><div class="PathNav"><a href="#Path15" title="Previous event (15)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path17" title="Next event (17)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path33" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">33</div></td><td><div class="PathNav"><a href="#Path32" title="Previous event (32)">&#x2190;</a></div></td></td><td>Taking true branch</td><td><div class="PathNav"><a href="#Path34" title="Next event (34)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path55" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">55</div></td><td><div class="PathNav"><a href="#Path54" title="Previous event (54)">&#x2190;</a></div></td></td><td>Taking true branch</td><td><div class="PathNav"><a href="#Path56" title="Next event (56)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN631">631</td><td class="line">            (length=<span class='macro'>ucase_toFullFolding<span class='expansion'>ucase_toFullFolding_54</span></span>(csp, (UChar32)cp1, &amp;p, options))&gt;=0</td></tr>
+<tr><td class="num" id="LN632">632</td><td class="line">        ) {</td></tr>
+<tr><td class="num" id="LN633">633</td><td class="line">            <span class='comment'>/* cp1 case-folds to the code point "length" or to p[length] */</span></td></tr>
+<tr><td class="num" id="LN634">634</td><td class="line">            <span class='keyword'>if</span>(<span class='macro'>U_IS_SURROGATE(c1)<span class='expansion'>(((c1)&amp;0xfffff800)==0xd800)</span></span>) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path34" class="msg msgControl" style="margin-left:13ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">34</div></td><td><div class="PathNav"><a href="#Path33" title="Previous event (33)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path35" title="Next event (35)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path56" class="msg msgControl" style="margin-left:13ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">56</div></td><td><div class="PathNav"><a href="#Path55" title="Previous event (55)">&#x2190;</a></div></td></td><td>Taking true branch</td><td><div class="PathNav"><a href="#Path57" title="Next event (57)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN635">635</td><td class="line">                <span class='keyword'>if</span>(<span class='macro'>U_IS_SURROGATE_LEAD(c1)<span class='expansion'>(((c1)&amp;0x400)==0)</span></span>) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path57" class="msg msgControl" style="margin-left:17ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">57</div></td><td><div class="PathNav"><a href="#Path56" title="Previous event (56)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#EndPath" title="Next event (58)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN636">636</td><td class="line">                    <span class='comment'>/* advance beyond source surrogate pair if it case-folds */</span></td></tr>
+<tr><td class="num" id="LN637">637</td><td class="line">                    ++s1;</td></tr>
+<tr><td class="num" id="LN638">638</td><td class="line">                } <span class='keyword'>else</span> <span class='comment'>/* isTrail(c1) */</span> {</td></tr>
+<tr><td class="num" id="LN639">639</td><td class="line">                    <span class='comment'>/*</span></td></tr>
+<tr><td class="num" id="LN640">640</td><td class="line">                     <span class='comment'>* we got a supplementary code point when hitting its trail surrogate,</span></td></tr>
+<tr><td class="num" id="LN641">641</td><td class="line">                     <span class='comment'>* therefore the lead surrogate must have been the same as in the other string;</span></td></tr>
+<tr><td class="num" id="LN642">642</td><td class="line">                     <span class='comment'>* compare this decomposition with the lead surrogate in the other string</span></td></tr>
+<tr><td class="num" id="LN643">643</td><td class="line">                     <span class='comment'>* remember that this simulates bulk text replacement:</span></td></tr>
+<tr><td class="num" id="LN644">644</td><td class="line">                     <span class='comment'>* the decomposition would replace the entire code point</span></td></tr>
+<tr><td class="num" id="LN645">645</td><td class="line">                     <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN646">646</td><td class="line">                    --s2;</td></tr>
+<tr><td class="num" id="LN647">647</td><td class="line">                    c2=<span class="mrange">*(s2-1)</span>;</td></tr>
+<tr><td class="num"></td><td class="line"><div id="EndPath" class="msg msgEvent" style="margin-left:23ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexEvent">58</div></td><td><div class="PathNav"><a href="#Path57" title="Previous event (57)">&#x2190;</a></div></td></td><td>Assigned value is garbage or undefined</td></tr></table></div></td></tr>
+<tr><td class="num" id="LN648">648</td><td class="line">                }</td></tr>
+<tr><td class="num" id="LN649">649</td><td class="line">            }</td></tr>
+<tr><td class="num" id="LN650">650</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN651">651</td><td class="line">            <span class='comment'>/* push current level pointers */</span></td></tr>
+<tr><td class="num" id="LN652">652</td><td class="line">            stack1[0].start=start1;</td></tr>
+<tr><td class="num" id="LN653">653</td><td class="line">            stack1[0].s=s1;</td></tr>
+<tr><td class="num" id="LN654">654</td><td class="line">            stack1[0].limit=limit1;</td></tr>
+<tr><td class="num" id="LN655">655</td><td class="line">            ++level1;</td></tr>
+<tr><td class="num" id="LN656">656</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN657">657</td><td class="line">            <span class='comment'>/* copy the folding result to fold1[] */</span></td></tr>
+<tr><td class="num" id="LN658">658</td><td class="line">            <span class='keyword'>if</span>(<span class="mrange">length&lt;=UCASE_MAX_STRING_LENGTH</span>) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path35" class="msg msgEvent" style="margin-left:16ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexEvent">35</div></td><td><div class="PathNav"><a href="#Path34" title="Previous event (34)">&#x2190;</a></div></td></td><td>Assuming 'length' is &gt; UCASE_MAX_STRING_LENGTH</td><td><div class="PathNav"><a href="#Path36" title="Next event (36)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path36" class="msg msgControl" style="margin-left:13ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">36</div></td><td><div class="PathNav"><a href="#Path35" title="Previous event (35)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path37" title="Next event (37)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN659">659</td><td class="line">                <span class='macro'>u_memcpy<span class='expansion'>u_memcpy_54</span></span>(fold1, p, length);</td></tr>
+<tr><td class="num" id="LN660">660</td><td class="line">            } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN661">661</td><td class="line">                int32_t i=0;</td></tr>
+<tr><td class="num" id="LN662">662</td><td class="line">                <span class='macro'>U16_APPEND_UNSAFE(fold1, i, length)<span class='expansion'>{ if((uint32_t)(length)&lt;=0xffff) { (fold1)[(i)++]=(uint16_t<br>)(length); } else { (fold1)[(i)++]=(uint16_t)(((length)&gt;&gt;<br>10)+0xd7c0); (fold1)[(i)++]=(uint16_t)(((length)&amp;0x3ff)|0xdc00<br>); } }</span></span>;</td></tr>
+<tr><td class="num" id="LN663">663</td><td class="line">                length=i;</td></tr>
+<tr><td class="num" id="LN664">664</td><td class="line">            }</td></tr>
+<tr><td class="num" id="LN665">665</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN666">666</td><td class="line">            <span class='comment'>/* set next level pointers to case folding */</span></td></tr>
+<tr><td class="num" id="LN667">667</td><td class="line">            start1=s1=fold1;</td></tr>
+<tr><td class="num" id="LN668">668</td><td class="line">            limit1=fold1+length;</td></tr>
+<tr><td class="num" id="LN669">669</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN670">670</td><td class="line">            <span class='comment'>/* get ready to read from decomposition, continue with loop */</span></td></tr>
+<tr><td class="num" id="LN671">671</td><td class="line">            c1=-1;</td></tr>
+<tr><td class="num" id="LN672">672</td><td class="line">            <span class='keyword'>continue</span>;</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path37" class="msg msgControl" style="margin-left:13ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">37</div></td><td><div class="PathNav"><a href="#Path36" title="Previous event (36)">&#x2190;</a></div></td></td><td> Execution continues on line 523</td><td><div class="PathNav"><a href="#Path38" title="Next event (38)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN673">673</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN674">674</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN675">675</td><td class="line">        <span class='keyword'>if</span>( level2==0 &amp;&amp;</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path17" class="msg msgControl" style="margin-left:9ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">17</div></td><td><div class="PathNav"><a href="#Path16" title="Previous event (16)">&#x2190;</a></div></td></td><td>Taking true branch</td><td><div class="PathNav"><a href="#Path18" title="Next event (18)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN676">676</td><td class="line">            (length=<span class='macro'>ucase_toFullFolding<span class='expansion'>ucase_toFullFolding_54</span></span>(csp, (UChar32)cp2, &amp;p, options))&gt;=0</td></tr>
+<tr><td class="num" id="LN677">677</td><td class="line">        ) {</td></tr>
+<tr><td class="num" id="LN678">678</td><td class="line">            <span class='comment'>/* cp2 case-folds to the code point "length" or to p[length] */</span></td></tr>
+<tr><td class="num" id="LN679">679</td><td class="line">            <span class='keyword'>if</span>(<span class='macro'>U_IS_SURROGATE(c2)<span class='expansion'>(((c2)&amp;0xfffff800)==0xd800)</span></span>) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path18" class="msg msgControl" style="margin-left:13ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">18</div></td><td><div class="PathNav"><a href="#Path17" title="Previous event (17)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path19" title="Next event (19)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN680">680</td><td class="line">                <span class='keyword'>if</span>(<span class='macro'>U_IS_SURROGATE_LEAD(c2)<span class='expansion'>(((c2)&amp;0x400)==0)</span></span>) {</td></tr>
+<tr><td class="num" id="LN681">681</td><td class="line">                    <span class='comment'>/* advance beyond source surrogate pair if it case-folds */</span></td></tr>
+<tr><td class="num" id="LN682">682</td><td class="line">                    ++s2;</td></tr>
+<tr><td class="num" id="LN683">683</td><td class="line">                } <span class='keyword'>else</span> <span class='comment'>/* isTrail(c2) */</span> {</td></tr>
+<tr><td class="num" id="LN684">684</td><td class="line">                    <span class='comment'>/*</span></td></tr>
+<tr><td class="num" id="LN685">685</td><td class="line">                     <span class='comment'>* we got a supplementary code point when hitting its trail surrogate,</span></td></tr>
+<tr><td class="num" id="LN686">686</td><td class="line">                     <span class='comment'>* therefore the lead surrogate must have been the same as in the other string;</span></td></tr>
+<tr><td class="num" id="LN687">687</td><td class="line">                     <span class='comment'>* compare this decomposition with the lead surrogate in the other string</span></td></tr>
+<tr><td class="num" id="LN688">688</td><td class="line">                     <span class='comment'>* remember that this simulates bulk text replacement:</span></td></tr>
+<tr><td class="num" id="LN689">689</td><td class="line">                     <span class='comment'>* the decomposition would replace the entire code point</span></td></tr>
+<tr><td class="num" id="LN690">690</td><td class="line">                     <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN691">691</td><td class="line">                    --s1;</td></tr>
+<tr><td class="num" id="LN692">692</td><td class="line">                    c1=*(s1-1);</td></tr>
+<tr><td class="num" id="LN693">693</td><td class="line">                }</td></tr>
+<tr><td class="num" id="LN694">694</td><td class="line">            }</td></tr>
+<tr><td class="num" id="LN695">695</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN696">696</td><td class="line">            <span class='comment'>/* push current level pointers */</span></td></tr>
+<tr><td class="num" id="LN697">697</td><td class="line">            stack2[0].start=start2;</td></tr>
+<tr><td class="num" id="LN698">698</td><td class="line">            stack2[0].s=s2;</td></tr>
+<tr><td class="num" id="LN699">699</td><td class="line">            stack2[0].limit=limit2;</td></tr>
+<tr><td class="num" id="LN700">700</td><td class="line">            ++level2;</td></tr>
+<tr><td class="num" id="LN701">701</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN702">702</td><td class="line">            <span class='comment'>/* copy the folding result to fold2[] */</span></td></tr>
+<tr><td class="num" id="LN703">703</td><td class="line">            <span class='keyword'>if</span>(<span class="mrange">length&lt;=UCASE_MAX_STRING_LENGTH</span>) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path19" class="msg msgEvent" style="margin-left:16ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexEvent">19</div></td><td><div class="PathNav"><a href="#Path18" title="Previous event (18)">&#x2190;</a></div></td></td><td>Assuming 'length' is &gt; UCASE_MAX_STRING_LENGTH</td><td><div class="PathNav"><a href="#Path20" title="Next event (20)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path20" class="msg msgControl" style="margin-left:13ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">20</div></td><td><div class="PathNav"><a href="#Path19" title="Previous event (19)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path21" title="Next event (21)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN704">704</td><td class="line">                <span class='macro'>u_memcpy<span class='expansion'>u_memcpy_54</span></span>(fold2, p, length);</td></tr>
+<tr><td class="num" id="LN705">705</td><td class="line">            } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN706">706</td><td class="line">                int32_t i=0;</td></tr>
+<tr><td class="num" id="LN707">707</td><td class="line">                <span class='macro'>U16_APPEND_UNSAFE(fold2, i, length)<span class='expansion'>{ if((uint32_t)(length)&lt;=0xffff) { (fold2)[(i)++]=(uint16_t<br>)(length); } else { (fold2)[(i)++]=(uint16_t)(((length)&gt;&gt;<br>10)+0xd7c0); (fold2)[(i)++]=(uint16_t)(((length)&amp;0x3ff)|0xdc00<br>); } }</span></span>;</td></tr>
+<tr><td class="num" id="LN708">708</td><td class="line">                length=i;</td></tr>
+<tr><td class="num" id="LN709">709</td><td class="line">            }</td></tr>
+<tr><td class="num" id="LN710">710</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN711">711</td><td class="line">            <span class='comment'>/* set next level pointers to case folding */</span></td></tr>
+<tr><td class="num" id="LN712">712</td><td class="line">            start2=s2=fold2;</td></tr>
+<tr><td class="num" id="LN713">713</td><td class="line">            limit2=fold2+length;</td></tr>
+<tr><td class="num" id="LN714">714</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN715">715</td><td class="line">            <span class='comment'>/* get ready to read from decomposition, continue with loop */</span></td></tr>
+<tr><td class="num" id="LN716">716</td><td class="line">            c2=-1;</td></tr>
+<tr><td class="num" id="LN717">717</td><td class="line">            <span class='keyword'>continue</span>;</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path21" class="msg msgControl" style="margin-left:13ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">21</div></td><td><div class="PathNav"><a href="#Path20" title="Previous event (20)">&#x2190;</a></div></td></td><td> Execution continues on line 523</td><td><div class="PathNav"><a href="#Path22" title="Next event (22)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN718">718</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN719">719</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN720">720</td><td class="line">        <span class='comment'>/*</span></td></tr>
+<tr><td class="num" id="LN721">721</td><td class="line">         <span class='comment'>* no decomposition/case folding, max level for both sides:</span></td></tr>
+<tr><td class="num" id="LN722">722</td><td class="line">         <span class='comment'>* return difference result</span></td></tr>
+<tr><td class="num" id="LN723">723</td><td class="line">         <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN724">724</td><td class="line">         <span class='comment'>* code point order comparison must not just return cp1-cp2</span></td></tr>
+<tr><td class="num" id="LN725">725</td><td class="line">         <span class='comment'>* because when single surrogates are present then the surrogate pairs</span></td></tr>
+<tr><td class="num" id="LN726">726</td><td class="line">         <span class='comment'>* that formed cp1 and cp2 may be from different string indexes</span></td></tr>
+<tr><td class="num" id="LN727">727</td><td class="line">         <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN728">728</td><td class="line">         <span class='comment'>* example: { d800 d800 dc01 } vs. { d800 dc00 }, compare at second code units</span></td></tr>
+<tr><td class="num" id="LN729">729</td><td class="line">         <span class='comment'>* c1=d800 cp1=10001 c2=dc00 cp2=10000</span></td></tr>
+<tr><td class="num" id="LN730">730</td><td class="line">         <span class='comment'>* cp1-cp2&gt;0 but c1-c2&lt;0 and in fact in UTF-32 it is { d800 10001 } &lt; { 10000 }</span></td></tr>
+<tr><td class="num" id="LN731">731</td><td class="line">         <span class='comment'>*</span></td></tr>
+<tr><td class="num" id="LN732">732</td><td class="line">         <span class='comment'>* therefore, use same fix-up as in ustring.c/uprv_strCompare()</span></td></tr>
+<tr><td class="num" id="LN733">733</td><td class="line">         <span class='comment'>* except: uprv_strCompare() fetches c=*s while this functions fetches c=*s++</span></td></tr>
+<tr><td class="num" id="LN734">734</td><td class="line">         <span class='comment'>* so we have slightly different pointer/start/limit comparisons here</span></td></tr>
+<tr><td class="num" id="LN735">735</td><td class="line">         <span class='comment'>*/</span></td></tr>
+<tr><td class="num" id="LN736">736</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN737">737</td><td class="line">        <span class='keyword'>if</span>(c1&gt;=0xd800 &amp;&amp; c2&gt;=0xd800 &amp;&amp; (options&amp;<span class='macro'>U_COMPARE_CODE_POINT_ORDER<span class='expansion'>0x8000</span></span>)) {</td></tr>
+<tr><td class="num" id="LN738">738</td><td class="line">            <span class='comment'>/* subtract 0x2800 from BMP code points to make them smaller than supplementary ones */</span></td></tr>
+<tr><td class="num" id="LN739">739</td><td class="line">            <span class='keyword'>if</span>(</td></tr>
+<tr><td class="num" id="LN740">740</td><td class="line">                (c1&lt;=0xdbff &amp;&amp; s1!=limit1 &amp;&amp; <span class='macro'>U16_IS_TRAIL(*s1)<span class='expansion'>(((*s1)&amp;0xfffffc00)==0xdc00)</span></span>) ||</td></tr>
+<tr><td class="num" id="LN741">741</td><td class="line">                (<span class='macro'>U16_IS_TRAIL(c1)<span class='expansion'>(((c1)&amp;0xfffffc00)==0xdc00)</span></span> &amp;&amp; start1!=(s1-1) &amp;&amp; <span class='macro'>U16_IS_LEAD(*(s1-2))<span class='expansion'>(((*(s1-2))&amp;0xfffffc00)==0xd800)</span></span>)</td></tr>
+<tr><td class="num" id="LN742">742</td><td class="line">            ) {</td></tr>
+<tr><td class="num" id="LN743">743</td><td class="line">                <span class='comment'>/* part of a surrogate pair, leave &gt;=d800 */</span></td></tr>
+<tr><td class="num" id="LN744">744</td><td class="line">            } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN745">745</td><td class="line">                <span class='comment'>/* BMP code point - may be surrogate code point - make &lt;d800 */</span></td></tr>
+<tr><td class="num" id="LN746">746</td><td class="line">                c1-=0x2800;</td></tr>
+<tr><td class="num" id="LN747">747</td><td class="line">            }</td></tr>
+<tr><td class="num" id="LN748">748</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN749">749</td><td class="line">            <span class='keyword'>if</span>(</td></tr>
+<tr><td class="num" id="LN750">750</td><td class="line">                (c2&lt;=0xdbff &amp;&amp; s2!=limit2 &amp;&amp; <span class='macro'>U16_IS_TRAIL(*s2)<span class='expansion'>(((*s2)&amp;0xfffffc00)==0xdc00)</span></span>) ||</td></tr>
+<tr><td class="num" id="LN751">751</td><td class="line">                (<span class='macro'>U16_IS_TRAIL(c2)<span class='expansion'>(((c2)&amp;0xfffffc00)==0xdc00)</span></span> &amp;&amp; start2!=(s2-1) &amp;&amp; <span class='macro'>U16_IS_LEAD(*(s2-2))<span class='expansion'>(((*(s2-2))&amp;0xfffffc00)==0xd800)</span></span>)</td></tr>
+<tr><td class="num" id="LN752">752</td><td class="line">            ) {</td></tr>
+<tr><td class="num" id="LN753">753</td><td class="line">                <span class='comment'>/* part of a surrogate pair, leave &gt;=d800 */</span></td></tr>
+<tr><td class="num" id="LN754">754</td><td class="line">            } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN755">755</td><td class="line">                <span class='comment'>/* BMP code point - may be surrogate code point - make &lt;d800 */</span></td></tr>
+<tr><td class="num" id="LN756">756</td><td class="line">                c2-=0x2800;</td></tr>
+<tr><td class="num" id="LN757">757</td><td class="line">            }</td></tr>
+<tr><td class="num" id="LN758">758</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN759">759</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN760">760</td><td class="line">        <span class='keyword'>return</span> c1-c2;</td></tr>
+<tr><td class="num" id="LN761">761</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN762">762</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN763">763</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN764">764</td><td class="line"><span class='comment'>/* public API functions */</span></td></tr>
+<tr><td class="num" id="LN765">765</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN766">766</td><td class="line"><span class='macro'>U_CAPI<span class='expansion'>extern "C"</span></span> int32_t U_EXPORT2</td></tr>
+<tr><td class="num" id="LN767">767</td><td class="line"><span class='macro'>u_strCaseCompare<span class='expansion'>u_strCaseCompare_54</span></span>(<span class='keyword'>const</span> UChar *s1, int32_t length1,</td></tr>
+<tr><td class="num" id="LN768">768</td><td class="line">                 <span class='keyword'>const</span> UChar *s2, int32_t length2,</td></tr>
+<tr><td class="num" id="LN769">769</td><td class="line">                 uint32_t options,</td></tr>
+<tr><td class="num" id="LN770">770</td><td class="line">                 UErrorCode *pErrorCode) {</td></tr>
+<tr><td class="num" id="LN771">771</td><td class="line">    <span class='comment'>/* argument checking */</span></td></tr>
+<tr><td class="num" id="LN772">772</td><td class="line">    <span class='keyword'>if</span>(pErrorCode==0 || U_FAILURE(*pErrorCode)) {</td></tr>
+<tr><td class="num" id="LN773">773</td><td class="line">        <span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN774">774</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN775">775</td><td class="line">    <span class='keyword'>if</span>(s1==<span class='macro'>NULL<span class='expansion'>__null</span></span> || length1&lt;-1 || s2==<span class='macro'>NULL<span class='expansion'>__null</span></span> || length2&lt;-1) {</td></tr>
+<tr><td class="num" id="LN776">776</td><td class="line">        *pErrorCode=U_ILLEGAL_ARGUMENT_ERROR;</td></tr>
+<tr><td class="num" id="LN777">777</td><td class="line">        <span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN778">778</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN779">779</td><td class="line">    <span class='keyword'>return</span> <span class='macro'>u_strcmpFold<span class='expansion'>u_strcmpFold_54</span></span>(s1, length1, s2, length2,</td></tr>
+<tr><td class="num" id="LN780">780</td><td class="line">                        options|<span class='macro'>U_COMPARE_IGNORE_CASE<span class='expansion'>0x10000</span></span>,</td></tr>
+<tr><td class="num" id="LN781">781</td><td class="line">                        pErrorCode);</td></tr>
+<tr><td class="num" id="LN782">782</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN783">783</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN784">784</td><td class="line"><span class='macro'>U_CAPI<span class='expansion'>extern "C"</span></span> int32_t U_EXPORT2</td></tr>
+<tr><td class="num" id="LN785">785</td><td class="line"><span class='macro'>u_strcasecmp<span class='expansion'>u_strcasecmp_54</span></span>(<span class='keyword'>const</span> UChar *s1, <span class='keyword'>const</span> UChar *s2, uint32_t options) {</td></tr>
+<tr><td class="num" id="LN786">786</td><td class="line">    UErrorCode errorCode=U_ZERO_ERROR;</td></tr>
+<tr><td class="num" id="LN787">787</td><td class="line">    <span class='keyword'>return</span> <span class='macro'>u_strcmpFold<span class='expansion'>u_strcmpFold_54</span></span>(s1, -1, s2, -1,</td></tr>
+<tr><td class="num" id="LN788">788</td><td class="line">                        options|<span class='macro'>U_COMPARE_IGNORE_CASE<span class='expansion'>0x10000</span></span>,</td></tr>
+<tr><td class="num" id="LN789">789</td><td class="line">                        &amp;errorCode);</td></tr>
+<tr><td class="num" id="LN790">790</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN791">791</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN792">792</td><td class="line"><span class='macro'>U_CAPI<span class='expansion'>extern "C"</span></span> int32_t U_EXPORT2</td></tr>
+<tr><td class="num" id="LN793">793</td><td class="line"><span class='macro'>u_memcasecmp<span class='expansion'>u_memcasecmp_54</span></span>(<span class='keyword'>const</span> UChar *s1, <span class='keyword'>const</span> UChar *s2, int32_t length, uint32_t options) {</td></tr>
+<tr><td class="num" id="LN794">794</td><td class="line">    UErrorCode errorCode=U_ZERO_ERROR;</td></tr>
+<tr><td class="num" id="LN795">795</td><td class="line">    <span class='keyword'>return</span> <span class='macro'>u_strcmpFold<span class='expansion'>u_strcmpFold_54</span></span>(s1, length, s2, length,</td></tr>
+<tr><td class="num" id="LN796">796</td><td class="line">                        options|<span class='macro'>U_COMPARE_IGNORE_CASE<span class='expansion'>0x10000</span></span>,</td></tr>
+<tr><td class="num" id="LN797">797</td><td class="line">                        &amp;errorCode);</td></tr>
+<tr><td class="num" id="LN798">798</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN799">799</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN800">800</td><td class="line"><span class='macro'>U_CAPI<span class='expansion'>extern "C"</span></span> int32_t U_EXPORT2</td></tr>
+<tr><td class="num" id="LN801">801</td><td class="line"><span class='macro'>u_strncasecmp<span class='expansion'>u_strncasecmp_54</span></span>(<span class='keyword'>const</span> UChar *s1, <span class='keyword'>const</span> UChar *s2, int32_t n, uint32_t options) {</td></tr>
+<tr><td class="num" id="LN802">802</td><td class="line">    UErrorCode errorCode=U_ZERO_ERROR;</td></tr>
+<tr><td class="num" id="LN803">803</td><td class="line">    <span class='keyword'>return</span> <span class='macro'>u_strcmpFold<span class='expansion'>u_strcmpFold_54</span></span>(s1, n, s2, n,</td></tr>
+<tr><td class="num" id="LN804">804</td><td class="line">                        options|(<span class='macro'>U_COMPARE_IGNORE_CASE<span class='expansion'>0x10000</span></span>|<span class='macro'>_STRNCMP_STYLE<span class='expansion'>0x1000</span></span>),</td></tr>
+<tr><td class="num" id="LN805">805</td><td class="line">                        &amp;errorCode);</td></tr>
+<tr><td class="num" id="LN806">806</td><td class="line">}</td></tr>
+</table></body></html>

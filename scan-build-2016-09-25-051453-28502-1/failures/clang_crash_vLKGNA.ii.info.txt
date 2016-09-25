@@ -1,0 +1,13 @@
+/home/haha/code/v8_5_0/v8/src/extensions/externalize-string-extension.cc
+Crash
+-cc1 -triple x86_64-unknown-linux-gnu -fsyntax-only -disable-free -main-file-name externalize-string-extension.cc -mrelocation-model static -mthread-model posix -mdisable-fp-elim -fmath-errno -masm-verbose -mconstructor-aliases -munwind-tables -fuse-init-array -target-cpu x86-64 -dwarf-column-info -debugger-tuning=gdb -ffunction-sections -fdata-sections -resource-dir /usr/local/bin/../lib/clang/4.0.0 -D CR_CLANG_REVISION=259396-1 -D V8_TARGET_ARCH_X64 -D ENABLE_GDB_JIT_INTERFACE -D V8_DEPRECATION_WARNINGS -D V8_IMMINENT_DEPRECATION_WARNINGS -D V8_I18N_SUPPORT -D V8_USE_EXTERNAL_STARTUP_DATA -D ICU_UTIL_DATA_IMPL=ICU_UTIL_DATA_STATIC -D U_USING_ICU_NAMESPACE=0 -D U_ENABLE_DYLOAD=0 -D U_STATIC_IMPLEMENTATION -D ENABLE_DISASSEMBLER -D V8_ENABLE_CHECKS -D OBJECT_PRINT -D VERIFY_HEAP -D DEBUG -D TRACE_MAPS -D _GLIBCXX_DEBUG=1 -D ENABLE_HANDLE_ZAPPING -D ENABLE_SLOW_DCHECKS -I ../. -I ../.. -I ../third_party/icu/source/i18n -I ../third_party/icu/source/common -internal-isystem /usr/lib/gcc/x86_64-redhat-linux/5.3.1/../../../../include/c++/5.3.1 -internal-isystem /usr/lib/gcc/x86_64-redhat-linux/5.3.1/../../../../include/c++/5.3.1/x86_64-redhat-linux -internal-isystem /usr/lib/gcc/x86_64-redhat-linux/5.3.1/../../../../include/c++/5.3.1/backward -internal-isystem /usr/local/include -internal-isystem /usr/local/bin/../lib/clang/4.0.0/include -internal-externc-isystem /include -internal-externc-isystem /usr/include -O0 -Wno-unused-parameter -Wno-long-long -Wno-missing-field-initializers -Wno-gnu-zero-variadic-macro-arguments -Wno-format-pedantic -std=gnu++0x -fdeprecated-macro -fdebug-compilation-dir /home/haha/code/v8_5_0/v8/out -ferror-limit 19 -fmessage-length 0 -fno-rtti -fobjc-runtime=gcc -fdiagnostics-show-option -x c++ ../src/extensions/externalize-string-extension.cc
+Linux 192.168.0.103 4.3.4-300.fc23.x86_64 #1 SMP Mon Jan 25 13:39:23 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+clang version 4.0.0 (trunk 282067) (llvm/trunk 282066)
+Target: x86_64-unknown-linux-gnu
+Thread model: posix
+InstalledDir: /usr/local/bin
+Found candidate GCC installation: /usr/lib/gcc/x86_64-redhat-linux/5.3.1
+Selected GCC installation: /usr/lib/gcc/x86_64-redhat-linux/5.3.1
+Candidate multilib: .;@m64
+Candidate multilib: 32;@m32
+Selected multilib: .;@m64

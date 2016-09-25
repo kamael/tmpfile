@@ -1,0 +1,328 @@
+<!doctype html>
+<html>
+<head>
+<title>../src/third_party/fdlibm/fdlibm.cc</title>
+<style type="text/css">
+ body { color:#000000; background-color:#ffffff }
+ body { font-family:Helvetica, sans-serif; font-size:10pt }
+ h1 { font-size:14pt }
+ .code { border-collapse:collapse; width:100%; }
+ .code { font-family: "Monospace", monospace; font-size:10pt }
+ .code { line-height: 1.2em }
+ .comment { color: green; font-style: oblique }
+ .keyword { color: blue }
+ .string_literal { color: red }
+ .directive { color: darkmagenta }
+ .expansion { display: none; }
+ .macro:hover .expansion { display: block; border: 2px solid #FF0000; padding: 2px; background-color:#FFF0F0; font-weight: normal;   -webkit-border-radius:5px;  -webkit-box-shadow:1px 1px 7px #000;   border-radius:5px;  box-shadow:1px 1px 7px #000; position: absolute; top: -1em; left:10em; z-index: 1 } 
+ .macro { color: darkmagenta; background-color:LemonChiffon; position: relative }
+ .num { width:2.5em; padding-right:2ex; background-color:#eeeeee }
+ .num { text-align:right; font-size:8pt }
+ .num { color:#444444 }
+ .line { padding-left: 1ex; border-left: 3px solid #ccc }
+ .line { white-space: pre }
+ .msg { -webkit-box-shadow:1px 1px 7px #000 }
+ .msg { box-shadow:1px 1px 7px #000 }
+ .msg { -webkit-border-radius:5px }
+ .msg { border-radius:5px }
+ .msg { font-family:Helvetica, sans-serif; font-size:8pt }
+ .msg { float:left }
+ .msg { padding:0.25em 1ex 0.25em 1ex }
+ .msg { margin-top:10px; margin-bottom:10px }
+ .msg { font-weight:bold }
+ .msg { max-width:60em; word-wrap: break-word; white-space: pre-wrap }
+ .msgT { padding:0x; spacing:0x }
+ .msgEvent { background-color:#fff8b4; color:#000000 }
+ .msgControl { background-color:#bbbbbb; color:#000000 }
+ .mrange { background-color:#dfddf3 }
+ .mrange { border-bottom:1px solid #6F9DBE }
+ .PathIndex { font-weight: bold; padding:0px 5px; margin-right:5px; }
+ .PathIndex { -webkit-border-radius:8px }
+ .PathIndex { border-radius:8px }
+ .PathIndexEvent { background-color:#bfba87 }
+ .PathIndexControl { background-color:#8c8c8c }
+ .PathNav a { text-decoration:none; font-size: larger }
+ .CodeInsertionHint { font-weight: bold; background-color: #10dd10 }
+ .CodeRemovalHint { background-color:#de1010 }
+ .CodeRemovalHint { border-bottom:1px solid #6F9DBE }
+ table.simpletable {
+   padding: 5px;
+   font-size:12pt;
+   margin:20px;
+   border-collapse: collapse; border-spacing: 0px;
+ }
+ td.rowname {
+   text-align:right; font-weight:bold; color:#444444;
+   padding-right:2ex; }
+</style>
+</head>
+<body>
+<!-- BUGDESC The left operand of '==' is a garbage value -->
+
+<!-- BUGTYPE Result of operation is garbage or undefined -->
+
+<!-- BUGCATEGORY Logic error -->
+
+<!-- BUGFILE /home/haha/code/v8_5_0/v8/out/../src/third_party/fdlibm/fdlibm.cc -->
+
+<!-- FILENAME fdlibm.cc -->
+
+<!-- FUNCTIONNAME rempio2 -->
+
+<!-- ISSUEHASHCONTENTOFLINEINCONTEXT e2cbc0c563f56a365c46d9366201db48 -->
+
+<!-- BUGLINE 218 -->
+
+<!-- BUGCOLUMN 21 -->
+
+<!-- BUGPATHLENGTH 9 -->
+
+<!-- BUGMETAEND -->
+<!-- REPORTHEADER -->
+<h3>Bug Summary</h3>
+<table class="simpletable">
+<tr><td class="rowname">File:</td><td>out/../src/third_party/fdlibm/fdlibm.cc</td></tr>
+<tr><td class="rowname">Location:</td><td><a href="#EndPath">line 218, column 21</a></td></tr>
+<tr><td class="rowname">Description:</td><td>The left operand of '==' is a garbage value</td></tr>
+</table>
+<!-- REPORTSUMMARYEXTRA -->
+<h3>Annotated Source Code</h3>
+<table class="code">
+<tr><td class="num" id="LN1">1</td><td class="line"><span class='comment'>// The following is adapted from fdlibm (http://www.netlib.org/fdlibm).</span></td></tr>
+<tr><td class="num" id="LN2">2</td><td class="line"><span class='comment'>//</span></td></tr>
+<tr><td class="num" id="LN3">3</td><td class="line"><span class='comment'>// ====================================================</span></td></tr>
+<tr><td class="num" id="LN4">4</td><td class="line"><span class='comment'>// Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.</span></td></tr>
+<tr><td class="num" id="LN5">5</td><td class="line"><span class='comment'>//</span></td></tr>
+<tr><td class="num" id="LN6">6</td><td class="line"><span class='comment'>// Developed at SunSoft, a Sun Microsystems, Inc. business.</span></td></tr>
+<tr><td class="num" id="LN7">7</td><td class="line"><span class='comment'>// Permission to use, copy, modify, and distribute this</span></td></tr>
+<tr><td class="num" id="LN8">8</td><td class="line"><span class='comment'>// software is freely granted, provided that this notice</span></td></tr>
+<tr><td class="num" id="LN9">9</td><td class="line"><span class='comment'>// is preserved.</span></td></tr>
+<tr><td class="num" id="LN10">10</td><td class="line"><span class='comment'>// ====================================================</span></td></tr>
+<tr><td class="num" id="LN11">11</td><td class="line"><span class='comment'>//</span></td></tr>
+<tr><td class="num" id="LN12">12</td><td class="line"><span class='comment'>// The original source code covered by the above license above has been</span></td></tr>
+<tr><td class="num" id="LN13">13</td><td class="line"><span class='comment'>// modified significantly by Google Inc.</span></td></tr>
+<tr><td class="num" id="LN14">14</td><td class="line"><span class='comment'>// Copyright 2014 the V8 project authors. All rights reserved.</span></td></tr>
+<tr><td class="num" id="LN15">15</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN16">16</td><td class="line"><span class='directive'>#include "src/third_party/fdlibm/fdlibm.h"</span></td></tr>
+<tr><td class="num" id="LN17">17</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN18">18</td><td class="line"><span class='directive'>#include &lt;stdint.h&gt;</span></td></tr>
+<tr><td class="num" id="LN19">19</td><td class="line"><span class='directive'>#include &lt;cmath&gt;</span></td></tr>
+<tr><td class="num" id="LN20">20</td><td class="line"><span class='directive'>#include &lt;limits&gt;</span></td></tr>
+<tr><td class="num" id="LN21">21</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN22">22</td><td class="line"><span class='directive'>#include "src/base/macros.h"</span></td></tr>
+<tr><td class="num" id="LN23">23</td><td class="line"><span class='directive'>#include "src/double.h"</span></td></tr>
+<tr><td class="num" id="LN24">24</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN25">25</td><td class="line"><span class='keyword'>namespace</span> v8 {</td></tr>
+<tr><td class="num" id="LN26">26</td><td class="line"><span class='keyword'>namespace</span> fdlibm {</td></tr>
+<tr><td class="num" id="LN27">27</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN28">28</td><td class="line"><span class='directive'>#ifdef _MSC_VER</span></td></tr>
+<tr><td class="num" id="LN29">29</td><td class="line"><span class='keyword'>inline</span> <span class='keyword'>double</span> scalbn(<span class='keyword'>double</span> x, <span class='keyword'>int</span> y) { <span class='keyword'>return</span> _scalb(x, y); }</td></tr>
+<tr><td class="num" id="LN30">30</td><td class="line"><span class='directive'>#endif  // _MSC_VER</span></td></tr>
+<tr><td class="num" id="LN31">31</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN32">32</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN33">33</td><td class="line"><span class='comment'>// Table of constants for 2/pi, 396 Hex digits (476 decimal) of 2/pi</span></td></tr>
+<tr><td class="num" id="LN34">34</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>const</span> <span class='keyword'>int</span> two_over_pi[] = {</td></tr>
+<tr><td class="num" id="LN35">35</td><td class="line">    0xA2F983, 0x6E4E44, 0x1529FC, 0x2757D1, 0xF534DD, 0xC0DB62, 0x95993C,</td></tr>
+<tr><td class="num" id="LN36">36</td><td class="line">    0x439041, 0xFE5163, 0xABDEBB, 0xC561B7, 0x246E3A, 0x424DD2, 0xE00649,</td></tr>
+<tr><td class="num" id="LN37">37</td><td class="line">    0x2EEA09, 0xD1921C, 0xFE1DEB, 0x1CB129, 0xA73EE8, 0x8235F5, 0x2EBB44,</td></tr>
+<tr><td class="num" id="LN38">38</td><td class="line">    0x84E99C, 0x7026B4, 0x5F7E41, 0x3991D6, 0x398353, 0x39F49C, 0x845F8B,</td></tr>
+<tr><td class="num" id="LN39">39</td><td class="line">    0xBDF928, 0x3B1FF8, 0x97FFDE, 0x05980F, 0xEF2F11, 0x8B5A0A, 0x6D1F6D,</td></tr>
+<tr><td class="num" id="LN40">40</td><td class="line">    0x367ECF, 0x27CB09, 0xB74F46, 0x3F669E, 0x5FEA2D, 0x7527BA, 0xC7EBE5,</td></tr>
+<tr><td class="num" id="LN41">41</td><td class="line">    0xF17B3D, 0x0739F7, 0x8A5292, 0xEA6BFB, 0x5FB11F, 0x8D5D08, 0x560330,</td></tr>
+<tr><td class="num" id="LN42">42</td><td class="line">    0x46FC7B, 0x6BABF0, 0xCFBC20, 0x9AF436, 0x1DA9E3, 0x91615E, 0xE61B08,</td></tr>
+<tr><td class="num" id="LN43">43</td><td class="line">    0x659985, 0x5F14A0, 0x68408D, 0xFFD880, 0x4D7327, 0x310606, 0x1556CA,</td></tr>
+<tr><td class="num" id="LN44">44</td><td class="line">    0x73A8C9, 0x60E27B, 0xC08C6B};</td></tr>
+<tr><td class="num" id="LN45">45</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN46">46</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>const</span> <span class='keyword'>double</span> zero = 0.0;</td></tr>
+<tr><td class="num" id="LN47">47</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>const</span> <span class='keyword'>double</span> two24 = 1.6777216e+07;</td></tr>
+<tr><td class="num" id="LN48">48</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>const</span> <span class='keyword'>double</span> one = 1.0;</td></tr>
+<tr><td class="num" id="LN49">49</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>const</span> <span class='keyword'>double</span> twon24 = 5.9604644775390625e-08;</td></tr>
+<tr><td class="num" id="LN50">50</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN51">51</td><td class="line"><span class='keyword'>static</span> <span class='keyword'>const</span> <span class='keyword'>double</span> PIo2[] = {</td></tr>
+<tr><td class="num" id="LN52">52</td><td class="line">    1.57079625129699707031e+00,  <span class='comment'>// 0x3FF921FB, 0x40000000</span></td></tr>
+<tr><td class="num" id="LN53">53</td><td class="line">    7.54978941586159635335e-08,  <span class='comment'>// 0x3E74442D, 0x00000000</span></td></tr>
+<tr><td class="num" id="LN54">54</td><td class="line">    5.39030252995776476554e-15,  <span class='comment'>// 0x3CF84698, 0x80000000</span></td></tr>
+<tr><td class="num" id="LN55">55</td><td class="line">    3.28200341580791294123e-22,  <span class='comment'>// 0x3B78CC51, 0x60000000</span></td></tr>
+<tr><td class="num" id="LN56">56</td><td class="line">    1.27065575308067607349e-29,  <span class='comment'>// 0x39F01B83, 0x80000000</span></td></tr>
+<tr><td class="num" id="LN57">57</td><td class="line">    1.22933308981111328932e-36,  <span class='comment'>// 0x387A2520, 0x40000000</span></td></tr>
+<tr><td class="num" id="LN58">58</td><td class="line">    2.73370053816464559624e-44,  <span class='comment'>// 0x36E38222, 0x80000000</span></td></tr>
+<tr><td class="num" id="LN59">59</td><td class="line">    2.16741683877804819444e-51   <span class='comment'>// 0x3569F31D, 0x00000000</span></td></tr>
+<tr><td class="num" id="LN60">60</td><td class="line">};</td></tr>
+<tr><td class="num" id="LN61">61</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN62">62</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN63">63</td><td class="line"><span class='macro'>INLINE(<span class='keyword'>int</span> __kernel_rem_pio2(<span class='keyword'>double</span>* x, <span class='keyword'>double</span>* y, <span class='keyword'>int</span> e0, <span class='keyword'>int</span> nx))<span class='expansion'>inline int __kernel_rem_pio2(double* x, double* y, int e0, int<br> nx)</span></span> {</td></tr>
+<tr><td class="num" id="LN64">64</td><td class="line">  <span class='keyword'>static</span> <span class='keyword'>const</span> int32_t jk = 3;</td></tr>
+<tr><td class="num" id="LN65">65</td><td class="line">  <span class='keyword'>double</span> fw;</td></tr>
+<tr><td class="num" id="LN66">66</td><td class="line">  int32_t jx = nx - 1;</td></tr>
+<tr><td class="num" id="LN67">67</td><td class="line">  int32_t jv = (e0 - 3) / 24;</td></tr>
+<tr><td class="num" id="LN68">68</td><td class="line">  <span class='keyword'>if</span> (jv &lt; 0) jv = 0;</td></tr>
+<tr><td class="num" id="LN69">69</td><td class="line">  int32_t q0 = e0 - 24 * (jv + 1);</td></tr>
+<tr><td class="num" id="LN70">70</td><td class="line">  int32_t m = jx + jk;</td></tr>
+<tr><td class="num" id="LN71">71</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN72">72</td><td class="line">  <span class='keyword'>double</span> f[20];</td></tr>
+<tr><td class="num" id="LN73">73</td><td class="line">  <span class='keyword'>for</span> (<span class='keyword'>int</span> i = 0, j = jv - jx; i &lt;= m; i++, j++) {</td></tr>
+<tr><td class="num" id="LN74">74</td><td class="line">    f[i] = (j &lt; 0) ? zero : <span class='keyword'>static_cast</span>&lt;<span class='keyword'>double</span>&gt;(two_over_pi[j]);</td></tr>
+<tr><td class="num" id="LN75">75</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN76">76</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN77">77</td><td class="line">  <span class='keyword'>double</span> q[20];</td></tr>
+<tr><td class="num" id="LN78">78</td><td class="line">  <span class='keyword'>for</span> (<span class='keyword'>int</span> i = 0; i &lt;= jk; i++) {</td></tr>
+<tr><td class="num" id="LN79">79</td><td class="line">    fw = 0.0;</td></tr>
+<tr><td class="num" id="LN80">80</td><td class="line">    <span class='keyword'>for</span> (<span class='keyword'>int</span> j = 0; j &lt;= jx; j++) fw += x[j] * f[jx + i - j];</td></tr>
+<tr><td class="num" id="LN81">81</td><td class="line">    q[i] = fw;</td></tr>
+<tr><td class="num" id="LN82">82</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN83">83</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN84">84</td><td class="line">  int32_t jz = jk;</td></tr>
+<tr><td class="num" id="LN85">85</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN86">86</td><td class="line">recompute:</td></tr>
+<tr><td class="num" id="LN87">87</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN88">88</td><td class="line">  int32_t iq[20];</td></tr>
+<tr><td class="num" id="LN89">89</td><td class="line">  <span class='keyword'>double</span> z = q[jz];</td></tr>
+<tr><td class="num" id="LN90">90</td><td class="line">  <span class='keyword'>for</span> (<span class='keyword'>int</span> i = 0, j = jz; j &gt; 0; i++, j--) {</td></tr>
+<tr><td class="num" id="LN91">91</td><td class="line">    fw = <span class='keyword'>static_cast</span>&lt;<span class='keyword'>double</span>&gt;(<span class='keyword'>static_cast</span>&lt;int32_t&gt;(twon24 * z));</td></tr>
+<tr><td class="num" id="LN92">92</td><td class="line">    iq[i] = <span class='keyword'>static_cast</span>&lt;int32_t&gt;(z - two24 * fw);</td></tr>
+<tr><td class="num" id="LN93">93</td><td class="line">    z = q[j - 1] + fw;</td></tr>
+<tr><td class="num" id="LN94">94</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN95">95</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN96">96</td><td class="line">  z = scalbn(z, q0);</td></tr>
+<tr><td class="num" id="LN97">97</td><td class="line">  z -= 8.0 * std::floor(z * 0.125);</td></tr>
+<tr><td class="num" id="LN98">98</td><td class="line">  int32_t n = <span class='keyword'>static_cast</span>&lt;int32_t&gt;(z);</td></tr>
+<tr><td class="num" id="LN99">99</td><td class="line">  z -= <span class='keyword'>static_cast</span>&lt;<span class='keyword'>double</span>&gt;(n);</td></tr>
+<tr><td class="num" id="LN100">100</td><td class="line">  int32_t ih = 0;</td></tr>
+<tr><td class="num" id="LN101">101</td><td class="line">  <span class='keyword'>if</span> (q0 &gt; 0) {</td></tr>
+<tr><td class="num" id="LN102">102</td><td class="line">    int32_t i = (iq[jz - 1] &gt;&gt; (24 - q0));</td></tr>
+<tr><td class="num" id="LN103">103</td><td class="line">    n += i;</td></tr>
+<tr><td class="num" id="LN104">104</td><td class="line">    iq[jz - 1] -= i &lt;&lt; (24 - q0);</td></tr>
+<tr><td class="num" id="LN105">105</td><td class="line">    ih = iq[jz - 1] &gt;&gt; (23 - q0);</td></tr>
+<tr><td class="num" id="LN106">106</td><td class="line">  } <span class='keyword'>else</span> <span class='keyword'>if</span> (q0 == 0) {</td></tr>
+<tr><td class="num" id="LN107">107</td><td class="line">    ih = iq[jz - 1] &gt;&gt; 23;</td></tr>
+<tr><td class="num" id="LN108">108</td><td class="line">  } <span class='keyword'>else</span> <span class='keyword'>if</span> (z &gt;= 0.5) {</td></tr>
+<tr><td class="num" id="LN109">109</td><td class="line">    ih = 2;</td></tr>
+<tr><td class="num" id="LN110">110</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN111">111</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN112">112</td><td class="line">  <span class='keyword'>if</span> (ih &gt; 0) {</td></tr>
+<tr><td class="num" id="LN113">113</td><td class="line">    n += 1;</td></tr>
+<tr><td class="num" id="LN114">114</td><td class="line">    int32_t carry = 0;</td></tr>
+<tr><td class="num" id="LN115">115</td><td class="line">    <span class='keyword'>for</span> (<span class='keyword'>int</span> i = 0; i &lt; jz; i++) {</td></tr>
+<tr><td class="num" id="LN116">116</td><td class="line">      int32_t j = iq[i];</td></tr>
+<tr><td class="num" id="LN117">117</td><td class="line">      <span class='keyword'>if</span> (carry == 0) {</td></tr>
+<tr><td class="num" id="LN118">118</td><td class="line">        <span class='keyword'>if</span> (j != 0) {</td></tr>
+<tr><td class="num" id="LN119">119</td><td class="line">          carry = 1;</td></tr>
+<tr><td class="num" id="LN120">120</td><td class="line">          iq[i] = 0x1000000 - j;</td></tr>
+<tr><td class="num" id="LN121">121</td><td class="line">        }</td></tr>
+<tr><td class="num" id="LN122">122</td><td class="line">      } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN123">123</td><td class="line">        iq[i] = 0xffffff - j;</td></tr>
+<tr><td class="num" id="LN124">124</td><td class="line">      }</td></tr>
+<tr><td class="num" id="LN125">125</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN126">126</td><td class="line">    <span class='keyword'>if</span> (q0 == 1) {</td></tr>
+<tr><td class="num" id="LN127">127</td><td class="line">      iq[jz - 1] &amp;= 0x7fffff;</td></tr>
+<tr><td class="num" id="LN128">128</td><td class="line">    } <span class='keyword'>else</span> <span class='keyword'>if</span> (q0 == 2) {</td></tr>
+<tr><td class="num" id="LN129">129</td><td class="line">      iq[jz - 1] &amp;= 0x3fffff;</td></tr>
+<tr><td class="num" id="LN130">130</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN131">131</td><td class="line">    <span class='keyword'>if</span> (ih == 2) {</td></tr>
+<tr><td class="num" id="LN132">132</td><td class="line">      z = one - z;</td></tr>
+<tr><td class="num" id="LN133">133</td><td class="line">      <span class='keyword'>if</span> (carry != 0) z -= scalbn(one, q0);</td></tr>
+<tr><td class="num" id="LN134">134</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN135">135</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN136">136</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN137">137</td><td class="line">  <span class='keyword'>if</span> (z == zero) {</td></tr>
+<tr><td class="num" id="LN138">138</td><td class="line">    int32_t j = 0;</td></tr>
+<tr><td class="num" id="LN139">139</td><td class="line">    <span class='keyword'>for</span> (<span class='keyword'>int</span> i = jz - 1; i &gt;= jk; i--) j |= iq[i];</td></tr>
+<tr><td class="num" id="LN140">140</td><td class="line">    <span class='keyword'>if</span> (j == 0) {</td></tr>
+<tr><td class="num" id="LN141">141</td><td class="line">      int32_t k = 1;</td></tr>
+<tr><td class="num" id="LN142">142</td><td class="line">      <span class='keyword'>while</span> (iq[jk - k] == 0) k++;</td></tr>
+<tr><td class="num" id="LN143">143</td><td class="line">      <span class='keyword'>for</span> (<span class='keyword'>int</span> i = jz + 1; i &lt;= jz + k; i++) {</td></tr>
+<tr><td class="num" id="LN144">144</td><td class="line">        f[jx + i] = <span class='keyword'>static_cast</span>&lt;<span class='keyword'>double</span>&gt;(two_over_pi[jv + i]);</td></tr>
+<tr><td class="num" id="LN145">145</td><td class="line">        <span class='keyword'>for</span> (j = 0, fw = 0.0; j &lt;= jx; j++) fw += x[j] * f[jx + i - j];</td></tr>
+<tr><td class="num" id="LN146">146</td><td class="line">        q[i] = fw;</td></tr>
+<tr><td class="num" id="LN147">147</td><td class="line">      }</td></tr>
+<tr><td class="num" id="LN148">148</td><td class="line">      jz += k;</td></tr>
+<tr><td class="num" id="LN149">149</td><td class="line">      <span class='keyword'>goto</span> recompute;</td></tr>
+<tr><td class="num" id="LN150">150</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN151">151</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN152">152</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN153">153</td><td class="line">  <span class='keyword'>if</span> (z == 0.0) {</td></tr>
+<tr><td class="num" id="LN154">154</td><td class="line">    jz -= 1;</td></tr>
+<tr><td class="num" id="LN155">155</td><td class="line">    q0 -= 24;</td></tr>
+<tr><td class="num" id="LN156">156</td><td class="line">    <span class='keyword'>while</span> (iq[jz] == 0) {</td></tr>
+<tr><td class="num" id="LN157">157</td><td class="line">      jz--;</td></tr>
+<tr><td class="num" id="LN158">158</td><td class="line">      q0 -= 24;</td></tr>
+<tr><td class="num" id="LN159">159</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN160">160</td><td class="line">  } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN161">161</td><td class="line">    z = scalbn(z, -q0);</td></tr>
+<tr><td class="num" id="LN162">162</td><td class="line">    <span class='keyword'>if</span> (z &gt;= two24) {</td></tr>
+<tr><td class="num" id="LN163">163</td><td class="line">      fw = <span class='keyword'>static_cast</span>&lt;<span class='keyword'>double</span>&gt;(<span class='keyword'>static_cast</span>&lt;int32_t&gt;(twon24 * z));</td></tr>
+<tr><td class="num" id="LN164">164</td><td class="line">      iq[jz] = <span class='keyword'>static_cast</span>&lt;int32_t&gt;(z - two24 * fw);</td></tr>
+<tr><td class="num" id="LN165">165</td><td class="line">      jz += 1;</td></tr>
+<tr><td class="num" id="LN166">166</td><td class="line">      q0 += 24;</td></tr>
+<tr><td class="num" id="LN167">167</td><td class="line">      iq[jz] = <span class='keyword'>static_cast</span>&lt;int32_t&gt;(fw);</td></tr>
+<tr><td class="num" id="LN168">168</td><td class="line">    } <span class='keyword'>else</span> {</td></tr>
+<tr><td class="num" id="LN169">169</td><td class="line">      iq[jz] = <span class='keyword'>static_cast</span>&lt;int32_t&gt;(z);</td></tr>
+<tr><td class="num" id="LN170">170</td><td class="line">    }</td></tr>
+<tr><td class="num" id="LN171">171</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN172">172</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN173">173</td><td class="line">  fw = scalbn(one, q0);</td></tr>
+<tr><td class="num" id="LN174">174</td><td class="line">  <span class='keyword'>for</span> (<span class='keyword'>int</span> i = jz; i &gt;= 0; i--) {</td></tr>
+<tr><td class="num" id="LN175">175</td><td class="line">    q[i] = fw * <span class='keyword'>static_cast</span>&lt;<span class='keyword'>double</span>&gt;(iq[i]);</td></tr>
+<tr><td class="num" id="LN176">176</td><td class="line">    fw *= twon24;</td></tr>
+<tr><td class="num" id="LN177">177</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN178">178</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN179">179</td><td class="line">  <span class='keyword'>double</span> fq[20];</td></tr>
+<tr><td class="num" id="LN180">180</td><td class="line">  <span class='keyword'>for</span> (<span class='keyword'>int</span> i = jz; i &gt;= 0; i--) {</td></tr>
+<tr><td class="num" id="LN181">181</td><td class="line">    fw = 0.0;</td></tr>
+<tr><td class="num" id="LN182">182</td><td class="line">    <span class='keyword'>for</span> (<span class='keyword'>int</span> k = 0; k &lt;= jk &amp;&amp; k &lt;= jz - i; k++) fw += PIo2[k] * q[i + k];</td></tr>
+<tr><td class="num" id="LN183">183</td><td class="line">    fq[jz - i] = fw;</td></tr>
+<tr><td class="num" id="LN184">184</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN185">185</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN186">186</td><td class="line">  fw = 0.0;</td></tr>
+<tr><td class="num" id="LN187">187</td><td class="line">  <span class='keyword'>for</span> (<span class='keyword'>int</span> i = jz; i &gt;= 0; i--) fw += fq[i];</td></tr>
+<tr><td class="num" id="LN188">188</td><td class="line">  y[0] = (ih == 0) ? fw : -fw;</td></tr>
+<tr><td class="num" id="LN189">189</td><td class="line">  fw = fq[0] - fw;</td></tr>
+<tr><td class="num" id="LN190">190</td><td class="line">  <span class='keyword'>for</span> (<span class='keyword'>int</span> i = 1; i &lt;= jz; i++) fw += fq[i];</td></tr>
+<tr><td class="num" id="LN191">191</td><td class="line">  y[1] = (ih == 0) ? fw : -fw;</td></tr>
+<tr><td class="num" id="LN192">192</td><td class="line">  <span class='keyword'>return</span> n &amp; 7;</td></tr>
+<tr><td class="num" id="LN193">193</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN194">194</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN195">195</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN196">196</td><td class="line"><span class='keyword'>int</span> rempio2(<span class='keyword'>double</span> x, <span class='keyword'>double</span>* y) {</td></tr>
+<tr><td class="num" id="LN197">197</td><td class="line">  int32_t hx = <span class='keyword'>static_cast</span>&lt;int32_t&gt;(internal::double_to_uint64(x) &gt;&gt; 32);</td></tr>
+<tr><td class="num" id="LN198">198</td><td class="line">  int32_t ix = hx &amp; 0x7fffffff;</td></tr>
+<tr><td class="num" id="LN199">199</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN200">200</td><td class="line">  <span class='keyword'>if</span> (<span class="mrange">ix &gt;= 0x7ff00000</span>) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path1" class="msg msgEvent" style="margin-left:7ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexEvent">1</div></td><td>Assuming 'ix' is &lt; 2146435072</td><td><div class="PathNav"><a href="#Path2" title="Next event (2)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path2" class="msg msgControl" style="margin-left:3ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">2</div></td><td><div class="PathNav"><a href="#Path1" title="Previous event (1)">&#x2190;</a></div></td></td><td>Taking false branch</td><td><div class="PathNav"><a href="#Path3" title="Next event (3)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN201">201</td><td class="line">    *y = std::numeric_limits&lt;<span class='keyword'>double</span>&gt;::quiet_NaN();</td></tr>
+<tr><td class="num" id="LN202">202</td><td class="line">    <span class='keyword'>return</span> 0;</td></tr>
+<tr><td class="num" id="LN203">203</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN204">204</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN205">205</td><td class="line">  int32_t e0 = (ix &gt;&gt; 20) - 1046;</td></tr>
+<tr><td class="num" id="LN206">206</td><td class="line">  uint64_t zi = internal::double_to_uint64(x) &amp; 0xFFFFFFFFu;</td></tr>
+<tr><td class="num" id="LN207">207</td><td class="line">  zi |= <span class='keyword'>static_cast</span>&lt;uint64_t&gt;(ix - (e0 &lt;&lt; 20)) &lt;&lt; 32;</td></tr>
+<tr><td class="num" id="LN208">208</td><td class="line">  <span class='keyword'>double</span> z = internal::uint64_to_double(zi);</td></tr>
+<tr><td class="num" id="LN209">209</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN210">210</td><td class="line">  <span class='keyword'>double</span> tx[3];</td></tr>
+<tr><td class="num" id="LN211">211</td><td class="line">  <span class='keyword'>for</span> (<span class='keyword'>int</span> i = 0; i &lt; 2; i++) {</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path3" class="msg msgControl" style="margin-left:3ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">3</div></td><td><div class="PathNav"><a href="#Path2" title="Previous event (2)">&#x2190;</a></div></td></td><td>Loop condition is true.  Entering loop body</td><td><div class="PathNav"><a href="#Path4" title="Next event (4)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path4" class="msg msgControl" style="margin-left:3ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">4</div></td><td><div class="PathNav"><a href="#Path3" title="Previous event (3)">&#x2190;</a></div></td></td><td>Loop condition is true.  Entering loop body</td><td><div class="PathNav"><a href="#Path5" title="Next event (5)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path5" class="msg msgControl" style="margin-left:3ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">5</div></td><td><div class="PathNav"><a href="#Path4" title="Previous event (4)">&#x2190;</a></div></td></td><td>Loop condition is false. Execution continues on line 215</td><td><div class="PathNav"><a href="#Path6" title="Next event (6)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num" id="LN212">212</td><td class="line">    tx[i] = <span class='keyword'>static_cast</span>&lt;<span class='keyword'>double</span>&gt;(<span class='keyword'>static_cast</span>&lt;int32_t&gt;(z));</td></tr>
+<tr><td class="num" id="LN213">213</td><td class="line">    z = (z - tx[i]) * two24;</td></tr>
+<tr><td class="num" id="LN214">214</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN215">215</td><td class="line">  tx[2] = z;</td></tr>
+<tr><td class="num" id="LN216">216</td><td class="line"> </td></tr>
+<tr><td class="num" id="LN217">217</td><td class="line">  <span class='keyword'>int</span> nx = 3;</td></tr>
+<tr><td class="num" id="LN218">218</td><td class="line">  <span class='keyword'>while</span> (<span class="mrange">tx[nx - 1]</span> == zero) nx--;</td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path6" class="msg msgControl" style="margin-left:3ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">6</div></td><td><div class="PathNav"><a href="#Path5" title="Previous event (5)">&#x2190;</a></div></td></td><td>Loop condition is true.  Entering loop body</td><td><div class="PathNav"><a href="#Path7" title="Next event (7)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path7" class="msg msgControl" style="margin-left:3ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">7</div></td><td><div class="PathNav"><a href="#Path6" title="Previous event (6)">&#x2190;</a></div></td></td><td>Loop condition is true.  Entering loop body</td><td><div class="PathNav"><a href="#Path8" title="Next event (8)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="Path8" class="msg msgControl" style="margin-left:3ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexControl">8</div></td><td><div class="PathNav"><a href="#Path7" title="Previous event (7)">&#x2190;</a></div></td></td><td>Loop condition is true.  Entering loop body</td><td><div class="PathNav"><a href="#EndPath" title="Next event (9)">&#x2192;</a></div></td></tr></table></div></td></tr>
+<tr><td class="num"></td><td class="line"><div id="EndPath" class="msg msgEvent" style="margin-left:21ex"><table class="msgT"><tr><td valign="top"><div class="PathIndex PathIndexEvent">9</div></td><td><div class="PathNav"><a href="#Path8" title="Previous event (8)">&#x2190;</a></div></td></td><td>The left operand of '==' is a garbage value</td></tr></table></div></td></tr>
+<tr><td class="num" id="LN219">219</td><td class="line">  <span class='keyword'>int</span> n = __kernel_rem_pio2(tx, y, e0, nx);</td></tr>
+<tr><td class="num" id="LN220">220</td><td class="line">  <span class='keyword'>if</span> (hx &lt; 0) {</td></tr>
+<tr><td class="num" id="LN221">221</td><td class="line">    y[0] = -y[0];</td></tr>
+<tr><td class="num" id="LN222">222</td><td class="line">    y[1] = -y[1];</td></tr>
+<tr><td class="num" id="LN223">223</td><td class="line">    <span class='keyword'>return</span> -n;</td></tr>
+<tr><td class="num" id="LN224">224</td><td class="line">  }</td></tr>
+<tr><td class="num" id="LN225">225</td><td class="line">  <span class='keyword'>return</span> n;</td></tr>
+<tr><td class="num" id="LN226">226</td><td class="line">}</td></tr>
+<tr><td class="num" id="LN227">227</td><td class="line">}  <span class='comment'>// namespace internal</span></td></tr>
+<tr><td class="num" id="LN228">228</td><td class="line">}  <span class='comment'>// namespace v8</span></td></tr>
+</table></body></html>
